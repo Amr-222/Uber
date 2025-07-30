@@ -1,8 +1,8 @@
-﻿using DAL.Repo.Abstraction;
+﻿using Uber.DAL.Repo.Abstraction;
 using Uber.DAL.DataBase;
 
 
-namespace DAL.Repo.Impelementation
+namespace User.DAL.Repo.Impelementation
 {
     public class UserRepo : IUserRepo
     {

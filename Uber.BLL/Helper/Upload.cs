@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 
 
-namespace BLL.Helper
+namespace Uber.BLL.Helper
 {
     public static class Upload
     {

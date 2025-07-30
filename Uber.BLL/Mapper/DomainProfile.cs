@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace BLL.Mapper
+namespace Uber.BLL.Mapper
 {
     public class DomainProfile : Profile
     {

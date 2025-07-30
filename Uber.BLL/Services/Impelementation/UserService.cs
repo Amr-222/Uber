@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using DAL.Repo.Abstraction;
+using Uber.DAL.Repo.Abstraction;
 
-namespace BLLUber.Services.Impelementation
+namespace Uber.BLL.Services.Impelementation
 {
     public class UserServices
     {

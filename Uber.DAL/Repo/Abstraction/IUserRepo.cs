@@ -1,5 +1,5 @@
 ﻿
-namespace DAL.Repo.Abstraction
+namespace Uber.DAL.Repo.Abstraction
 {
     public interface IUserRepo
     {

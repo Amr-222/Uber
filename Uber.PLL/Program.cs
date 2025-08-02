@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Uber.DAL.DataBase;
+using Uber.DAL.Entities;
 
 namespace Uber.PLL
 {
@@ -18,6 +21,17 @@ namespace Uber.PLL
             builder.Services.AddDbContext<UberDBContext>(options =>
             options.UseSqlServer(connectionString));
 
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+            options =>
+            {
+                options.LoginPath = new PathString("/Account/Login");
+                options.AccessDeniedPath = new PathString("/Account/Login");
+            });
+
+            builder.Services.AddIdentityCore<UserIdentity>(options => options.SignIn.RequireConfirmedAccount = true)
+                    .AddEntityFrameworkStores<UberDBContext>()
+                    .AddTokenProvider<DataProtectorTokenProvider<UserIdentity>>(TokenOptions.DefaultProvider);
 
             var app = builder.Build();
 
@@ -33,6 +47,8 @@ namespace Uber.PLL
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthorization();
 
             app.UseAuthorization();
 

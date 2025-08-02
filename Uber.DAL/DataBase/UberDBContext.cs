@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace Uber.DAL.DataBase
 {
-    public class UberDBContext : DbContext
+    public class UberDBContext : IdentityDbContext<User>
     {
 
 

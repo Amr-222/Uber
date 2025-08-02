@@ -1,6 +1,6 @@
 ﻿namespace Uber.DAL.Entities
 {
-    public class Driver
+    public class Driver : UserIdentity
     {
         public Driver() { }
 

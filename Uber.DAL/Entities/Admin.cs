@@ -1,6 +1,6 @@
 ﻿namespace Uber.DAL.Entities
 {
-    public class User : UserIdentity
+    public class Admin : IdentityUser
     {
     }
 }

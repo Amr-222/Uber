@@ -2,6 +2,8 @@
 {
     public enum VehicleType
     {
-
+        Car,
+        Comfort,
+        Motocycle
     }
 }

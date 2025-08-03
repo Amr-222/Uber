@@ -1,6 +1,7 @@
 ﻿namespace Uber.DAL.Entities
 {
-    public class Admin : IdentityUser
+    public class Admin : AppUser
     {
+        // TODO: Add everything
     }
 }

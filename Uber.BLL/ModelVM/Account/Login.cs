@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Uber.DAL.Entities
+namespace Uber.BLL.ModelVM.Account
 {
-    public class UserIdentity
+    internal class Login
     {
     }
 }

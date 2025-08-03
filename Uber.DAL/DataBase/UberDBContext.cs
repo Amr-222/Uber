@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Uber.DAL.Entities;
 
 namespace Uber.DAL.DataBase
 {
-    public class UberDBContext : IdentityDbContext<User>
+    public class UberDBContext : IdentityDbContext<AppUser>
     {
 
 
@@ -18,6 +19,6 @@ namespace Uber.DAL.DataBase
         //    optionsBuilder.UseSqlServer("Server=.;Database=;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true");
         //}
 
-     //   public DbSet<Employee> Employees { get; set; }
+        public DbSet<Customer> Customers { get; set; }
     }
 }

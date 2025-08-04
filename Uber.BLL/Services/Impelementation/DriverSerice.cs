@@ -1,29 +1,34 @@
 ﻿using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Uber.BLL.Helper;
-using Uber.BLL.ModelVM.User;
-using Uber.BLL.Services.Abstraction;
+using Uber.BLL.ModelVM.Driver;
 using Uber.DAL.Entities;
 using Uber.DAL.Repo.Abstraction;
+
 namespace Uber.BLL.Services.Impelementation
 {
-    public class UserService : IUserService
+    public class DriverService
     {
         private readonly IMapper mapper;
-        private readonly IUserRepo userRepo;
+        private readonly IDriverRepo driverRepo;
 
-        public UserService(IUserRepo _userRepo, IMapper _mapper)
+        public DriverService(IDriverRepo _driverRepo, IMapper _mapper)
         {
-            this.userRepo = _userRepo;
+            this.driverRepo = _driverRepo;
             mapper = _mapper;
         }
 
-        public (bool, string?) Create(CreateUser user)
+        public (bool, string?) Create(CreateDriver driver)
         {
             try
             {
-                var cust = mapper.Map<DAL.Entities.User>(user);
-                cust.AddProfilePhoto(Upload.UploadFile("Files", user.File));
-                var result = userRepo.Create(cust);
+                var driv = mapper.Map<Driver>(driver);
+                driv.AddProfilePhoto(Upload.UploadFile("Files", driver.File));
+                var result = driverRepo.Create(driv);
                 return result;
             }
             catch (Exception ex)
@@ -36,7 +41,7 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                var result = userRepo.Delete(id);
+                var result = driverRepo.Delete(id);
                 return result;
             }
             catch (Exception ex)
@@ -44,5 +49,14 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
+
+
+
+
+
+
+
+
+
     }
 }

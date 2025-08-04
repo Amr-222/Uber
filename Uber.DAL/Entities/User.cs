@@ -46,15 +46,6 @@ namespace Uber.DAL.Entities
 
 
 
-
-
-
-
-
-
-
-
-
         //public (bool, string) Create()
         //{
 

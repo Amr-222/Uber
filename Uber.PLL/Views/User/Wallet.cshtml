@@ -1,0 +1,11 @@
+﻿<h2>Request a Ride</h2>
+<form asp-action="Request" method="post">
+    <input class="form-control mb-2" name="Pickup" placeholder="Pickup Location" required />
+    <input class="form-control mb-2" name="Dropoff" placeholder="Dropoff Location" required />
+    <select class="form-select mb-2" name="VehicleType">
+        <option value="1">Standard</option>
+        <option value="2">Luxury</option>
+        <option value="3">SUV</option>
+    </select>
+    <button class="btn btn-success">Request Ride</button>
+</form>

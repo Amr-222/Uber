@@ -1,8 +1,170 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background: #fff;
+        color: #000;
+    }
+
+    header {
+        background: #000;
+        color: #fff;
+        padding: 20px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+        .nav-left h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .nav-left a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+    .nav-right a {
+        margin-left: 20px;
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .nav-right .signup-btn {
+        background: #fff;
+        color: #000;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+    }
+
+    .main {
+        display: flex;
+        justify-content: space-between;
+        padding: 50px;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .form-section {
+        max-width: 400px;
+    }
+
+        .form-section h1 {
+            font-size: 40px;
+            margin-bottom: 30px;
+        }
+
+        .form-section input,
+        .form-section select,
+        .form-section button {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        .form-section button {
+            background: #000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+    .image-section img {
+        width: 500px;
+        max-width: 100%;
+        border-radius: 10px;
+    }
+
+    .suggestions {
+        padding: 40px 50px;
+    }
+
+        .suggestions h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+    .cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .card {
+        flex: 1;
+        min-width: 250px;
+        padding: 20px;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+        .card h3 {
+            margin-bottom: 10px;
+        }
+</style>
+
+<header>
+    <div class="nav-left">
+        <h1>Uber</h1>
+        <a href="#">Ride</a>
+        <a href="#">Drive</a>
+       
+    </div>
+    <div class="nav-right">
+        <a asp-controller="Account" asp-action="ChooseLoginType">Log in</a>
+        <a asp-controller="Account" asp-action="ChooseRegisterType" class="signup-btn">Sign up</a>
+    </div>
+
+</header>
+
+<div class="main">
+    <div class="form-section">
+        <h1>Go anywhere with Uber</h1>
+        <input type="text" placeholder="Pickup location">
+        <input type="text" placeholder="Dropoff location">
+        <input type="date">
+        <select>
+            <option>Now</option>
+            <option>Schedule</option>
+        </select>
+        <button>See prices</button>
+    </div>
+    <div class="image-section">
+        <img src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_552,w_552/v1712926828/assets/a3/cf8564-e2a6-418c-b9b0-65dd285c100b/original/3-2-ridesharing-new.jpg" alt="Uber Image">
+    </div>
+</div>
+
+<div class="suggestions">
+    <h2>Suggestions</h2>
+    <div class="cards">
+        <div class="card">
+            <h3>Ride</h3>
+            <p>Go anywhere with Uber. Request a ride in just a few taps.</p>
+        </div>
+        <div class="card">
+            <h3>Reserve</h3>
+            <p>Reserve your ride in advance so you’re ready to go.</p>
+        </div>
+        <div class="card">
+            <h3>Intercity</h3>
+            <p>Get convenient, affordable travel between cities.</p>
+        </div>
+    </div>
 </div>

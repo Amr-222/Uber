@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Uber.BLL.ModelVM.Account
 {
-    internal class Login
+    public class Login
     {
     }
 }

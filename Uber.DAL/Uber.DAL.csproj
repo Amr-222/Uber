@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Remove="Repo\Abstraction\UserRepo.cs" />
+    <Compile Remove="Repo\Implementation\IDriverRepo.cs" />
   </ItemGroup>
 
   <ItemGroup>

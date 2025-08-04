@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-
+using Uber.DAL.Entities;
 namespace Uber.DAL.DataBase
 {
     public class UberDBContext : DbContext
@@ -17,6 +17,7 @@ namespace Uber.DAL.DataBase
         //    optionsBuilder.UseSqlServer("Server=.;Database=;Trusted_Connection=True;MultipleActiveResultSets=true;TrustServerCertificate=true");
         //}
 
-     //   public DbSet<Employee> Employees { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Driver> Drivers { get; set; }
     }
 }

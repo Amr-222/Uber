@@ -10,7 +10,17 @@ namespace Uber.DAL.Entities
         public string Name { get; protected set; }
 
         public Gender Gender { get; protected set; }
-        public int Age { get; protected set; }
+
+        public int Age()
+        {
+            var today = DateTime.Today;
+            int age = today.Year - DateOfBirth.Year;
+
+            if (DateOfBirth.Date > today.AddYears(-age))
+                age--;
+
+            return age;
+        }
         public DateTime DateOfBirth { get; protected set; }
 
         public bool IsDeleted { get; protected set; } = false;

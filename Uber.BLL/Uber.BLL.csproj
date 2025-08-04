@@ -10,6 +10,7 @@
     <None Remove="Helper\NewFile1.txt" />
     <None Remove="Helper\U" />
     <None Remove="Mapper\NewFile1.txt" />
+    <None Remove="ModelVM\Driver\NewFile1.txt" />
     <None Remove="Services\Abstraction\NewFile1.txt" />
     <None Remove="Services\Impelementation\NewFile1.txt" />
   </ItemGroup>
@@ -22,10 +23,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Uber.DAL\Uber.DAL.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ModelVM\" />
   </ItemGroup>
 
 </Project>

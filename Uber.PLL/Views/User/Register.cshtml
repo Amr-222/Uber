@@ -1,7 +1,71 @@
-﻿<h2>User Registration</h2>
-<form asp-action="Register" method="post">
-    <input class="form-control mb-2" name="Name" placeholder="Full Name" required />
-    <input class="form-control mb-2" name="Email" placeholder="Email" type="email" required />
-    <input class="form-control mb-2" name="Password" placeholder="Password" type="password" required />
-    <button class="btn btn-success">Register</button>
-</form>
+@{
+    ViewData["Title"] = "Register as Rider";
+}
+
+<style>
+    .register-container {
+        max-width: 500px;
+        margin: 60px auto;
+        padding: 40px;
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        font-family: 'Inter', sans-serif;
+    }
+
+        .register-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .register-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .register-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .register-container button {
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .register-container button:hover {
+                background-color: #222;
+            }
+</style>
+
+<div class="register-container">
+    <h2>Register as Rider</h2>
+    <form asp-action="RegisterUser" method="post">
+        <label>Name</label>
+        <input type="text" name="Name" required />
+
+        <label>Email</label>
+        <input type="email" name="Email" required />
+
+        <label>Password</label>
+        <input type="password" name="Password" required />
+
+        <button type="submit">Register</button>
+    </form>
+</div>

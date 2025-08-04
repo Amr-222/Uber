@@ -1,6 +1,86 @@
-﻿<h2>User Login</h2>
-<form asp-action="Login" method="post">
-    <input class="form-control mb-2" name="Email" placeholder="Email" required />
-    <input class="form-control mb-2" name="Password" placeholder="Password" type="password" required />
-    <button class="btn btn-primary">Login</button>
-</form>
+@{
+    ViewData["Title"] = "Login";
+}
+
+<style>
+    .login-container {
+        max-width: 400px;
+        margin: 60px auto;
+        padding: 40px;
+        background-color: #f9f9f9;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        font-family: 'Inter', sans-serif;
+    }
+
+        .login-container h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            color: #111;
+        }
+
+        .login-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .login-container button {
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .login-container button:hover {
+                background-color: #222;
+            }
+
+        .login-container .forgot-link {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #555;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+            .login-container .forgot-link:hover {
+                color: #000;
+                text-decoration: underline;
+            }
+</style>
+
+<div class="login-container">
+    <h2>Login as @ViewBag.Role</h2>
+    <form asp-action="Login" method="post">
+        <input type="hidden" name="Role" value="@ViewBag.Role" />
+
+        <label>Email</label>
+        <input type="email" name="Email" required />
+
+        <label>Password</label>
+        <input type="password" name="Password" required />
+
+        <button type="submit">Login</button>
+    </form>
+
+    <a asp-action="ForgotPassword" class="forgot-link">Forgot Password?</a>
+</div>

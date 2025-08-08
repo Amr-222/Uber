@@ -20,13 +20,13 @@ namespace Uber.DAL.Entities
 
         public Driver() { }
 
-        public Driver(string name, Gender gender, DateTime DateOfBirth, string? ImagePath, string street, string city)
+        public Driver(string name, Gender gender, DateTime DateOfBirth, string? ImagePath/*, string street, string city*/)
         {
             this.Name = name;
             this.Gender = gender;     
             this.DateOfBirth = DateOfBirth;
             this.ImagePath = ImagePath;
-            this.Address = new Location { Street = street, City = city };
+            //this.Address = new Location { Street = street, City = city };
 
         }
 
@@ -38,7 +38,7 @@ namespace Uber.DAL.Entities
         public Wallet Wallet { get; set; }
 
 
-        public int RideId { get; set; }
+      
 
         public List<Ride> Rides { get; set; }
 
@@ -67,14 +67,14 @@ namespace Uber.DAL.Entities
         }
 
 
-        public (bool, string?) Edit(string name,DateTime dateofbirth,string? imagepath, Location address)
+        public (bool, string?) Edit(string name,DateTime dateofbirth,string? imagepath/*, Location address*/)
         {
             try
             {
                 this.Name = name;
                 this.DateOfBirth = dateofbirth;
                 this.ImagePath = imagepath;
-                this.Address = address;
+                //this.Address = address;
                 ModifiedAt = DateTime.Now;
                 return (true, null);
             }

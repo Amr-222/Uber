@@ -8,12 +8,13 @@ namespace Uber.DAL.Entities
 
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; }
+        public int Id { get; private set; }
 
       
 
-        public Location From { get; set; }
-        public Location To { get; set; }
+        //public Location From { get; set; }
+        //public Location To { get; set; }
+
         public DateTime Date { get; set; } = DateTime.Now;
 
         public int Rate {  get; set; }

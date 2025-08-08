@@ -48,11 +48,13 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
+                //
+                return (true,null);
 
             }
-            catch (Exeption ex)
+            catch (Exception ex)
             {
-
+                return (false, ex.Message);
             }
         }
     }

@@ -32,8 +32,8 @@ namespace Uber.PLL
             .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
             options =>
             {
-                options.LoginPath = new PathString("/Account/Login");
-                options.AccessDeniedPath = new PathString("/Account/Login");
+                options.LoginPath = new PathString("/Account/ChooseLoginType");
+                options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
             });
 
             builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)

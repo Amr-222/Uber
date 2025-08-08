@@ -37,7 +37,7 @@ namespace Uber.DAL.DataBase
                 .HasOne(r => r.User)
                 .WithMany(u => u.Rides)
                 .HasForeignKey(r => r.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

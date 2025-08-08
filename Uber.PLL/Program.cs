@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Uber.DAL.DataBase;
 using Uber.DAL.Entities;
-using Uber.PLL.Stripe;
 
 namespace Uber.PLL
 {
@@ -24,8 +23,8 @@ namespace Uber.PLL
             options.UseSqlServer(connectionString));
 
             // Stripe
-            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
-            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+            var stripeSettings = builder.Configuration.GetSection("Stripe");
+            StripeConfiguration.ApiKey = stripeSettings["SecretKey"];
 
             // Identity
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

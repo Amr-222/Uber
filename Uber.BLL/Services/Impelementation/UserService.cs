@@ -44,5 +44,16 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
+        public (bool, string?) Edit(EditUser user)
+        {
+            try
+            {
+
+            }
+            catch (Exeption ex)
+            {
+
+            }
+        }
     }
 }

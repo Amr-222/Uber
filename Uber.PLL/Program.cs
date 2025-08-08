@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 using Uber.DAL.DataBase;
 using Uber.DAL.Entities;
+using Uber.PLL.Stripe;
 
 namespace Uber.PLL
 {
@@ -20,6 +22,10 @@ namespace Uber.PLL
 
             builder.Services.AddDbContext<UberDBContext>(options =>
             options.UseSqlServer(connectionString));
+
+            // Stripe
+            builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
+            StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 
             // Identity
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

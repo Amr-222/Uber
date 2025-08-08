@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MVCDay3.Models;
 using Newtonsoft.Json.Linq;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace MVCDay3.Controllers
 {

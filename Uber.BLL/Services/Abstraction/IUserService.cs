@@ -5,8 +5,8 @@ namespace Uber.BLL.Services.Abstraction
     public interface IUserService
     {
         public (bool, string?) Create(CreateUser user);
-        (bool, string?) Delete(string id);
-        //(bool, string?) Update(EmployeeDTO employee);
+        public (bool, string?) Delete(string id);
+        public (bool, string?) Edit(EditUser user);
         //(string?, EmployeeDTO?) GetByID(int id);
         //List<Employee> GetAll();
     }

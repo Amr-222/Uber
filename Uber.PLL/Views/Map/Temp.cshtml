@@ -1,0 +1,85 @@
+﻿<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
+<div id="map" style="height: 500px; width: 100%;"></div>
+
+<script>
+    let map = L.map('map').setView([40.7128, -74.0060], 12); // NYC default
+
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    let startMarker, endMarker, routeLayer;
+    let clickCount = 0;
+    let startCoords, endCoords;
+
+    // Add search box
+    L.Control.geocoder({
+        defaultMarkGeocode: false
+    })
+    .on('markgeocode', function(e) {
+        let latlng = e.geocode.center;
+        map.setView(latlng, 14);
+
+        // Treat search result as if user clicked
+        handleMapClick(latlng);
+    })
+    .addTo(map);
+
+    // Also allow normal clicking
+    map.on('click', function (e) {
+        handleMapClick(e.latlng);
+    });
+
+    function handleMapClick(latlng) {
+        clickCount++;
+
+        if (clickCount === 1) {
+            if (startMarker) map.removeLayer(startMarker);
+            startCoords = latlng;
+            startMarker = L.marker(startCoords, { draggable: true }).addTo(map)
+                .bindPopup("Start Location").openPopup();
+        }
+        else if (clickCount === 2) {
+            if (endMarker) map.removeLayer(endMarker);
+            endCoords = latlng;
+            endMarker = L.marker(endCoords, { draggable: true }).addTo(map)
+                .bindPopup("Destination").openPopup();
+
+            // Send to backend for route
+            fetch('/Home/GetRoute', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    startLat: startCoords.lat,
+                    startLng: startCoords.lng,
+                    endLat: endCoords.lat,
+                    endLng: endCoords.lng
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (routeLayer) map.removeLayer(routeLayer);
+                if (data.coordinates) {
+                    routeLayer = L.polyline(data.coordinates, { color: 'blue', weight: 5 }).addTo(map);
+                    map.fitBounds(routeLayer.getBounds());
+                    alert(`Distance: ${data.distance}, Time: ${data.time}`);
+                } else {
+                    alert("No route found");
+                }
+            });
+        }
+        else {
+            clickCount = 0;
+            if (startMarker) map.removeLayer(startMarker);
+            if (endMarker) map.removeLayer(endMarker);
+            if (routeLayer) map.removeLayer(routeLayer);
+        }
+    }
+</script>

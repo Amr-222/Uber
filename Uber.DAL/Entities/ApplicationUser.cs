@@ -27,7 +27,7 @@ namespace Uber.DAL.Entities
         public DateTime CreatedAt { get; } = DateTime.Now;
         public string? ImagePath { get; protected set; }
 
-        public Location Address { get; protected set; }
+        //public Location Address { get; protected set; }
 
     }
 }

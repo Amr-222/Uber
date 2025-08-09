@@ -17,11 +17,11 @@ namespace Uber.PLL.Controllers
 
         public async Task<IActionResult> Dashboard()
         {
-            var riders = await _context.Users.ToListAsync();
-            var drivers = await _context.Drivers.ToListAsync();
-            ViewBag.Riders = riders;
-            ViewBag.Drivers = drivers;
-            return View();
+            //var riders = await _context.Users.ToListAsync();
+            //var drivers = await _context.Drivers.ToListAsync();
+            //ViewBag.Riders = riders;
+            //ViewBag.Drivers = drivers;
+            return View("AdminDashBoard");
         }
 
         // --- Users ---

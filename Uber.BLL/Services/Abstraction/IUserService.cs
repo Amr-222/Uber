@@ -1,4 +1,5 @@
 ﻿using Uber.BLL.ModelVM.User;
+using Uber.DAL.Entities;
 
 namespace Uber.BLL.Services.Abstraction
 {
@@ -7,7 +8,7 @@ namespace Uber.BLL.Services.Abstraction
         public (bool, string?) Create(CreateUser user);
         public (bool, string?) Delete(string id);
         public (bool, string?) Edit(EditUser user);
-        //(string?, EmployeeDTO?) GetByID(int id);
-        //List<Employee> GetAll();
+        public (string?, User?) GetByID(string id); // TODO Change this
+        public List<User> GetAll();
     }
 }

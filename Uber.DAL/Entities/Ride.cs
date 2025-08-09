@@ -23,8 +23,19 @@ namespace Uber.DAL.Entities
         public Driver Driver { get; set; }
         public string UserId { get; set; }
         public User User { get; set; }
-
-
+        public bool IsCanceld { get; set; }
+        public (bool, string?) Cancel()
+        {
+            try
+            {
+                IsCanceld = true;
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
 
 
 

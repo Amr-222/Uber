@@ -3,11 +3,14 @@ using Newtonsoft.Json.Linq;
 
 namespace MVCDay3.Controllers
 {
-    public class TempForMap : Controller
+    public class MapController : Controller
     {
 
         private readonly string orsApiKey = "eyJvcmciOiI1YjNjZTM1OTc4NTExMTAwMDFjZjYyNDgiLCJpZCI6Ijc3MWY5NzUwNmI4ODQ3ZTBhZjllNjgxYjk2MjVlOTRmIiwiaCI6Im11cm11cjY0In0=";
-
+        public IActionResult Temp()
+        {
+            return View();
+        }
         [HttpPost]
         public async Task<IActionResult> GetRoute([FromBody] RouteRequest request)
         {

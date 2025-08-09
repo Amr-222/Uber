@@ -1,4 +1,5 @@
-﻿using Uber.DAL.Enums;
+﻿using System.Runtime.CompilerServices;
+using Uber.DAL.Enums;
 
 namespace Uber.DAL.Entities
 {
@@ -66,7 +67,7 @@ namespace Uber.DAL.Entities
 
 
 
-
+        
         public (bool, string?) Edit(string name, DateTime dateofbirth, string? imagepath/*, Location address*/)
         {
             try

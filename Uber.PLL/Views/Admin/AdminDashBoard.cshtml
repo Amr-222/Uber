@@ -6,12 +6,13 @@
 
 <style>
     body {
-        background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+        background: #FFFFFF;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     h1 {
         font-weight: bold;
+        color: #1CB5A3;
         text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
     }
 
@@ -30,6 +31,8 @@
         font-size: 1.2rem;
         font-weight: bold;
         letter-spacing: 0.5px;
+        background-color: #1CB5A3;
+        color: white !important;
     }
 
     table {
@@ -69,27 +72,15 @@
             background-color: #b02a37;
         }
 </style>
-<style>
-    /* Rider header color */
-    .bg-rider {
-        background-color: #1F3B78 !important;
-        color: white !important;
-    }
 
-    /* Driver header color */
-    .bg-driver {
-        background-color: #1CB5A3 !important;
-        color: white !important;
-    }
-</style>
 <div class="container mt-4">
-    <h1 class="mb-4 text-center text-primary">Admin Dashboard</h1>
+    <h1 class="mb-4 text-center">Admin Dashboard</h1>
 
     <div class="row g-4">
         <!-- Riders Table -->
         <div class="col-md-6">
             <div class="card shadow-lg">
-                <div class="card-header bg-rider">
+                <div class="card-header">
                     <h4>Riders</h4>
                 </div>
                 <div class="card-body">
@@ -125,7 +116,7 @@
         <!-- Drivers Table -->
         <div class="col-md-6">
             <div class="card shadow-lg">
-                <div class="card-header bg-driver">
+                <div class="card-header">
                     <h4>Drivers</h4>
                 </div>
                 <div class="card-body">

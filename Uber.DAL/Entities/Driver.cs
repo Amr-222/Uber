@@ -11,8 +11,8 @@ namespace Uber.DAL.Entities
     
 
 
-
-
+        
+         
         public int TotalRatingPoints { get; private set; } // the total points of all the people who rated this person
                                                            // (ex: this person was rated twice as 3 and 5 stars then the points will be 8)
         public int TotalRatings { get; private set; } // Total number of people who rated this person

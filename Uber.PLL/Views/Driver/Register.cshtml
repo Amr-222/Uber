@@ -27,13 +27,23 @@
             color: #333;
         }
 
-        .register-container input {
+        .register-container input[type="text"],
+        .register-container input[type="email"],
+        .register-container input[type="password"],
+        .register-container input[type="file"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 16px;
+        }
+
+        .register-container .car-type-options label {
+            display: inline-block;
+            margin-right: 15px;
+            font-weight: 500;
+            cursor: pointer;
         }
 
         .register-container button {
@@ -56,7 +66,8 @@
 
 <div class="register-container">
     <h2>Register as Driver</h2>
-    <form asp-action="RegisterDriver" method="post">
+    <form asp-action="RegisterDriver" method="post" enctype="multipart/form-data">
+
         <label>Name</label>
         <input type="text" name="Name" required />
 
@@ -66,9 +77,18 @@
         <label>Password</label>
         <input type="password" name="Password" required />
 
-        <label>Car Type</label>
-        <input type="text" name="CarType" required />
+        <label>Car Model</label>
+        <input type="text" name="CarModel" required />
 
+        <label>Car Type</label>
+        <div class="car-type-options">
+            <label><input type="radio" name="CarType" value="Driver" required /> Driver</label>
+            <label><input type="radio" name="CarType" value="Taxi" /> Taxi</label>
+            <label><input type="radio" name="CarType" value="Scooter" /> Scooter</label>
+        </div>
+
+        <label>Upload Photo</label>
+        <input type="file" name="Photo" accept="image/*" required />
 
         <button type="submit">Register</button>
     </form>

@@ -34,6 +34,28 @@ namespace Uber.DAL.Entities
 
 
 
+        public string Get_Type() {
+
+            switch (Type)
+            {
+                case VehicleType.Car:
+                    return "Car";
+                    break;
+                case VehicleType.Scooter:
+                    return "Scooter";
+                    break;
+                    case VehicleType.Shuttle:
+                    return "Shuttle";
+                    break;
+
+                default:
+                    return "";
+                    break;
+
+            }
+
+        }
+
         public Vehicle() { }
 
         public Vehicle(string brand, string model, int year, string plate, string color, int seatingCapacity, VehicleType type, Transmission transmission, VehicleEngine vehicleEngine)

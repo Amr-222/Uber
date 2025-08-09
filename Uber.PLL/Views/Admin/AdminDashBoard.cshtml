@@ -1,0 +1,151 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    body {
+        background: linear-gradient(to right, #e0f7fa, #f1f8e9);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1 {
+        font-weight: bold;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+    .card-header {
+        font-size: 1.2rem;
+        font-weight: bold;
+        letter-spacing: 0.5px;
+    }
+
+    table {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    thead {
+        background-color: #f8f9fa;
+    }
+
+    tbody tr:hover {
+        background-color: rgba(0, 123, 255, 0.05);
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 500;
+    }
+
+    .btn-warning {
+        background-color: #ffc107;
+        border: none;
+    }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+
+        .btn-danger:hover {
+            background-color: #b02a37;
+        }
+</style>
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-center text-primary">Admin Dashboard</h1>
+
+    <div class="row g-4">
+        <!-- Riders Table -->
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4>Riders</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var rider in ViewBag.Riders)
+                            {
+                                <tr>
+                                    <td>@rider.Id</td>
+                                    <td>@rider.Name</td>
+                                    <td>@rider.Email</td>
+                                    <td>
+                                        <a href="/Admin/EditUser/@rider.Id" class="btn btn-warning btn-sm">Edit</a>
+                                        <a href="/Admin/DeleteUser/@rider.Id" class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Are you sure you want to delete this rider?');">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drivers Table -->
+        <div class="col-md-6">
+            <div class="card shadow-lg">
+                <div class="card-header bg-success text-white">
+                    <h4>Drivers</h4>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Car Model</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var driver in ViewBag.Drivers)
+                            {
+                                <tr>
+                                    <td>@driver.Id</td>
+                                    <td>@driver.Name</td>
+                                    <td>@driver.Email</td>
+                                    <td>@driver.CarModel</td>
+                                    <td>
+                                        <a href="/Admin/EditDriver/@driver.Id" class="btn btn-warning btn-sm">Edit</a>
+                                        <a href="/Admin/DeleteDriver/@driver.Id" class="btn btn-danger btn-sm"
+                                           onclick="return confirm('Are you sure you want to delete this driver?');">Delete</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

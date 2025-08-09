@@ -57,5 +57,13 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
+        public (string?, User?) GetByID(string id)
+        {
+            return userRepo.GetByID(id);
+        }
+        public List<User> GetAll()
+        { 
+            return userRepo.GetAll(); 
+        }
     }
 }

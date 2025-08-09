@@ -12,6 +12,6 @@ namespace Uber.BLL.Services.Abstraction
     {
         public (bool, string?) Create(CreateDriver driver);
         public (bool, string?) Delete(string id);
-        public (bool, string?) Edit();
+        //public (bool, string?) Edit();
     }
 }

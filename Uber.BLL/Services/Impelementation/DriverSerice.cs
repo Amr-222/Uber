@@ -8,10 +8,11 @@ using Uber.BLL.Helper;
 using Uber.BLL.ModelVM.Driver;
 using Uber.DAL.Entities;
 using Uber.DAL.Repo.Abstraction;
+using Uber.BLL.Services.Abstraction;
 
 namespace Uber.BLL.Services.Impelementation
 {
-    public class DriverService
+    public class DriverService : IDriverService
     {
         private readonly IMapper mapper;
         private readonly IDriverRepo driverRepo;

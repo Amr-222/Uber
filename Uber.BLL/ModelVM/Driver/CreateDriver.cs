@@ -10,5 +10,6 @@ namespace Uber.BLL.ModelVM.Driver
     public class CreateDriver
     {
         public IFormFile? File { get; set; }
+        public string ImagePath { get; set; }
     }
 }

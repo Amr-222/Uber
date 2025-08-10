@@ -8,15 +8,16 @@ namespace Uber.DAL.Entities
         //License  **
 
         public DateTime? ModifiedAt { get; private set; }
-    
 
 
         
-         
-        public int TotalRatingPoints { get; private set; } // the total points of all the people who rated this person
-                                                           // (ex: this person was rated twice as 3 and 5 stars then the points will be 8)
-        public int TotalRatings { get; private set; } // Total number of people who rated this person
-        public double Rating() => TotalRatings != 0 ? (double)TotalRatingPoints / TotalRatings : 5; // the actual rating that we will display
+        public string? ImagePath { get; protected set; }
+
+
+        public int TotalRatingPoints { get; private set; } 
+                                                           
+        public int TotalRatings { get; private set; } 
+        public double Rating() => TotalRatings != 0 ? (double)TotalRatingPoints / TotalRatings : 5;
 
         public Driver() { }
 

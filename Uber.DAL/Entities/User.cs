@@ -21,12 +21,12 @@ namespace Uber.DAL.Entities
 
         public User() { }
 
-        public User( string name,Gender gender,DateTime DateOfBirth, string? ImagePath/*, string street,string city*/)
+        public User( string name,Gender gender,DateTime DateOfBirth/*, string street,string city*/)
         {
             this.Name = name;
             this.Gender = gender;         
             this.DateOfBirth = DateOfBirth;
-            this.ImagePath = ImagePath;
+           
             //this.Address = new Location { Street = street, City = city };
 
         }
@@ -58,24 +58,24 @@ namespace Uber.DAL.Entities
             }
         }
 
-        public void AddProfilePhoto(string path)
-        {
-            if (IsDeleted) return;
-            ImagePath = path;
-        }
+        //public void AddProfilePhoto(string path)
+        //{
+        //    if (IsDeleted) return;
+        //    ImagePath = path;
+        //}
 
 
 
 
         
-        public (bool, string?) Edit(string name, DateTime dateofbirth, string? imagepath/*, Location address*/)
+        public (bool, string?) Edit(string name, DateTime dateofbirth)
         {
             try
             {
                 this.Name = name;
                 this.DateOfBirth = dateofbirth;
-                this.ImagePath = imagepath;
-                //this.Address = address;
+              
+              
                 ModifiedAt = DateTime.Now;
                 return (true, null);
             }

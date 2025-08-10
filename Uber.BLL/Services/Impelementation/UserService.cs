@@ -21,8 +21,7 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                var cust = mapper.Map<DAL.Entities.User>(user);
-                cust.AddProfilePhoto(Upload.UploadFile("Files", user.File));
+                var cust = mapper.Map<DAL.Entities.User>(user);      
                 var result = userRepo.Create(cust);
                 return result;
             }
@@ -49,6 +48,8 @@ namespace Uber.BLL.Services.Impelementation
             try
             {
                 //
+                //Mappppppppppp
+              //  userRepo.Edit();
                 return (true,null);
 
             }

@@ -77,7 +77,7 @@ namespace Uber.DAL.Repo.Impelementation
                 {
                     return (false, "User not found");
                 }
-                u.Edit(user.Name,user.DateOfBirth,user.ImagePath/*,user.Address*/); 
+                u.Edit(user.Name,user.DateOfBirth/*,user.Address*/); 
                 db.SaveChanges();
                 return (true, null);
             }

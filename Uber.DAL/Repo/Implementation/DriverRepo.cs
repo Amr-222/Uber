@@ -5,10 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Uber.DAL.DataBase;
 using Uber.DAL.Entities;
+using Uber.DAL.Repo.Abstraction;
 
 namespace Uber.DAL.Repo.Implementation
 {
-    public class DriverRepo
+    public class DriverRepo : IDriverRepo
     {
         private readonly UberDBContext db;
 

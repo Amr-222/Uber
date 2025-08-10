@@ -27,18 +27,22 @@ namespace Uber.PLL
             StripeConfiguration.ApiKey = stripeSettings["SecretKey"];
 
             // Identity
-            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-            .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
-            options =>
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
-                options.LoginPath = new PathString("/Account/ChooseLoginType");
-                options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+            })
+                .AddEntityFrameworkStores<UberDBContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/ChooseLoginType";
+                options.AccessDeniedPath = "/Account/ChooseLoginType";
             });
-
-            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-                    .AddEntityFrameworkStores<UberDBContext>()
-                    .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
-
 
 
 

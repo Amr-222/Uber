@@ -1,17 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using Uber.BLL.ModelVM.Account;
+using Uber.DAL.Entities;
 namespace Uber.PLL.Controllers
 {
     public class AccountController : Controller
     {
-        public IActionResult Index()
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+
+        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
-            return View();
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
-        public IActionResult ChooseLoginType()
-        {
-            return View();
-        }
+
+        public IActionResult ChooseLoginType() => View();
+        public IActionResult ChooseRegisterType() => View();
 
         [HttpGet]
         public IActionResult Login(string role)
@@ -25,10 +33,21 @@ namespace Uber.PLL.Controllers
             return NotFound();
         }
 
-        public IActionResult ChooseRegisterType()
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginVM model)
         {
-            return View();
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+
+                if (result.Succeeded)
+                    return RedirectToAction("Index", "Home");
+
+                ModelState.AddModelError("", "Invalid Username or Password");
+            }
+            return View(model);
         }
+
         [HttpGet]
         public IActionResult Register(string role)
         {
@@ -41,5 +60,30 @@ namespace Uber.PLL.Controllers
             return NotFound();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Register(RegisterVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser
+                {
+                    UserName = model.Email,
+                    Email = model.Email
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    foreach (var item in result.Errors)
+                        ModelState.AddModelError("Password", item.Description);
+                }
+            }
+            return View(model);
+        }
     }
 }

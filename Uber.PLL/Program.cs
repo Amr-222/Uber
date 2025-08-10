@@ -2,8 +2,13 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
+using Uber.BLL.Mapper;
+using Uber.BLL.Services.Abstraction;
+using Uber.BLL.Services.Impelementation;
 using Uber.DAL.DataBase;
 using Uber.DAL.Entities;
+using Uber.DAL.Repo.Abstraction;
+using Uber.DAL.Repo.Implementation;
 
 namespace Uber.PLL
 {
@@ -22,28 +27,40 @@ namespace Uber.PLL
             builder.Services.AddDbContext<UberDBContext>(options =>
             options.UseSqlServer(connectionString));
 
+            // Auto Mapper
+            builder.Services.AddAutoMapper(x => x.AddProfile(new DomainProfile()));
+
+            // Dependency 
+
+            builder.Services.AddScoped<IDriverService, DriverService>();
+            builder.Services.AddScoped<IDriverRepo, DriverRepo>();
             // Stripe
             var stripeSettings = builder.Configuration.GetSection("Stripe");
             StripeConfiguration.ApiKey = stripeSettings["SecretKey"];
 
             // Identity
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,options =>{
+    options.LoginPath = new PathString("/Account/ChooseLoginType");
+    options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
+});
+
+            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                    .AddEntityFrameworkStores<UberDBContext>()
+                    .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
+
+
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
+                // Default Password settings.
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
-                options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
                 options.Password.RequiredLength = 6;
-            })
-                .AddEntityFrameworkStores<UberDBContext>()
-                .AddDefaultTokenProviders();
-
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = "/Account/ChooseLoginType";
-                options.AccessDeniedPath = "/Account/ChooseLoginType";
-            });
-
+                options.Password.RequiredUniqueChars = 0;
+            }).AddEntityFrameworkStores<UberDBContext>();
 
 
             var app = builder.Build();

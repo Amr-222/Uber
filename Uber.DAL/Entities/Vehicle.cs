@@ -18,7 +18,7 @@ namespace Uber.DAL.Entities
 
         public string Model { get; private set; }
 
-        public int Year { get; private set; }
+        public int YearMade { get; private set; }
 
         public string Plate { get; private set; }
 
@@ -62,7 +62,7 @@ namespace Uber.DAL.Entities
         {
             Brand = brand;
             Model = model;
-            Year = year;
+            YearMade = year;
             Plate = plate;
             Color = color;
             SeatingCapacity = seatingCapacity;

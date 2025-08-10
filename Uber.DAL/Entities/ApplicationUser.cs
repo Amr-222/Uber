@@ -25,7 +25,6 @@ namespace Uber.DAL.Entities
 
         public bool IsDeleted { get; protected set; } = false;
         public DateTime CreatedAt { get; } = DateTime.Now;
-        public string? ImagePath { get; protected set; }
 
         //public Location Address { get; protected set; }
 

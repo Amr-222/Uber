@@ -5,13 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Uber.BLL.Helper;
+using Uber.BLL.Services.Abstraction;
 using Uber.DAL.Entities;
 using Uber.DAL.Repo.Abstraction;
 using Uber.DAL.Repo.Impelementation;
 
 namespace Uber.BLL.Services.Impelementation
 {
-     public class RideService
+     public class RideService : IRideService
     {
         private readonly IRideRepo rideRepo;
 

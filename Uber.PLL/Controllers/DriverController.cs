@@ -13,48 +13,42 @@ namespace Uber.PLL.Controllers
     {
         private readonly IDriverService service;
 
-        public DriverController(DriverService service)
+        public DriverController(IDriverService service)
         {
             this.service = service;
         }
 
-        [HttpGet]
-        public IActionResult RegisterDriver()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult RegisterDriver(CreateDriver model, IFormFile Photo)
+       
+        public IActionResult RegisterDriver(CreateDriver driver)
         {
             if (ModelState.IsValid)
             {
-                if (Photo != null && Photo.Length > 0)
-                {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
+                //if (Photo != null && Photo.Length > 0)
+                //{
+                //    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+                //    if (!Directory.Exists(uploadsFolder))
+                //    {
+                //        Directory.CreateDirectory(uploadsFolder);
+                //    }
 
-                    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(Photo.FileName);
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                //    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(Photo.FileName);
+                //    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        Photo.CopyTo(fileStream);
-                    }
+                //    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                //    {
+                //        Photo.CopyTo(fileStream);
+                //    }
 
-                    model.ImagePath = "/uploads/" + uniqueFileName;
-                }
+                //    model.ImagePath = "/uploads/" + uniqueFileName;
+                //}
 
-                service.Create(model);
+                service.Create(driver);
                 
 
                 return RedirectToAction("Login", "Driver");
             }
 
-            return View(model);
+            return View(driver);
         }
 
         [HttpGet]

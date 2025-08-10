@@ -2,6 +2,8 @@
     ViewData["Title"] = "Register as Driver";
 }
 
+@model Uber.BLL.ModelVM.Driver.CreateDriver
+
 <style>
     .register-container {
         max-width: 500px;
@@ -66,29 +68,59 @@
 
 <div class="register-container">
     <h2>Register as Driver</h2>
-    <form asp-action="RegisterDriver" method="post" enctype="multipart/form-data">
+    <form  asp-controller="Driver" asp-action="RegisterDriver" method="post" enctype="multipart/form-data">
 
         <label>Name</label>
-        <input type="text" name="Name" required />
+        <input asp-for="Name" type="text" name="Name" required />
 
         <label>Email</label>
-        <input type="email" name="Email" required />
+        <input asp-for="Email" type="email" name="Email" required />
 
         <label>Password</label>
-        <input type="password" name="Password" required />
+        <input asp-for="Password" type="password" name="Password" minlength="6" required />
 
-        <label>Car Model</label>
-        <input type="text" name="CarModel" required />
+        <label>Vehicle Brand</label>
+        <input asp-for="Vehicle.Brand" type="text" name="Brand" required />
 
-        <label>Car Type</label>
+        <label>Vehicle Model</label>
+        <input asp-for="Vehicle.Model" type="text" name="Model" required />
+
+        <label>Year Of Production</label>
+        <input asp-for="Vehicle.YearMade" type="number" name="YearMade" min="2008" max="2025" required />
+
+        <label>Plate</label>
+        <input asp-for="Vehicle.Plate" type="text" name="Plate" required />
+
+        <label>Color</label>
+        <input asp-for="Vehicle.Color" type="text" name="Color" required />
+
+        <label>Seating Capacity</label>
+        <input asp-for="Vehicle.SeatingCapacity"type="number" name="SeatingCapacity" min="1" max="14" required />
+
+
+
+
+        <label>Vehicle Type</label>
         <div class="car-type-options">
-            <label><input type="radio" name="CarType" value="Driver" required /> Driver</label>
-            <label><input type="radio" name="CarType" value="Taxi" /> Taxi</label>
-            <label><input type="radio" name="CarType" value="Scooter" /> Scooter</label>
+            <label><input asp-for="Vehicle.Type" type="radio" name="CarType" value="Car" required /> Car</label>
+            <label><input asp-for="Vehicle.Type"  type="radio" name="CarType" value="Scooter" /> Scooter</label>
+            <label><input asp-for="Vehicle.Type" type="radio" name="CarType" value="Shuttle" /> Shuttle</label>
+        </div>
+
+        <label>Vehicle Transmission</label>
+        <div class="car-type-options">
+            <label><input asp-for="Vehicle.Transmission" type="radio" name="Transmission" value="Manual" required /> Manual</label>
+            <label><input asp-for="Vehicle.Transmission" type="radio" name="Transmission" value="Auto" /> Automatic</label>
+          </div>
+
+        <label>Vehicle Engine</label>
+        <div class="car-type-options">
+            <label><input asp-for="Vehicle.VehicleEngine" type="radio" name="Engine" value="Gas" required /> Gas</label>
+            <label><input asp-for="Vehicle.VehicleEngine" type="radio" name="Engine" value="Electric" /> Electric</label>
         </div>
 
         <label>Upload Photo</label>
-        <input type="file" name="Photo" accept="image/*" required />
+        <input asp-for="File" type="file" class="form-control" >
 
         <button type="submit">Register</button>
     </form>

@@ -100,18 +100,13 @@
                 background: #1CB5A3;
             }
 
-    .image-section {
+    .image-section img {
         width: 500px;
         max-width: 100%;
-        border-radius: 10px;
-        background: #f5f5f5;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 300px;
-        color: #999;
-        font-size: 18px;
+        border-radius:  10px;
     }
+
+
 
     .about-us {
         background-color: #000;
@@ -119,7 +114,7 @@
         padding: 40px 50px;
         text-align: center;
         width: 100%;
-        margin-top: auto; 
+        margin-top: auto;
     }
 
         .about-us h2 {
@@ -153,6 +148,25 @@
         .social-icons a:hover img {
             filter: brightness(0) invert(0.6);
         }
+
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+
+        .social-icons a img {
+            width: 40px;
+            height: 40px;
+            filter: brightness(0) invert(1);
+            transition: filter 0.3s ease;
+        }
+
+        .social-icons a:hover img {
+            filter: brightness(0) invert(0.6);
+        }
 </style>
 
 <header>
@@ -162,9 +176,10 @@
         <a href="">Drive</a>
     </div>
     <div class="nav-right">
-        <a href="">Log in</a>
-        <a href="" class="signup-btn">Sign up</a>
+        <a asp-controller="Account" asp-action="ChooseLoginType">Log in</a>
+        <a asp-controller="Account" asp-action="ChooseRegisterType" class="signup-btn">Sign up</a>
     </div>
+
 </header>
 
 <div class="main">
@@ -185,6 +200,15 @@
         <img src="https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_552,w_552/v1712926828/assets/a3/cf8564-e2a6-418c-b9b0-65dd285c100b/original/3-2-ridesharing-new.jpg" alt="Uber Map">
     </div>
 </div>
+
+
+
+
+
+
+
+
+
 
 <div class="about-us">
     <h2>About Us</h2>
@@ -211,3 +235,18 @@
         </a>
     </div>
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

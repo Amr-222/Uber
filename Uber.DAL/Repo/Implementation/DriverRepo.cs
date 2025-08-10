@@ -22,6 +22,9 @@ namespace Uber.DAL.Repo.Implementation
         {
             try
             {
+                db.Wallets.Add(driver.Wallet);
+                db.Vehicles.Add(driver.Vehicle);
+                db.SaveChanges();
                 db.Drivers.Add(driver);
                 db.SaveChanges();
                 return (true, null);

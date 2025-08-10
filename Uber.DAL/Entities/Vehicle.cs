@@ -14,23 +14,23 @@ namespace Uber.DAL.Entities
 
        
 
-        public string Brand { get; private set; }
+        public string Brand { get;  set; }
 
-        public string Model { get; private set; }
+        public string Model { get;  set; }
 
-        public int YearMade { get; private set; }
+        public int YearMade { get;  set; }
 
-        public string Plate { get; private set; }
+        public string Plate { get;  set; }
 
-        public string Color { get; private set; }
+        public string Color { get;  set; }
 
-        public int SeatingCapacity {  get; private set; }
+        public int SeatingCapacity {  get;  set; }
 
-        public VehicleType Type { get; private set; }
+        public VehicleType Type { get;  set; }
 
-        public Transmission Transmission { get; private set; } // Manual or Automatic
+        public Transmission Transmission { get;  set; } // Manual or Automatic
 
-        public VehicleEngine VehicleEngine { get; private set; } // Gas or Electric
+        public VehicleEngine VehicleEngine { get;  set; } // Gas or Electric
 
 
 

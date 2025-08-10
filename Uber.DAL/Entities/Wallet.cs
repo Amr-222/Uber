@@ -13,7 +13,7 @@ namespace Uber.DAL.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        public double Balance { get; private set; }
+        public double Balance { get; private set; } = 0;
 
         public Wallet()
         {

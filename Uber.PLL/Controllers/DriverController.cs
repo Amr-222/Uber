@@ -42,13 +42,17 @@ namespace Uber.PLL.Controllers
                 //    model.ImagePath = "/uploads/" + uniqueFileName;
                 //}
 
-                service.Create(driver);
+
+
+
+
+                service.CreateAsync(driver);
                 
 
                 return RedirectToAction("Login", "Driver");
             }
 
-            return View(driver);
+            return View("~/Views/Driver/Register.cshtml", driver);
         }
 
         [HttpGet]

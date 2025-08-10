@@ -72,7 +72,7 @@ namespace Uber.PLL.Controllers
 
 
             var result = await signInManager.PasswordSignInAsync(
-     model.Email,     
+     model.Email,      
      model.Password,    
      model.RememberMe,
      lockoutOnFailure: false

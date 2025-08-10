@@ -1,154 +1,240 @@
 ﻿@{
-    ViewData["Title"] = "Admin Dashboard";
+    ViewData["Title"] = "AdminDashBoard";
 }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
     body {
-        background: #FFFFFF;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-family: 'Inter', sans-serif;
+        background: #fff;
+        color: #000;
+        margin: 0;
+    }
+    header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #000;
+        color: #fff;
+        padding: 20px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    h1 {
-        font-weight: bold;
-        color: #1CB5A3;
-        text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 30px;
     }
 
-    .card {
-        border: none;
-        border-radius: 15px;
-        overflow: hidden;
-        transition: transform 0.2s ease-in-out;
-    }
-
-        .card:hover {
-            transform: scale(1.02);
+        .nav-left h1 {
+            margin: 0;
+            font-size: 24px;
         }
 
-    .card-header {
-        font-size: 1.2rem;
-        font-weight: bold;
-        letter-spacing: 0.5px;
-        background-color: #1CB5A3;
-        color: white !important;
-    }
+        .nav-left a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+        }
 
-    table {
-        border-radius: 10px;
-        overflow: hidden;
-    }
-
-    thead {
-        background-color: #f8f9fa;
-    }
-
-    tbody tr:hover {
-        background-color: rgba(0, 123, 255, 0.05);
-    }
-
-    .btn-sm {
-        padding: 4px 8px;
-        border-radius: 6px;
+    .nav-right a {
+        margin-left: 20px;
+        color: #fff;
+        text-decoration: none;
         font-weight: 500;
     }
 
-    .btn-warning {
-        background-color: #ffc107;
-        border: none;
+    .nav-right .signup-btn {
+        background: #fff;
+        color: #000;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
     }
 
-        .btn-warning:hover {
-            background-color: #e0a800;
+    .page-title {
+        text-align: center;
+        font-size: 40px;
+        font-weight: bold;
+        margin-top: 40px;
+        margin-bottom: 30px;
+    }
+
+    .cards-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 40px;
+        padding: 40px;
+        height: auto;
+    }
+
+    .card {
+        background: #000;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+        width: 250px;
+        height: 180px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out, background 0.25s ease-in-out;
+        text-align: center;
+        color: #fff;
+        font-size: 20px;
+        font-weight: bold;
+        gap: 10px;
+    }
+
+        .card i {
+            font-size: 40px;
+            margin-bottom: 10px;
         }
 
-    .btn-danger {
-        background-color: #dc3545;
-        border: none;
+        .card:hover {
+            transform: scale(1.08);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+            background: #1a1a1a;
+        }
+
+    a {
+        text-decoration: none;
+        color: inherit;
     }
 
-        .btn-danger:hover {
-            background-color: #b02a37;
+    @media (max-width: 768px) {
+        .nav-left, .nav-right
+
+    {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    header {
+        flex-direction: column;
+    }
+
+    .cards-container {
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .card {
+        width: 90%;
+        height: auto;
+    }
+
+    }
+
+    .about-us {
+        background-color: #000;
+        color: #fff;
+        padding: 50px 50px;
+        text-align: center;
+        margin-top: 50px;
+        border-radius: 10px;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        font-family: 'Inter', sans-serif;
+    }
+
+        .about-us h2 {
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        .about-us p {
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 40px;
+        }
+
+    .social-icons {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+    }
+
+        .social-icons a img {
+            width: 50px;
+            height: 50px;
+            filter: brightness(0) invert(1);
+            transition: filter 0.3s ease;
+        }
+
+        .social-icons a:hover img {
+            filter: brightness(0) invert(0.6);
         }
 </style>
 
-<div class="container mt-4">
-    <h1 class="mb-4 text-center">Admin Dashboard</h1>
+<header>
+    <div class="nav-left">
+        <h1>Uber</h1>
+        <a href="#">Ride</a>
+        <a href="#">Drive</a>
+    </div>
+    <div class="nav-right">
+        <a asp-controller="Account" asp-action="ChooseLoginType">Log in</a>
+        <a asp-controller="Account" asp-action="ChooseRegisterType" class="signup-btn">Sign up</a>
+    </div>
+</header>
 
-    <div class="row g-4">
-        <!-- Riders Table -->
-        <div class="col-md-6">
-            <div class="card shadow-lg">
-                <div class="card-header">
-                    <h4>Riders</h4>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-hover text-center">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @* @foreach (var rider in ViewBag.Riders)
-                            {
-                                <tr>
-                                    <td>@rider.Id</td>
-                                    <td>@rider.Name</td>
-                                    <td>@rider.Email</td>
-                                    <td>
-                                        <a href="/Admin/EditUser/@rider.Id" class="btn btn-warning btn-sm">Edit</a>
-                                        <a href="/Admin/DeleteUser/@rider.Id" class="btn btn-danger btn-sm"
-                                           onclick="return confirm('Are you sure you want to delete this rider?');">Delete</a>
-                                    </td>
-                                </tr>
-                            } *@
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<div class="page-title">Admin Dashboard</div>
 
-        <!-- Drivers Table -->
-        <div class="col-md-6">
-            <div class="card shadow-lg">
-                <div class="card-header">
-                    <h4>Drivers</h4>
-                </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-hover text-center">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Car Model</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @* @foreach (var driver in ViewBag.Drivers)
-                            {
-                                <tr>
-                                    <td>@driver.Id</td>
-                                    <td>@driver.Name</td>
-                                    <td>@driver.Email</td>
-                                    <td>@driver.CarModel</td>
-                                    <td>
-                                        <a href="/Admin/EditDriver/@driver.Id" class="btn btn-warning btn-sm">Edit</a>
-                                        <a href="/Admin/DeleteDriver/@driver.Id" class="btn btn-danger btn-sm"
-                                           onclick="return confirm('Are you sure you want to delete this driver?');">Delete</a>
-                                    </td>
-                                </tr>
-                            } *@
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+<div class="cards-container">
+    <a href="@Url.Action("Admin_Drivers", "Admin")">
+        <div class="card">
+            <i class="fas fa-car"></i>
+            Drivers
         </div>
+    </a>
+
+    <a href="@Url.Action("Admin_Riders", "Admin")">
+        <div class="card">
+            <i class="fas fa-user"></i>
+            Riders
+        </div>
+    </a>
+
+    <a href="@Url.Action("Admin_Rides", "Admin")">
+        <div class="card">
+            <i class="fas fa-route"></i>
+            Rides
+        </div>
+    </a>
+
+    <a href="@Url.Action("Admin_Admines", "Admin")">
+        <div class="card">
+            <i class="fas fa-user-shield"></i>
+            Admins
+        </div>
+    </a>
+</div>
+
+<div class="about-us">
+    <h2>About Us</h2>
+    <p>
+        Uber is a global platform that connects riders and drivers to make transportation reliable and accessible for everyone. Since our founding, we've expanded to hundreds of cities worldwide, empowering millions of people to move freely.
+        <br><br>
+        Our mission is to ignite opportunity by setting the world in motion. We believe in creating seamless and safe experiences for riders, while providing flexible earning opportunities for drivers. Whether you need a ride, want to deliver food, or earn on your schedule, Uber is here to help.
+        <br><br>
+        We are committed to innovation, sustainability, and community impact — striving to build a future where transportation is safe, affordable, and inclusive for all.
+    </p>
+
+    <div class="social-icons">
+        <a href="https://www.google.com" target="_blank" aria-label="Google">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google Logo" />
+        </a>
+        <a href="https://www.facebook.com" target="_blank" aria-label="Facebook">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_(2019).png" alt="Facebook Logo" />
+        </a>
     </div>
 </div>

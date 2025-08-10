@@ -4,13 +4,11 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
-<div id="map" style="height: 500px; width: 100%;"></div>
-
+<div id="map" style="height: 1000px; width: 120%;"></div>
 
 <script>
     let map = L.map('map').setView([40.7128, -74.0060], 12); // NYC default
 
-    // Add OpenStreetMap tiles
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '© OpenStreetMap contributors'
@@ -20,7 +18,6 @@
     let clickCount = 0;
     let startCoords, endCoords;
 
-    // Add search box
     L.Control.geocoder({
         defaultMarkGeocode: false
     })
@@ -28,7 +25,6 @@
         let latlng = e.geocode.center;
         map.setView(latlng, 14);
 
-        // Treat search result as if user clicked
         handleMapClick(latlng);
     })
     .addTo(map);

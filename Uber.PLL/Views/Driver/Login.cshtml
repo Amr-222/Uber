@@ -2,6 +2,8 @@
     ViewData["Title"] = "Login";
 }
 
+@model Uber.BLL.ModelVM.Account.LoginVM
+
 <style>
     .login-container {
         max-width: 400px;
@@ -70,14 +72,14 @@
 
 <div class="login-container">
     <h2>Login @ViewBag.Role</h2>
-    <form asp-action="Login" method="post">
+    <form asp-controller="Driver" asp-action="Login" method="post">
         <input type="hidden" name="Role" value="@ViewBag.Role" />
 
         <label>Email</label>
-        <input type="email" name="Email" required />
+        <input asp-for="Email" type="email"  required />
 
         <label>Password</label>
-        <input type="password" name="Password" required />
+        <input asp-for="Password" type="password"  required />
 
         <button type="submit">Login</button>
     </form>

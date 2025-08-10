@@ -1,21 +1,25 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Uber.DAL.DataBase; 
-using Uber.DAL.Entities;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using System.IO;
+using Uber.BLL.ModelVM.Account;
+using Uber.BLL.ModelVM.Driver;
 using Uber.BLL.Services.Abstraction;
 using Uber.BLL.Services.Impelementation;
-using Uber.BLL.ModelVM.Driver;
-using System.IO;
-using Microsoft.AspNetCore.Http;
+using Uber.DAL.DataBase; 
+using Uber.DAL.Entities;
 
 namespace Uber.PLL.Controllers
 {
     public class DriverController : Controller
     {
+        private readonly SignInManager<IdentityUser> signInManager;
         private readonly IDriverService service;
 
-        public DriverController(IDriverService service)
+        public DriverController(IDriverService service, SignInManager<IdentityUser> signInManager)
         {
             this.service = service;
+            this.signInManager = signInManager;
         }
 
        
@@ -61,19 +65,22 @@ namespace Uber.PLL.Controllers
             return View();
         }
 
-        //[HttpPost]
-        //public IActionResult Login(string email, string password)
-        //{
-        //    var driver = service.Drivers.FirstOrDefault(d => d.Email == email && d.Password == password);
-        //    if (driver != null)
-        //    {
-        //        HttpContext.Session.SetInt32("DriverId", driver.Id);
-        //        return RedirectToAction("Index", "Home");
-        //    }
+        [HttpPost]
+        public async Task <IActionResult> Login(LoginVM model)
+        {
 
-        //    ViewBag.Error = "Invalid email or password";
-        //    return View();
-        //}
+
+
+            var result = await signInManager.PasswordSignInAsync(
+     model.Email,     
+     model.Password,    
+     model.RememberMe,
+     lockoutOnFailure: false
+ );
+
+
+            return View("/Views/Home/Index.cshtml");
+        }
 
     }
 }

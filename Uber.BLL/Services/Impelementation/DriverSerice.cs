@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Uber.BLL.Helper;
 using Uber.BLL.ModelVM.Driver;
+using Uber.BLL.Services.Abstraction;
 using Uber.DAL.Entities;
 using Uber.DAL.Repo.Abstraction;
-using Uber.BLL.Services.Abstraction;
 
 namespace Uber.BLL.Services.Impelementation
 {
@@ -16,21 +17,29 @@ namespace Uber.BLL.Services.Impelementation
     {
         private readonly IMapper mapper;
         private readonly IDriverRepo driverRepo;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public DriverService(IDriverRepo _driverRepo, IMapper _mapper)
+        public DriverService(IDriverRepo _driverRepo, IMapper _mapper, UserManager<ApplicationUser> userManager)
         {
             this.driverRepo = _driverRepo;
             mapper = _mapper;
+            this.userManager = userManager;
         }
 
-        public (bool, string?) Create(CreateDriver driver)
+        public async Task<(bool, string?)> CreateAsync(CreateDriver driver)
         {
             try
             {
                 var driv = mapper.Map<Driver>(driver);
+
                 driv.AddProfilePhoto(Upload.UploadFile("Files", driver.File));
+
+                var res = await userManager.CreateAsync(driv, driver.Password);
+
                 var result = driverRepo.Create(driv);
+               
                 return result;
+            
             }
             catch (Exception ex)
             {

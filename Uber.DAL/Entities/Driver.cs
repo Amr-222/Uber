@@ -19,7 +19,10 @@ namespace Uber.DAL.Entities
         public int TotalRatings { get; private set; } 
         public double Rating() => TotalRatings != 0 ? (double)TotalRatingPoints / TotalRatings : 5;
 
-        public Driver() { }
+        public Driver() 
+        { 
+            Wallet =new Wallet();
+        }
 
         public Driver(string name, Gender gender, DateTime DateOfBirth, string? ImagePath/*, string street, string city*/)
         {
@@ -27,6 +30,7 @@ namespace Uber.DAL.Entities
             this.Gender = gender;     
             this.DateOfBirth = DateOfBirth;
             this.ImagePath = ImagePath;
+            Wallet = new Wallet();
             //this.Address = new Location { Street = street, City = city };
 
         }

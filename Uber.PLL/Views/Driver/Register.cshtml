@@ -71,56 +71,56 @@
     <form  asp-controller="Driver" asp-action="RegisterDriver" method="post" enctype="multipart/form-data">
 
         <label>Name</label>
-        <input asp-for="Name" type="text" name="Name" required />
+        <input asp-for="Name" type="text"  required />
 
         <label>Email</label>
-        <input asp-for="Email" type="email" name="Email" required />
+        <input asp-for="Email" type="email"  required />
 
         <label>Password</label>
-        <input asp-for="Password" type="password" name="Password" minlength="6" required />
+        <input asp-for="Password" type="password"  minlength="6" required />
 
         <label>Vehicle Brand</label>
-        <input asp-for="Vehicle.Brand" type="text" name="Brand" required />
+        <input asp-for="Vehicle.Brand" type="text"  required />
 
         <label>Vehicle Model</label>
-        <input asp-for="Vehicle.Model" type="text" name="Model" required />
+        <input asp-for="Vehicle.Model" type="text"  required />
 
         <label>Year Of Production</label>
-        <input asp-for="Vehicle.YearMade" type="number" name="YearMade" min="2008" max="2025" required />
+        <input asp-for="Vehicle.YearMade" type="number"  min="2008" max="2025" required />
 
         <label>Plate</label>
-        <input asp-for="Vehicle.Plate" type="text" name="Plate" required />
+        <input asp-for="Vehicle.Plate" type="text"  required />
 
         <label>Color</label>
-        <input asp-for="Vehicle.Color" type="text" name="Color" required />
+        <input asp-for="Vehicle.Color" type="text"  required />
 
         <label>Seating Capacity</label>
-        <input asp-for="Vehicle.SeatingCapacity"type="number" name="SeatingCapacity" min="1" max="14" required />
+        <input asp-for="Vehicle.SeatingCapacity"type="number"  min="1" max="14" required />
 
 
 
 
         <label>Vehicle Type</label>
-        <div class="car-type-options">
-            <label><input asp-for="Vehicle.Type" type="radio" name="CarType" value="Car" required /> Car</label>
-            <label><input asp-for="Vehicle.Type"  type="radio" name="CarType" value="Scooter" /> Scooter</label>
-            <label><input asp-for="Vehicle.Type" type="radio" name="CarType" value="Shuttle" /> Shuttle</label>
+        <div class="car-type-options">                         
+            <label><input asp-for="Vehicle.Type" type="radio"  value="Car" required /> Car</label>
+            <label><input asp-for="Vehicle.Type"  type="radio"  value="Scooter" /> Scooter</label>
+            <label><input asp-for="Vehicle.Type" type="radio"  value="Shuttle" /> Shuttle</label>
         </div>
 
         <label>Vehicle Transmission</label>
         <div class="car-type-options">
-            <label><input asp-for="Vehicle.Transmission" type="radio" name="Transmission" value="Manual" required /> Manual</label>
-            <label><input asp-for="Vehicle.Transmission" type="radio" name="Transmission" value="Auto" /> Automatic</label>
+            <label><input asp-for="Vehicle.Transmission" type="radio"  value="Manual" required /> Manual</label>
+            <label><input asp-for="Vehicle.Transmission" type="radio" value="Automatic" /> Automatic</label>
           </div>
 
         <label>Vehicle Engine</label>
         <div class="car-type-options">
-            <label><input asp-for="Vehicle.VehicleEngine" type="radio" name="Engine" value="Gas" required /> Gas</label>
-            <label><input asp-for="Vehicle.VehicleEngine" type="radio" name="Engine" value="Electric" /> Electric</label>
+            <label><input asp-for="Vehicle.VehicleEngine" type="radio"  value="Gasoline" required /> Gas</label>
+            <label><input asp-for="Vehicle.VehicleEngine" type="radio"  value="Electric" /> Electric</label>
         </div>
 
         <label>Upload Photo</label>
-        <input asp-for="File" type="file" class="form-control" >
+        <input asp-for="File" type="file"  >
 
         <button type="submit">Register</button>
     </form>

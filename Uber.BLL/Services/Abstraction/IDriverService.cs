@@ -10,7 +10,7 @@ namespace Uber.BLL.Services.Abstraction
 {
     public interface IDriverService
     {
-        public (bool, string?) Create(CreateDriver driver);
+        public  Task<(bool, string?)> CreateAsync(CreateDriver driver);
         public (bool, string?) Delete(string id);
         //public (bool, string?) Edit();
     }

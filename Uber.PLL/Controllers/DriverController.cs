@@ -13,45 +13,28 @@ namespace Uber.PLL.Controllers
 {
     public class DriverController : Controller
     {
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IDriverService service;
 
-        public DriverController(IDriverService service, SignInManager<IdentityUser> signInManager)
+        public DriverController(IDriverService service, SignInManager<ApplicationUser> signInManager)
         {
             this.service = service;
             this.signInManager = signInManager;
         }
 
-       
-        public IActionResult RegisterDriver(CreateDriver driver)
+
+        [HttpPost]
+        public async Task<IActionResult> RegisterDriver(CreateDriver driver)
         {
             if (ModelState.IsValid)
             {
-                //if (Photo != null && Photo.Length > 0)
-                //{
-                //    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
-                //    if (!Directory.Exists(uploadsFolder))
-                //    {
-                //        Directory.CreateDirectory(uploadsFolder);
-                //    }
+                var (success, error) = await service.CreateAsync(driver);
 
-                //    var uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(Photo.FileName);
-                //    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                //    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                //    {
-                //        Photo.CopyTo(fileStream);
-                //    }
-
-                //    model.ImagePath = "/uploads/" + uniqueFileName;
-                //}
-
-
-
-
-
-                service.CreateAsync(driver);
-                
+                if (!success)
+                {
+                    ModelState.AddModelError("", error ?? "An error occurred");
+                    return View("~/Views/Driver/Register.cshtml", driver);
+                }
 
                 return RedirectToAction("Login", "Driver");
             }

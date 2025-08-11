@@ -32,11 +32,16 @@ namespace Uber.BLL.Services.Impelementation
             {
                 var driv = mapper.Map<Driver>(driver);
 
+                driv.UserName = driver.Email;
+
                 driv.AddProfilePhoto(Upload.UploadFile("Files", driver.File));
+
+
+                var result = driverRepo.Create(driv);
 
                 var res = await userManager.CreateAsync(driv, driver.Password);
 
-                var result = driverRepo.Create(driv);
+             
                
                 return result;
             

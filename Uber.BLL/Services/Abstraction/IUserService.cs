@@ -5,7 +5,7 @@ namespace Uber.BLL.Services.Abstraction
 {
     public interface IUserService
     {
-        public (bool, string?) Create(CreateUser user);
+        public Task<(bool, string?)> CreateAsync(CreateUser user);
         public (bool, string?) Delete(string id);
         public (bool, string?) Edit(EditUser user);
         public (string?, User?) GetByID(string id); // TODO Change this

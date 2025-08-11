@@ -10,7 +10,7 @@ namespace Uber.DAL.Entities
         public DateTime? ModifiedAt { get; private set; }
 
 
-        
+        public double Balance { get; private set; } = 0;
         public string? ImagePath { get; protected set; }
 
 
@@ -21,7 +21,7 @@ namespace Uber.DAL.Entities
 
         public Driver() 
         { 
-            Wallet =new Wallet();
+            //Wallet =new Wallet();
         }
 
         public Driver(string name, Gender gender, DateTime DateOfBirth, string? ImagePath/*, string street, string city*/)
@@ -30,7 +30,7 @@ namespace Uber.DAL.Entities
             this.Gender = gender;     
             this.DateOfBirth = DateOfBirth;
             this.ImagePath = ImagePath;
-            Wallet = new Wallet();
+            //Wallet = new Wallet();
             //this.Address = new Location { Street = street, City = city };
 
         }
@@ -38,9 +38,9 @@ namespace Uber.DAL.Entities
         //Navigation Property
 
 
-        public int WalletId { get; set; }
+        //public int WalletId { get; set; }
 
-        public Wallet Wallet { get; set; }
+        //public Wallet Wallet { get; set; }
 
 
       

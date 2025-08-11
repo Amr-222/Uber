@@ -32,9 +32,9 @@ namespace Uber.DAL.Entities
         }
         //Navigation Property
 
-        public int WalletId { get;  set; }
+        //public int WalletId { get;  set; }
 
-        public Wallet Wallet { get;  set; }
+        //public Wallet Wallet { get;  set; }
 
 
 
@@ -42,7 +42,7 @@ namespace Uber.DAL.Entities
 
 
 
-
+        public double Balance { get; private set; } = 0;
 
 
         public (bool, string?) Delete()

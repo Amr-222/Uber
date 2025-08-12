@@ -26,29 +26,24 @@ namespace Uber.PLL.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> RegisterDriver(CreateUser driver)
+        public async Task<IActionResult> RegisterUser(CreateUser user)
         {
             if (ModelState.IsValid)
             {
-                var (success, error) = await service.CreateAsync(driver);
+                var (success, error) = await service.CreateAsync(user);
 
                 if (!success)
                 {
                     ModelState.AddModelError("", error ?? "An error occurred");
-                    return View("~/Views/User/Register.cshtml", driver);
+                    return View("~/Views/User/Register.cshtml", user);
                 }
 
                 return RedirectToAction("Login", "User");
             }
 
-            return View("~/Views/User/Register.cshtml", driver);
+            return View("~/Views/User/Register.cshtml", user);
         }
 
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM model)

@@ -18,13 +18,15 @@ namespace Uber.DAL.Repo.Implementation
             this.db = db;
         }
 
-        public (bool, string?) Create(Driver driver)
+        public (bool, string?) CreateVehicle(Vehicle vehicle)
         {
             try
             {
                 //db.Wallets.Add(driver.Wallet);
-                db.Vehicles.Add(driver.Vehicle);
+
+                db.Vehicles.Add(vehicle);
                 db.SaveChanges();
+
                 //db.Drivers.Add(driver);
                 //db.SaveChanges();
                 return (true, null);

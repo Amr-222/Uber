@@ -3,7 +3,7 @@ namespace Uber.DAL.Repo.Abstraction
 {
     public interface IUserRepo
     {
-        (bool, string?) Create(User user);
+        //(bool, string?) Create(User user);
         (string?, User?) GetByID(string id);
         List<User> GetAll();
         (bool, string?) Delete(string id);

@@ -2,6 +2,10 @@
     ViewData["Title"] = "Register as Rider";
 }
 
+@model Uber.BLL.ModelVM.User.CreateUser
+
+
+
 <style>
     .register-container {
         max-width: 500px;
@@ -27,13 +31,23 @@
             color: #333;
         }
 
-        .register-container input {
+        .register-container input[type="text"],
+        .register-container input[type="email"],
+        .register-container input[type="password"],
+        .register-container input[type="file"] {
             width: 100%;
             padding: 12px;
             margin-bottom: 20px;
             border: 1px solid #ccc;
             border-radius: 8px;
             font-size: 16px;
+        }
+
+        .register-container .car-type-options label {
+            display: inline-block;
+            margin-right: 15px;
+            font-weight: 500;
+            cursor: pointer;
         }
 
         .register-container button {
@@ -54,17 +68,32 @@
             }
 </style>
 
+
+
 <div class="register-container">
     <h2>Register as Rider</h2>
-    <form asp-action="RegisterUser" method="post">
+    <form asp-controller ="User" asp-action="RegisterUser" method="post">
         <label>Name</label>
-        <input type="text" name="Name" required />
+        <input asp-for="Name" type="text" required />
 
         <label>Email</label>
-        <input type="email" name="Email" required />
+        <input asp-for="Email" type="email" required />
+
+
+        <label>Gender</label>
+        <div class="car-type-options">
+            <label><input asp-for="Gender" type="radio" value="Male" required />Male</label>
+            <label><input asp-for="Gender" type="radio" value="Female" />Female</label>
+        </div>
+
+
+        <label>Date of Birth</label>
+        <input asp-for="DateOfBirth" type="date" min="1925-01-01" max="2007-12-31" required>
+
 
         <label>Password</label>
-        <input type="password" name="Password" required />
+        <input asp-for="Password" type="password" minlength="6" required />
+
 
         <button type="submit">Register</button>
     </form>

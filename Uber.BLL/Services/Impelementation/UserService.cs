@@ -14,25 +14,44 @@ namespace Uber.BLL.Services.Impelementation
         private readonly IUserRepo userRepo;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public UserService(IUserRepo _userRepo, IMapper _mapper)
+        public UserService(IUserRepo _userRepo, IMapper _mapper, UserManager<ApplicationUser> _userManager)
         {
-            this.userRepo = _userRepo;
+            userRepo = _userRepo;
             mapper = _mapper;
+            userManager = _userManager;
         }
 
         public async Task<(bool, string?)> CreateAsync(CreateUser user)
         {
             try
             {
+
+                string errors = "";
+
                 var user1 = mapper.Map<User>(user);
 
                 user1.UserName = user.Email;
 
-                var result = userRepo.Create(user1);
+                //var result = userRepo.Create(user1);
 
                 var res = await userManager.CreateAsync(user1, user.Password);
 
-                return result;
+
+                if (res.Succeeded)
+                {
+
+                    return (true,null);
+                }
+                else
+                {
+                    foreach (var error in res.Errors)
+                    {
+                        errors += (($"{error.Code} - {error.Description}\n"));
+                    }
+
+                    return (false, errors);
+                }
+               
 
             }
             catch (Exception ex)

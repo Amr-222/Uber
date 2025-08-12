@@ -30,6 +30,8 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
+                string errors = "";
+
                 var driv = mapper.Map<Driver>(driver);
 
                 driv.UserName = driver.Email;
@@ -37,13 +39,31 @@ namespace Uber.BLL.Services.Impelementation
                 driv.AddProfilePhoto(Upload.UploadFile("Files", driver.File));
 
 
-                var result = driverRepo.Create(driv);
+                var result = driverRepo.CreateVehicle(driv.Vehicle);
+
+                if (!result.Item1)
+                    return result;
+
 
                 var res = await userManager.CreateAsync(driv, driver.Password);
 
-             
+                if (res.Succeeded)
+                {
+
+                    return (true, null);
+                }
+                else
+                {
+                    foreach (var error in res.Errors)
+                    {
+                        errors += (($"{error.Code} - {error.Description}\n"));
+                    }
+
+                    return (false, errors);
+                }
+
+
                
-                return result;
             
             }
             catch (Exception ex)

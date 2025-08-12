@@ -47,12 +47,12 @@ namespace Uber.PLL
             // Identity
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,options =>{
-    options.LoginPath = new PathString("/Account/ChooseLoginType");
-    options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
-});
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
+                    options.LoginPath = new PathString("/Account/ChooseLoginType");
+                    options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
+                });
 
-            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                     .AddEntityFrameworkStores<UberDBContext>()
                     .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
 
@@ -84,6 +84,7 @@ namespace Uber.PLL
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

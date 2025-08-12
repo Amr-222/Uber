@@ -25,6 +25,7 @@ namespace Uber.PLL.Controllers
         }
 
 
+
         [HttpPost]
         public async Task<IActionResult> RegisterUser(CreateUser user)
         {
@@ -45,6 +46,12 @@ namespace Uber.PLL.Controllers
         }
 
 
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM model)
         {
@@ -59,7 +66,18 @@ namespace Uber.PLL.Controllers
  );
 
 
-            return View("/Views/Home/Index.cshtml");
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+
+                ViewBag.LoginError = "*Invalid username or password";
+                return View();
+            }
+
+
         }
 
     }

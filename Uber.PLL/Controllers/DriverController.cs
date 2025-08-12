@@ -62,7 +62,16 @@ namespace Uber.PLL.Controllers
  );
 
 
-            return View("/Views/Home/Index.cshtml");
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+
+                ViewBag.LoginError = "*Invalid username or password";
+                return View();
+            }
         }
 
     }

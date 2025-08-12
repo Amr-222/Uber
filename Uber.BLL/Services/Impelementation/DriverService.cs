@@ -84,7 +84,18 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
+        public (bool, string?) GetNearstDriver(double lag, double lng)
+        {
+            try
+            {
 
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (true, ex.Message);
+            }
+        }
 
 
 

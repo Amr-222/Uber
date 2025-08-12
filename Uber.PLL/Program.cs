@@ -27,12 +27,12 @@ namespace Uber.PLL
 
             builder.Services.AddDbContext<UberDBContext>(options =>
             options.UseSqlServer(connectionString));
-
+            // SignalR
+            //builder.Services.AddSignalR();
             // Auto Mapper
             builder.Services.AddAutoMapper(x => x.AddProfile(new DomainProfile()));
 
             // Dependency 
-
             builder.Services.AddScoped<IDriverService, DriverService>();
             builder.Services.AddScoped<IDriverRepo, DriverRepo>();
 
@@ -45,14 +45,13 @@ namespace Uber.PLL
             StripeConfiguration.ApiKey = stripeSettings["SecretKey"];
 
             // Identity
-
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,options =>{
-    options.LoginPath = new PathString("/Account/ChooseLoginType");
-    options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
-});
+                options.LoginPath = new PathString("/Account/ChooseLoginType");
+                options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
+                });
 
-            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
                     .AddEntityFrameworkStores<UberDBContext>()
                     .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
 
@@ -78,12 +77,14 @@ namespace Uber.PLL
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            //SignalR
+            //app.MapHub<RideHub>("/rideHub");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

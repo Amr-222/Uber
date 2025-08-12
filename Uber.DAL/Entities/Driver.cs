@@ -42,16 +42,12 @@ namespace Uber.DAL.Entities
 
         //public Wallet Wallet { get; set; }
 
-
-      
-
+        public double CurrentLng { get; private set; }
+        public double CurrentLat { get; private set; }
+        public bool IsActive { get; private set; } = false;
         public List<Ride> Rides { get; set; }
-
-
         public int VehicleId { get; set; }
-
         public Vehicle Vehicle { get; set; }
-
         public (bool, string?) Delete()
         {
             try
@@ -70,7 +66,6 @@ namespace Uber.DAL.Entities
             if (IsDeleted) return;
             ImagePath = path;
         }
-
 
         public (bool, string?) Edit(string name,DateTime dateofbirth,string? imagepath/*, Location address*/)
         {

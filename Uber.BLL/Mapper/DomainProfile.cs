@@ -12,6 +12,7 @@ namespace Uber.BLL.Mapper
         {
             CreateMap<User, CreateUser>().ReverseMap();
             CreateMap<Driver, CreateDriver>().ReverseMap();
+            CreateMap<Driver, GetDriver>().ReverseMap();  
         }
     }
 }

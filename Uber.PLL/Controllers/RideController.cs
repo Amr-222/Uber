@@ -1,24 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Uber.DAL.Entities;
-using Uber.DAL.DataBase;
+using Microsoft.AspNetCore.SignalR;
+using Uber.BLL.Services.Abstraction;
 using Uber.BLL.Services.Impelementation;
+using Uber.DAL.DataBase;
+using Uber.DAL.Entities;
 
 namespace Uber.PLL.Controllers
 {
     public class RideController : Controller
     {
-        private readonly RideService _RideServices;
+        //private readonly IHubContext<RideHub> _hubContext;
+        //private readonly IDriverService driverService;
+        private readonly IRideService _RideServices;
 
-        public RideController(RideService _RideServices)
+
+        public RideController(/*IHubContext<RideHub> hubContext, IDriverService driverService*/ IRideService rideService)
         {
-            this._RideServices = _RideServices;
+            //_hubContext = hubContext;
+            //this.driverService = driverService;
+            _RideServices = rideService;
         }
 
-        public IActionResult Index()
-        {
-            var rides = _RideServices.GetAll();
-            return View(rides);
-        }
+        
 
         public IActionResult Create()
         {

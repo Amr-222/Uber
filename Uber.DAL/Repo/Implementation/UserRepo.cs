@@ -13,19 +13,19 @@ namespace Uber.DAL.Repo.Impelementation
             this.db = db;
         }
 
-        public (bool, string?) Create(User user)
-        {
-            try
-            {
-                db.Users.Add(user);
-                db.SaveChanges();
-                return (true, null);
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message);
-            }
-        }
+        //public (bool, string?) Create(User user)
+        //{
+        //    try
+        //    {
+        //        db.Users.Add(user);
+        //        db.SaveChanges();
+        //        return (true, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return (false, ex.Message);
+        //    }
+        //}
 
         public (bool, string?) Delete(string id)
         {

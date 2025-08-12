@@ -9,7 +9,7 @@ namespace Uber.DAL.Repo.Abstraction
 {
     public interface IDriverRepo
     {
-        (bool, string?) Create(Driver driver);
+        (bool, string?) CreateVehicle(Vehicle vehicle);
         (string?, Driver?) GetByID(string id);
         List<Driver> GetAll();
         (bool, string?) Delete(string id);

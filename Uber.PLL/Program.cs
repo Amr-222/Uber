@@ -8,6 +8,7 @@ using Uber.BLL.Services.Impelementation;
 using Uber.DAL.DataBase;
 using Uber.DAL.Entities;
 using Uber.DAL.Repo.Abstraction;
+using Uber.DAL.Repo.Impelementation;
 using Uber.DAL.Repo.Implementation;
 
 namespace Uber.PLL
@@ -34,6 +35,11 @@ namespace Uber.PLL
 
             builder.Services.AddScoped<IDriverService, DriverService>();
             builder.Services.AddScoped<IDriverRepo, DriverRepo>();
+
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserRepo, UserRepo>();
+
+
             // Stripe
             var stripeSettings = builder.Configuration.GetSection("Stripe");
             StripeConfiguration.ApiKey = stripeSettings["SecretKey"];

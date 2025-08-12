@@ -17,11 +17,13 @@ namespace Uber.PLL.Controllers
     {
         private readonly SignInManager<ApplicationUser> signInManager;
         private readonly IUserService service;
+        private readonly IDriverService driverService;
 
-        public UserController(IUserService service, SignInManager<ApplicationUser> signInManager)
+        public UserController(IUserService service, SignInManager<ApplicationUser> signInManager, IDriverService driverService)
         {
             this.service = service;
             this.signInManager = signInManager;
+            this.driverService = driverService;
         }
 
 
@@ -48,19 +50,32 @@ namespace Uber.PLL.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM model)
         {
-
-
-
             var result = await signInManager.PasswordSignInAsync(
-     model.Email,
-     model.Password,
-     model.RememberMe,
-     lockoutOnFailure: false
- );
+            model.Email,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: false
+            );
 
 
             return View("/Views/Home/Index.cshtml");
         }
-
+        [HttpGet]
+        public IActionResult RequestRide()
+        {
+            return View();
+        }
+        //[HttpPost]
+        /*public IActionResult RequestRide(double StartLat, double StartLng, double EndLat, double EndLng, string Id)
+        {
+            var result = driverService.GetNearstDriver(StartLat, StartLng);
+            if (!result.Item1) return View(result.Item2);
+            bool foundDriver = false;
+            int index = 0;
+            while (!foundDriver)
+            {
+                var res = driverService.SendRequest(result.Item3[index++], Id);
+            }
+        }*/
     }
 }

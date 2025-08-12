@@ -370,7 +370,7 @@
 
         const viewbox = "22.0,31.7,35.9,20.0";
 
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5&viewbox=${viewbox}&bounded=1`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=5&viewbox=${viewbox}&bounded=1&email=ibrahimsherif2005.357@gmail.com`;
         const res = await fetch(url);
         if (!res.ok) return [];
         const data = await res.json();

@@ -55,14 +55,14 @@ namespace Uber.PLL.Controllers
 
 
             var result = await signInManager.PasswordSignInAsync(
-     model.Email,      
-     model.Password,    
-     model.RememberMe,
-     lockoutOnFailure: false
- );
-
-
-            return View("/Views/Home/Index.cshtml");
+                model.Email,      
+                model.Password,    
+                model.RememberMe,
+                lockoutOnFailure: false
+                );
+            if (result.Succeeded)
+                return View("/Views/Home/Index.cshtml");
+            else return View();
         }
 
     }

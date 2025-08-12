@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -84,25 +86,27 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
-        public (bool, string?) GetNearstDriver(double lag, double lng)
+        public (bool, string?, List<GetDriver>?) GetNearestDriver(double lat, double lng)
         {
             try
             {
-
-                return (true, null);
+                var list = driverRepo.GetAll().Where(a => a.IsActive && (!a.IsDeleted)).OrderBy(d => ((d.CurrentLng - lng) * (d.CurrentLng - lng) + (d.CurrentLat - lat) * (d.CurrentLat - lat))).ToList();
+                List<GetDriver> list2 = new List<GetDriver>();
+                foreach (var driver in list)
+                {
+                    list2.Add(mapper.Map<GetDriver>(driver));
+                }
+                return (true, null, list2);
             }
             catch (Exception ex)
             {
-                return (true, ex.Message);
+                return (true, ex.Message, null);
             }
         }
 
-
-
-
-
-
-
-
+        public object SendRequest(GetDriver getDriver, string id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

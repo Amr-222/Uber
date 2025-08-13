@@ -10,7 +10,7 @@ namespace Uber.BLL.ModelVM.User
     public class UserProfileVM
     {
         public string Name { get; set; }
-        public List<Ride> Rides { get; set; }
+        public List<Uber.DAL.Entities.Ride> Rides { get; set; }
         public string PaymentMethod { get; set; }
     }
 }

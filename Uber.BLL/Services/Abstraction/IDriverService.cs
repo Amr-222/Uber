@@ -14,6 +14,8 @@ namespace Uber.BLL.Services.Abstraction
         public  Task<(bool, string?)> CreateAsync(CreateDriver driver);
         public (bool, string?) Delete(string id);
         public (bool, string?, List<string>?) GetNearestDriver(double lat, double lng);
+        public (bool,string?) MakeUserActive(string Id);
+        public (bool,string?) MakeUserInactive(string Id);
         object SendRequest(GetDriver getDriver, string id);
         //public (bool, string?) Edit();
     }

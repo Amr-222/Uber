@@ -110,5 +110,38 @@ namespace Uber.DAL.Repo.Implementation
                 return (ex.Message, null);
             }
         }
+        public (bool, string?) MakeUserActive(string id)
+        {
+            try
+            {
+                var driver = db.Drivers.Where(b => b.Id == id).FirstOrDefault();
+                if (driver == null)
+                    return (false, "No Driver with this Id");
+                var result = driver.MakeActive();
+                db.SaveChanges();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) MakeUserInactive(string id)
+        {
+            try
+            {
+                var driver = db.Drivers.Where(b => b.Id == id).FirstOrDefault();
+                if (driver == null)
+                    return (false, "No Driver with this Id");
+                var result = driver.MakeInactive();
+                db.SaveChanges();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
     }
 }

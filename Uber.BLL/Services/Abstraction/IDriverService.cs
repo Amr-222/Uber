@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Uber.BLL.ModelVM.Driver;
 using Uber.BLL.ModelVM.User;
+using Uber.DAL.Entities;
 
 namespace Uber.BLL.Services.Abstraction
 {
@@ -12,7 +13,7 @@ namespace Uber.BLL.Services.Abstraction
     {
         public  Task<(bool, string?)> CreateAsync(CreateDriver driver);
         public (bool, string?) Delete(string id);
-        public (bool, string?, List<string>?) GetNearestDriver(double lat, double lng);
+        public (bool, string?, List<Driver>?) GetNearestDriver(double lat, double lng);
         object SendRequest(GetDriver getDriver, string id);
         //public (bool, string?) Edit();
     }

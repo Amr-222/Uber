@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
-using Uber.BLL.Services.Abstraction;
-using Uber.DAL.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
+using Uber.BLL.Services.Abstraction;
+using Uber.BLL.Services.Impelementation;
+using Uber.DAL.Entities;
 
 public class RideController : Controller
 {
@@ -21,38 +23,49 @@ public class RideController : Controller
     }
 
     [Authorize] // user must be logged in
-    public async Task<IActionResult> RequestRide(double StartLat, double StartLng, double EndLat, double EndLng)
+    public async Task<IActionResult> RequestRide(
+    double StartLat, double StartLng, double EndLat, double EndLng)
     {
-        // 1) find nearest driver (you already have GetNearestDriver)
-        var nearest = _driverService.GetNearestDriver(StartLat, StartLng);
-        if (!nearest.Item1) return View("NoDrivers");
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+            return Unauthorized();
 
-        var chosenDriverId = nearest.Item3.FirstOrDefault(); // IdentityUser.Id (string)
+        var nearestDriversResult = _driverService.GetNearestDriver(StartLat, StartLng);
+        if (!nearestDriversResult.Item1 || nearestDriversResult.Item3 == null || !nearestDriversResult.Item3.Any())
+            return View("NoDrivers");
 
-        // 2) create pending ride in DB
-        var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-        var (ok, err, ride) = _rideService.CreatePendingRide(userId!, chosenDriverId, StartLat, StartLng, EndLat, EndLng);
-        if (!ok || ride == null) return BadRequest(err);
+        var nearestDriver = nearestDriversResult.Item3[0];
 
-        var rideGroup = $"ride-{ride.Id}";
+        // Create pending ride in DB
+        var (ok, err, ride) = _rideService.CreatePendingRide(
+            userId,
+            nearestDriver.Id, // This is Driver.Id
+            StartLat,
+            StartLng,
+            EndLat,
+            EndLng
+        );
 
-        // 3) Notify the target driver
-        await _hub.Clients.User(chosenDriverId).SendAsync("ReceiveRideRequest", new
-        {
-            rideId = ride.Id,
-            rideGroup,
-            startLat = StartLat,
-            startLng = StartLng,
-            endLat = EndLat,
-            endLng = EndLng,
-            userId
-        });
+        if (!ok || ride == null)
+            return BadRequest(err);
 
-        // 4) Show waiting view (client will connect to hub & join group)
-        return View("WaitingForDriver", ride.Id.ToString());
+        // Send ride request to the driver via SignalR
+        await _hub.Clients.User(nearestDriver.Id)
+            .SendAsync("ReceiveRideRequest", new
+            {
+                RideId = ride.Id,
+                StartLat,
+                StartLng,
+                EndLat,
+                EndLng
+            });
+
+        return View("WaitingForDriver", ride.Id.ToString()); // Pass RideId to the view
     }
 
-    // These can be called by Hub as well, but keeping REST fallbacks:
+
+
+// These can be called by Hub as well, but keeping REST fallbacks:
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> DriverAccept(int id, string rideGroup)

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Uber.DAL.DataBase;
 using Uber.DAL.Entities;
+using Uber.DAL.Enums;
 using Uber.DAL.Repo.Abstraction;
 
 namespace Uber.DAL.Repo.Implementation
@@ -13,6 +14,11 @@ namespace Uber.DAL.Repo.Implementation
     {
 
         private readonly UberDBContext db;
+        public RideRepo(UberDBContext db)
+        {
+            this.db = db;
+        }
+
         public (bool, string?) Create(Ride ride)
         {
             try
@@ -69,6 +75,14 @@ namespace Uber.DAL.Repo.Implementation
             {
                 return (ex.Message, null);
             }
+        }
+        public (bool, string?) UpdateStatus(int id, RideStatus status)
+        {
+            var r = db.Rides.Find(id);
+            if (r == null) return (false, "Not found");
+            r.Status = status;
+            db.SaveChanges();
+            return (true, null);
         }
     }
 }

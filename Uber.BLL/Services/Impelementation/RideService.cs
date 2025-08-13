@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Uber.BLL.Helper;
 using Uber.BLL.Services.Abstraction;
 using Uber.DAL.Entities;
+using Uber.DAL.Enums;
 using Uber.DAL.Repo.Abstraction;
 using Uber.DAL.Repo.Impelementation;
 
@@ -15,11 +16,36 @@ namespace Uber.BLL.Services.Impelementation
      public class RideService : IRideService
     {
         private readonly IRideRepo rideRepo;
-
         public RideService(IRideRepo rideRepo)
         {
             this.rideRepo = rideRepo;   
         }
+        public (bool, string?, Ride?) CreatePendingRide(
+        string userId, string driverId,
+        double startLat, double startLng, double endLat, double endLng)
+        {
+            try
+            {
+                var ride = new Ride
+                {
+                    UserId = userId,
+                    DriverId = driverId,
+                    StartLat = startLat,
+                    StartLng = startLng,
+                    EndLat = endLat,
+                    EndLng = endLng,
+                    Status = RideStatus.Pending
+                };
+                var (ok, err) = rideRepo.Create(ride);
+                return (ok, err, ok ? ride : null);
+            }
+            catch (Exception ex) { return (false, ex.Message, null); }
+        }
+
+        public (bool, string?) MarkAccepted(int id) => rideRepo.UpdateStatus(id, RideStatus.Accepted);
+        public (bool, string?) MarkRejected(int id) => rideRepo.UpdateStatus(id, RideStatus.Rejected);
+
+
         public (bool, string?) Create(Ride ride)
         {
 

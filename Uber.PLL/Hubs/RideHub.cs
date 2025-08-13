@@ -1,18 +1,26 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
+using System.Threading.Tasks;
 
+[Authorize] // both user & driver should be authenticated
 public class RideHub : Hub
 {
-    public async Task SendRideRequestToDriver(string driverId, object rideDetails)
+    // Client calls this right after page loads to join a ride group
+    public Task JoinRideGroup(string rideGroupId)
+        => Groups.AddToGroupAsync(Context.ConnectionId, rideGroupId);
+
+    public Task LeaveRideGroup(string rideGroupId)
+        => Groups.RemoveFromGroupAsync(Context.ConnectionId, rideGroupId);
+
+    // Driver will call these from the Driver dashboard UI
+    public async Task AcceptRide(string rideGroupId, int rideDbId)
     {
-        await Clients.User(driverId).SendAsync("ReceiveRideRequest", rideDetails);
+        // tell the user
+        await Clients.Group(rideGroupId).SendAsync("RideAccepted", rideDbId);
     }
 
-    public async Task DriverResponse(string rideId, bool accepted)
+    public async Task RejectRide(string rideGroupId, int rideDbId)
     {
-        // TODO: Update ride status in DB here
-        if (accepted)
-            await Clients.Group($"ride_{rideId}").SendAsync("RideAccepted", rideId);
-        else
-            await Clients.Group($"ride_{rideId}").SendAsync("RideDeclined", rideId);
+        await Clients.Group(rideGroupId).SendAsync("RideRejected", rideDbId);
     }
 }

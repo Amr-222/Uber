@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 using Uber.BLL.Mapper;
@@ -27,8 +28,7 @@ namespace Uber.PLL
 
             builder.Services.AddDbContext<UberDBContext>(options =>
             options.UseSqlServer(connectionString));
-            // SignalR
-            //builder.Services.AddSignalR();
+
             // Auto Mapper
             builder.Services.AddAutoMapper(x => x.AddProfile(new DomainProfile()));
 
@@ -39,6 +39,8 @@ namespace Uber.PLL
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IUserRepo, UserRepo>();
 
+            builder.Services.AddScoped<IRideService, RideService>();
+            builder.Services.AddScoped<IRideRepo, RideRepo>();
 
             // Stripe
             var stripeSettings = builder.Configuration.GetSection("Stripe");
@@ -46,9 +48,9 @@ namespace Uber.PLL
 
             // Identity
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,options =>{
-                options.LoginPath = new PathString("/Account/ChooseLoginType");
-                options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options => {
+                    options.LoginPath = new PathString("/Account/ChooseLoginType");
+                    options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
                 });
 
             builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -66,7 +68,9 @@ namespace Uber.PLL
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 0;
             }).AddEntityFrameworkStores<UberDBContext>();
-
+            // SignalR
+            builder.Services.AddSignalR();
+            builder.Services.AddSingleton<IUserIdProvider, NameIdentifierUserIdProvider>();
 
             var app = builder.Build();
 
@@ -78,12 +82,13 @@ namespace Uber.PLL
                 app.UseHsts();
             }
             //SignalR
-            //app.MapHub<RideHub>("/rideHub");
+            app.MapHub<RideHub>("/Hubs/rideHub");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
+
             app.UseAuthentication();
             app.UseAuthorization();
 

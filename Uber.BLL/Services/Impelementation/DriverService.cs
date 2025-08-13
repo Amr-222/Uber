@@ -96,7 +96,7 @@ namespace Uber.BLL.Services.Impelementation
             }
             catch (Exception ex)
             {
-                return (true, ex.Message, null);
+                return (false, ex.Message, null);
             }
         }
 

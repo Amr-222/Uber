@@ -6,43 +6,298 @@
 <p>Waiting for ride requests...</p>
 
 <div id="rideRequests"></div>
+<div id="connectionStatus" style="margin-top: 20px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+    <strong>Connection Status:</strong> <span id="statusText">Connecting...</span>
+</div>
 
-<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<!-- Use CDN for SignalR client library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 <script>
-    // Create connection to RideHub
-    const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/rideHub")
-        .build();
+    let connection;
+    let isConnected = false;
 
-    // When a ride request is received from RideController
-    connection.on("ReceiveRideRequest", function (ride) {
-        const container = document.getElementById("rideRequests");
+    // Initialize SignalR connection
+    async function initializeConnection() {
+        try {
+            // Create connection to RideHub
+            connection = new signalR.HubConnectionBuilder()
+                .withUrl("/rideHub", { 
+                    skipNegotiation: true,
+                    transport: signalR.HttpTransportType.WebSockets
+                })
+                .withAutomaticReconnect()
+                .build();
 
-        const rideDiv = document.createElement("div");
-        rideDiv.innerHTML = `
-            <div style="border:1px solid black; padding:10px; margin:5px;">
-                <h4>New Ride Request</h4>
-                <p>From: ${ride.startLat}, ${ride.startLng}</p>
-                <p>To: ${ride.endLat}, ${ride.endLng}</p>
-                <button onclick="acceptRide('${ride.rideId}')">Accept Ride</button>
-            </div>
-        `;
-        container.appendChild(rideDiv);
-    });
+            // Connection event handlers
+            connection.onreconnecting(() => {
+                updateStatus("Reconnecting...", "orange");
+            });
 
-    // Function to accept ride
-    function acceptRide(rideId) {
-        fetch(`/Ride/AcceptRide?rideId=${rideId}`, { method: "POST" })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert("Ride accepted! User will be notified.");
-                } else {
-                    alert("Error accepting ride: " + data.message);
+            connection.onreconnected(() => {
+                updateStatus("Connected", "green");
+                isConnected = true;
+            });
+
+            connection.onclose(() => {
+                updateStatus("Disconnected", "red");
+                isConnected = false;
+            });
+
+            // When a ride request is received from RideController
+            connection.on("ReceiveRideRequest", function (ride) {
+                console.log("Received ride request:", ride);
+                displayRideRequest(ride);
+                
+                // Show notification
+                if (Notification.permission === "granted") {
+                    new Notification("New Ride Request", {
+                        body: "You have a new ride request!",
+                        icon: "/favicon.ico"
+                    });
                 }
             });
+
+            // Start connection
+            await connection.start();
+            updateStatus("Connected", "green");
+            isConnected = true;
+            console.log("SignalR Connected. Connection ID:", connection.connectionId);
+
+            // Join driver-specific group - this is crucial for receiving ride requests
+            await joinDriverGroup();
+
+        } catch (err) {
+            console.error("SignalR Connection Error:", err);
+            updateStatus("Connection Failed: " + err.message, "red");
+        }
     }
 
-    // Start connection
-    connection.start().catch(err => console.error(err.toString()));
+    // Function to join driver-specific group
+    async function joinDriverGroup() {
+        try {
+            // Get the current user's ID from the page or authentication context
+            // For now, we'll use a placeholder - in production, this should come from the server
+            const driverId = await getCurrentDriverId();
+            if (driverId) {
+                await connection.invoke("JoinDriverGroup", driverId);
+                console.log("Joined driver group:", driverId);
+                updateStatus("Connected and joined driver group", "green");
+            } else {
+                console.warn("Could not determine driver ID");
+                updateStatus("Connected but driver ID not found", "orange");
+            }
+        } catch (err) {
+            console.error("Error joining driver group:", err);
+        }
+    }
+
+    // Function to get current driver ID - this should be implemented based on your auth system
+    async function getCurrentDriverId() {
+        try {
+            const response = await fetch('/Driver/GetCurrentDriverId');
+            if (response.ok) {
+                const data = await response.json();
+                return data.driverId;
+            } else {
+                console.error('Failed to get driver ID:', response.status);
+                return null;
+            }
+        } catch (err) {
+            console.error('Error getting driver ID:', err);
+            return null;
+        }
+    }
+
+    function updateStatus(message, color) {
+        const statusText = document.getElementById("statusText");
+        statusText.textContent = message;
+        statusText.style.color = color;
+    }
+
+    function displayRideRequest(ride) {
+        const container = document.getElementById("rideRequests");
+        
+        // Clear previous requests
+        container.innerHTML = "";
+
+        const rideDiv = document.createElement("div");
+        rideDiv.className = "ride-request";
+        rideDiv.style.cssText = "border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 15px; background-color: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.1);";
+        
+        rideDiv.innerHTML = `
+            <h4 style="color: #007bff; margin-bottom: 15px;">🚗 New Ride Request</h4>
+            <div style="margin-bottom: 15px;">
+                <p><strong>Pickup Location:</strong> ${ride.startLat.toFixed(6)}, ${ride.startLng.toFixed(6)}</p>
+                <p><strong>Destination:</strong> ${ride.endLat.toFixed(6)}, ${ride.endLng.toFixed(6)}</p>
+                <p><strong>Ride ID:</strong> ${ride.rideId}</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="acceptRide('${ride.rideId}', '${ride.rideGroup}')" 
+                        style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    ✅ Accept Ride
+                </button>
+                <button onclick="rejectRide('${ride.rideId}', '${ride.rideGroup}')" 
+                        style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    ❌ Reject Ride
+                </button>
+            </div>
+        `;
+        
+        container.appendChild(rideDiv);
+    }
+
+    // Function to accept ride
+    async function acceptRide(rideId, rideGroup) {
+        try {
+            const response = await fetch(`/Ride/DriverAccept`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: parseInt(rideId),
+                    rideGroup: rideGroup
+                })
+            });
+
+            if (response.ok) {
+                document.getElementById("rideRequests").innerHTML = "<div style='color: green; padding: 20px; text-align: center;'><h3>✅ Ride Accepted!</h3><p>Redirecting to ride details...</p></div>";
+                
+                // Redirect to ride details page after a short delay
+                setTimeout(() => {
+                    window.location.href = `/Ride/RideDetails/${rideId}`;
+                }, 2000);
+            } else {
+                const errorData = await response.json();
+                alert("Error accepting ride: " + (errorData.message || "Unknown error"));
+            }
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Error accepting ride. Please try again.");
+        }
+    }
+
+    // Function to reject ride
+    async function rejectRide(rideId, rideGroup) {
+        try {
+            const response = await fetch(`/Ride/DriverReject`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: parseInt(rideId),
+                    rideGroup: rideGroup
+                })
+            });
+
+            if (response.ok) {
+                document.getElementById("rideRequests").innerHTML = "<div style='color: orange; padding: 20px; text-align: center;'><h3>⚠️ Ride Rejected</h3><p>You have rejected the ride request.</p></div>";
+                
+                // Clear the ride request after rejecting
+                setTimeout(() => {
+                    document.getElementById("rideRequests").innerHTML = "<p>Waiting for new ride requests...</p>";
+                }, 3000);
+            } else {
+                const errorData = await response.json();
+                alert("Error rejecting ride: " + (errorData.message || "Unknown error"));
+            }
+        } catch (err) {
+            console.error("Error:", err);
+            alert("Error rejecting ride. Please try again.");
+        }
+    }
+
+    // Request notification permission
+    if (Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+
+    // Initialize connection when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeConnection();
+    });
+
+    // Test function to simulate receiving a ride request (for debugging)
+    window.testRideRequest = function() {
+        const testRide = {
+            rideId: 123,
+            rideGroup: "ride-123",
+            startLat: 40.7128,
+            startLng: -74.0060,
+            endLat: 40.7589,
+            endLng: -73.9851
+        };
+        displayRideRequest(testRide);
+    };
+</script>
+
+<!-- Debug section -->
+<div style="margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 5px;">
+    <h4>Debug Tools:</h4>
+    <button onclick="window.testRideRequest()" style="padding: 8px 16px; margin: 5px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Test Ride Request
+    </button>
+    <button onclick="console.log('Connection:', connection)" style="padding: 8px 16px; margin: 5px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Log Connection
+    </button>
+    <button onclick="testSignalRConnection()" style="padding: 8px 16px; margin: 5px; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Test SignalR
+    </button>
+    <button onclick="testDriverGroup()" style="padding: 8px 16px; margin: 5px; background-color: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Test Driver Group
+    </button>
+</div>
+
+<script>
+    // Test function to simulate receiving a ride request (for debugging)
+    window.testRideRequest = function() {
+        const testRide = {
+            rideId: 123,
+            rideGroup: "ride-123",
+            startLat: 40.7128,
+            startLng: -74.0060,
+            endLat: 40.7589,
+            endLng: -73.9851
+        };
+        displayRideRequest(testRide);
+    };
+
+    // Test SignalR connection
+    async function testSignalRConnection() {
+        if (!connection || !isConnected) {
+            alert("SignalR not connected!");
+            return;
+        }
+        
+        try {
+            const result = await connection.invoke("TestConnection");
+            console.log("SignalR test result:", result);
+            alert("SignalR connection test successful!");
+        } catch (err) {
+            console.error("SignalR test error:", err);
+            alert("SignalR test failed: " + err.message);
+        }
+    }
+
+    // Test driver group functionality
+    async function testDriverGroup() {
+        if (!connection || !isConnected) {
+            alert("SignalR not connected!");
+            return;
+        }
+        
+        try {
+            const driverId = await getCurrentDriverId();
+            if (driverId) {
+                await connection.invoke("JoinDriverGroup", driverId);
+                alert(`Successfully joined driver group: driver-${driverId}`);
+            } else {
+                alert("Could not get driver ID!");
+            }
+        } catch (err) {
+            console.error("Driver group test error:", err);
+            alert("Driver group test failed: " + err.message);
+        }
+    }
 </script>

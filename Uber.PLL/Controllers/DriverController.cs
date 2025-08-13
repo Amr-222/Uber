@@ -77,6 +77,25 @@ namespace Uber.PLL.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult GetCurrentDriverId()
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+                
+                return Json(new { driverId = userId });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error: {ex.Message}");
+            }
+        }
         [HttpPost]
         public IActionResult AcceptRide(string rideId)
         {

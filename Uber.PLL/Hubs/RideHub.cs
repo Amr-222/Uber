@@ -7,20 +7,42 @@ public class RideHub : Hub
 {
     // Client calls this right after page loads to join a ride group
     public Task JoinRideGroup(string rideGroupId)
-        => Groups.AddToGroupAsync(Context.ConnectionId, rideGroupId);
+    {
+        System.Console.WriteLine($"Client {Context.ConnectionId} joining ride group: {rideGroupId}");
+        return Groups.AddToGroupAsync(Context.ConnectionId, rideGroupId);
+    }
+
+    // Driver calls this to join their driver-specific group
+    public Task JoinDriverGroup(string driverId)
+    {
+        System.Console.WriteLine($"Driver {Context.ConnectionId} joining driver group: driver-{driverId}");
+        return Groups.AddToGroupAsync(Context.ConnectionId, $"driver-{driverId}");
+    }
 
     public Task LeaveRideGroup(string rideGroupId)
-        => Groups.RemoveFromGroupAsync(Context.ConnectionId, rideGroupId);
+    {
+        System.Console.WriteLine($"Client {Context.ConnectionId} leaving ride group: {rideGroupId}");
+        return Groups.RemoveFromGroupAsync(Context.ConnectionId, rideGroupId);
+    }
+
+    // Test method for debugging
+    public Task<string> TestConnection()
+    {
+        System.Console.WriteLine($"Test connection called by {Context.ConnectionId}");
+        return Task.FromResult($"Connection test successful! Connection ID: {Context.ConnectionId}");
+    }
 
     // Driver will call these from the Driver dashboard UI
     public async Task AcceptRide(string rideGroupId, int rideDbId)
     {
+        System.Console.WriteLine($"AcceptRide called: rideGroupId={rideGroupId}, rideDbId={rideDbId}");
         // tell the user
         await Clients.Group(rideGroupId).SendAsync("RideAccepted", rideDbId);
     }
 
     public async Task RejectRide(string rideGroupId, int rideDbId)
     {
+        System.Console.WriteLine($"RejectRide called: rideGroupId={rideGroupId}, rideDbId={rideDbId}");
         await Clients.Group(rideGroupId).SendAsync("RideRejected", rideDbId);
     }
 }

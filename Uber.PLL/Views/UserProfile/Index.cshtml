@@ -1,0 +1,184 @@
+﻿@model Uber.BLL.ModelVM.User.UserProfileVM
+@{
+    ViewData["Title"] = "User Profile";
+}
+
+<div class="profile-container">
+    <aside class="sidebar">
+        <div class="user-info">
+            <div class="icon-placeholder">
+                <i class="fas fa-user"></i>
+            </div>
+            <h3>@Model.Name</h3>
+        </div>
+
+        <ul>
+            <li data-tab="rides" class="active">🚗 Rides</li>
+            <li data-tab="payment">💳 Payment</li>
+            <li>
+                <a href="/Home/Help" style="color: inherit; text-decoration: none;">❓ Help</a>
+            </li>
+            <li data-tab="settings">⚙️ Settings</li>
+        </ul>
+    </aside>
+
+    <main class="content">
+        <section id="rides" class="tab-content active">
+            <h2>Your Rides</h2>
+            @if (Model.Rides != null && Model.Rides.Any())
+            {
+                foreach (var ride in Model.Rides)
+                {
+                    <div class="ride-card">
+                        <p><strong>From:</strong> @ride.StartLat @ride.StartLng</p>
+                        <p><strong>To:</strong> @ride.EndLat @ride.EndLng</p>
+                        @* <p><strong>Date & Time:</strong> @ride.RideTime.ToString("dd MMM yyyy - HH:mm")</p>
+                        <p><strong>Price:</strong> @ride.PriceEgp EGP</p> *@
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="empty-msg">No rides yet.</p>
+            }
+        </section>
+
+        <section id="payment" class="tab-content">
+            <h2>Payment Method</h2>
+            @if (!string.IsNullOrEmpty(Model.PaymentMethod))
+            {
+                <p>Current Method: <strong>@Model.PaymentMethod</strong></p>
+            }
+            else
+            {
+                <p class="empty-msg">No payment method set.</p>
+            }
+        </section>
+
+        <section id="settings" class="tab-content">
+            <h2>Settings</h2>
+            <a href="#" class="btn-update">Update Profile</a>
+        </section>
+    </main>
+</div>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+<script>
+    document.querySelectorAll(".sidebar ul li[data-tab]").forEach(item => {
+        item.addEventListener("click", () => {
+            document.querySelectorAll(".sidebar ul li").forEach(li => li.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+
+            item.classList.add("active");
+            document.getElementById(item.dataset.tab).classList.add("active");
+        });
+    });
+</script>
+
+<style>
+    .profile-container {
+        display: flex;
+        background: #f8f9fa;
+        min-height: 80vh;
+    }
+
+    .sidebar {
+        width: 220px;
+        background: #000;
+        color: #fff;
+        padding: 20px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .user-info {
+        text-align: center;
+        padding: 15px 0;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 15px;
+    }
+
+    .icon-placeholder {
+        width: 80px;
+        height: 80px;
+        background: #1CB5A3;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 8px;
+        font-size: 35px;
+        color: #fff;
+    }
+
+    .user-info h3 {
+        font-size: 16px;
+        margin: 0;
+        color: #fff;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        width: 100%;
+    }
+
+    .sidebar ul li {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        text-align: left;
+    }
+
+    .sidebar ul li:hover,
+    .sidebar ul li.active {
+        background: #1CB5A3;
+    }
+
+    .sidebar ul li a {
+        display: block;
+        color: inherit;
+        text-decoration: none;
+    }
+
+    .content {
+        flex: 1;
+        padding: 20px;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .ride-card {
+        background: #fff;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .empty-msg {
+        color: #777;
+        font-style: italic;
+    }
+
+    .btn-update {
+        display: inline-block;
+        padding: 10px 15px;
+        background: #1CB5A3;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .btn-update:hover {
+        background: #17a38a;
+    }
+</style>

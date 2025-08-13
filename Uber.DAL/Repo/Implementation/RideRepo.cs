@@ -84,5 +84,23 @@ namespace Uber.DAL.Repo.Implementation
             db.SaveChanges();
             return (true, null);
         }
+
+        public (bool, string?) AssignNewDriver(int rideId, string newDriverId)
+        {
+            try
+            {
+                var ride = db.Rides.Find(rideId);
+                if (ride == null) return (false, "Ride not found");
+                
+                ride.DriverId = newDriverId;
+                ride.Status = RideStatus.Pending; // Reset status to pending for new driver
+                db.SaveChanges();
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
     }
 }

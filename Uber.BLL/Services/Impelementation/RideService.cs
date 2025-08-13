@@ -80,5 +80,44 @@ namespace Uber.BLL.Services.Impelementation
         {
             return rideRepo.GetAll();
         }
+
+        public (bool, string?) AssignNewDriver(int rideId, string newDriverId)
+        {
+            try
+            {
+                var (ok, err) = rideRepo.AssignNewDriver(rideId, newDriverId);
+                return (ok, err);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) MarkInProgress(int id)
+        {
+            try
+            {
+                var (ok, err) = rideRepo.UpdateStatus(id, RideStatus.InProgress);
+                return (ok, err);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) MarkCompleted(int id)
+        {
+            try
+            {
+                var (ok, err) = rideRepo.UpdateStatus(id, RideStatus.Completed);
+                return (ok, err);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
     }
 }

@@ -16,6 +16,6 @@ namespace Uber.DAL.Repo.Abstraction
         public List<Ride> GetAll();
 
         public (bool, string?) UpdateStatus(int id, RideStatus status);
-
+        public (bool, string?) AssignNewDriver(int rideId, string newDriverId);
     }
 }

@@ -1,0 +1,19 @@
+﻿@model string 
+
+<h2>Waiting for a driver...</h2>
+<p>Ride ID: @Model</p>
+<div id="status">Looking for drivers...</div>
+
+<script>
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/rideHub") 
+        .build();
+
+    connection.on("DriverAccepted", function (rideId) {
+        if (rideId == "@Model") {
+            document.getElementById("status").innerText = "Driver accepted your request! 🚗";
+        }
+    });
+
+    connection.start().catch(err => console.error(err));
+</script>

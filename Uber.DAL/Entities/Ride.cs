@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Uber.DAL.Enums;
 
 namespace Uber.DAL.Entities
 {   public class Ride
@@ -10,31 +11,29 @@ namespace Uber.DAL.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-      
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        //public Location From { get; set; }
-        //public Location To { get; set; }
+        // Coordinates
+        public double StartLat { get; set; }
+        public double StartLng { get; set; }
+        public double EndLat { get; set; }
+        public double EndLng { get; set; }
 
-        public DateTime Date { get; set; } = DateTime.Now;
+        // Relationships
+        public string DriverId { get; set; }   // the chosen (target) driver
+        public Driver? Driver { get; set; }
+        public string UserId { get; set; }     // requester
+        public User? User { get; set; }
 
-        public int Rate {  get; set; }
-        
-        public string DriverId { get; set; }
-        public Driver Driver { get; set; }
-        public string UserId { get; set; }
-        public User User { get; set; }
+        // Workflow
+        public RideStatus Status { get; set; } = RideStatus.Pending;
+        public int? Rate { get; set; }
+
         public bool IsCanceld { get; set; }
         public (bool, string?) Cancel()
         {
-            try
-            {
-                IsCanceld = true;
-                return (true, null);
-            }
-            catch (Exception ex)
-            {
-                return (false, ex.Message);
-            }
+            try { IsCanceld = true; Status = RideStatus.Cancelled; return (true, null); }
+            catch (Exception ex) { return (false, ex.Message); }
         }
 
 

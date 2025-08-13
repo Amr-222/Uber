@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Request Ride";
+}
+
+<h2>Request Ride</h2>
+
+<form id="form">
+    <label>Start Lat</label><input id="StartLat" name="StartLat" />
+    <label>Start Lng</label><input id="StartLng" name="StartLng" />
+    <label>End Lat</label><input id="EndLat" name="EndLat" />
+    <label>End Lng</label><input id="EndLng" name="EndLng" />
+    <button type="submit">Request</button>
+</form>
+
+<script>
+    document.getElementById("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const q = new URLSearchParams({
+            StartLat: document.getElementById("StartLat").value,
+            StartLng: document.getElementById("StartLng").value,
+            EndLat: document.getElementById("EndLat").value,
+            EndLng: document.getElementById("EndLng").value
+        }).toString();
+        window.location = `/Ride/RequestRide?${q}`;
+    });
+</script>

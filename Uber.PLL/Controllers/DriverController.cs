@@ -55,15 +55,35 @@ namespace Uber.PLL.Controllers
 
 
             var result = await signInManager.PasswordSignInAsync(
-                model.Email,      
-                model.Password,    
-                model.RememberMe,
-                lockoutOnFailure: false
-                );
-            if (result.Succeeded)
-                return View("/Views/Home/Index.cshtml");
-            else return View();
-        }
+     model.Email,      
+     model.Password,    
+     model.RememberMe,
+     lockoutOnFailure: false
+ );
 
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+
+                ViewBag.LoginError = "*Invalid username or password";
+                return View();
+            }
+        }
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult AcceptRide(string rideId)
+        {
+            // Logic to mark ride as accepted
+            // Notify user through SignalR if needed
+
+            return Json(new { success = true });
+        }
     }
 }

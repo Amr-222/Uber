@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Uber.DAL.Entities;
+using Uber.DAL.Enums;
 
 namespace Uber.DAL.Repo.Abstraction
 {
@@ -13,5 +14,8 @@ namespace Uber.DAL.Repo.Abstraction
         public (bool, string?) Cancel(int id);
         public (string, Ride?) GetByID(int id);
         public List<Ride> GetAll();
+
+        public (bool, string?) UpdateStatus(int id, RideStatus status);
+
     }
 }

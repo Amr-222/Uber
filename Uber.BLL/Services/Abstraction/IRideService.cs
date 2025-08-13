@@ -9,9 +9,15 @@ namespace Uber.BLL.Services.Abstraction
 {
     public interface IRideService
     {
-        public (bool, string?) Create(Ride ride);// TODO Change this
-        public (bool, string?) Cancel(int id);// TODO Change this
-        public (string?, Ride?) GetByID(int id); // TODO Change this
-        public List<Ride> GetAll();// TODO Change this
+        (bool, string?) Create(Ride ride);
+        (bool, string?) Cancel(int id);
+        (string?, Ride?) GetByID(int id);
+        List<Ride> GetAll();
+
+        (bool, string?, Ride?) CreatePendingRide(string userId, string driverId,
+            double startLat, double startLng, double endLat, double endLng);
+
+        (bool, string?) MarkAccepted(int id);
+        (bool, string?) MarkRejected(int id);
     }
 }

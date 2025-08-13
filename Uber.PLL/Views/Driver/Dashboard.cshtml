@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Driver Dashboard";
+}
+
+<h2>Driver Dashboard</h2>
+<p>Waiting for ride requests...</p>
+
+<div id="rideRequests"></div>
+
+<script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+<script>
+    // Create connection to RideHub
+    const connection = new signalR.HubConnectionBuilder()
+        .withUrl("/rideHub")
+        .build();
+
+    // When a ride request is received from RideController
+    connection.on("ReceiveRideRequest", function (ride) {
+        const container = document.getElementById("rideRequests");
+
+        const rideDiv = document.createElement("div");
+        rideDiv.innerHTML = `
+            <div style="border:1px solid black; padding:10px; margin:5px;">
+                <h4>New Ride Request</h4>
+                <p>From: ${ride.startLat}, ${ride.startLng}</p>
+                <p>To: ${ride.endLat}, ${ride.endLng}</p>
+                <button onclick="acceptRide('${ride.rideId}')">Accept Ride</button>
+            </div>
+        `;
+        container.appendChild(rideDiv);
+    });
+
+    // Function to accept ride
+    function acceptRide(rideId) {
+        fetch(`/Ride/AcceptRide?rideId=${rideId}`, { method: "POST" })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Ride accepted! User will be notified.");
+                } else {
+                    alert("Error accepting ride: " + data.message);
+                }
+            });
+    }
+
+    // Start connection
+    connection.start().catch(err => console.error(err.toString()));
+</script>

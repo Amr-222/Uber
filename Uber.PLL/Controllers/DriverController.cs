@@ -76,8 +76,8 @@ namespace Uber.PLL.Controllers
         }
         public IActionResult Dashboard()
         {
-            var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var result = service.MakeUserActive(Id);
+            // Don't automatically set user as active - let the frontend handle this
+            // This prevents issues with the IsActive status being reset
             return View();
         }
 
@@ -142,6 +142,59 @@ namespace Uber.PLL.Controllers
                 if (result.Item1)
                 {
                     return Json(new { success = true, message = "Driver status set to active" });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = result.Item2 });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetCurrentDriverStatus()
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var (err, driver) = service.GetByID(userId);
+                if (err != null || driver == null)
+                {
+                    return NotFound("Driver not found");
+                }
+
+                return Json(new { isActive = driver.IsActive });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult ToggleDriverStatus([FromBody] ToggleDriverStatusRequest request)
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var result = request.IsActive ? service.MakeUserActive(userId) : service.MakeUserInactive(userId);
+                if (result.Item1)
+                {
+                    var status = request.IsActive ? "active" : "inactive";
+                    return Json(new { success = true, message = $"Driver status set to {status}" });
                 }
                 else
                 {

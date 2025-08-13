@@ -3,11 +3,42 @@
 }
 
 <h2>Driver Dashboard</h2>
+
+<!-- Driver Status Section -->
+<div style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e8; border-radius: 8px; border-left: 4px solid #28a745;">
+    <h4 style="color: #28a745; margin: 0 0 10px 0;">🚗 Driver Status</h4>
+    <div style="display: flex; align-items: center; gap: 15px;">
+        <div>
+            <strong>Current Status:</strong> 
+            <span id="driverStatus" style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                Active
+            </span>
+        </div>
+        <button onclick="toggleDriverStatus()" id="toggleStatusBtn" style="padding: 8px 16px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Set Inactive
+        </button>
+    </div>
+    <small style="color: #6c757d; margin-top: 10px; display: block;">
+        Active drivers receive ride requests. Inactive drivers are not considered for new rides.
+    </small>
+</div>
+
 <p>Waiting for ride requests...</p>
 
 <div id="rideRequests"></div>
 <div id="connectionStatus" style="margin-top: 20px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
     <strong>Connection Status:</strong> <span id="statusText">Connecting...</span>
+</div>
+
+<!-- Status Log Section -->
+<div id="statusLog" style="margin-top: 20px; padding: 15px; background-color: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+    <h4 style="color: #856404; margin: 0 0 10px 0;">📋 Status Log</h4>
+    <div id="logContent" style="max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; background-color: #f8f9fa; padding: 10px; border-radius: 5px;">
+        <div>Page loaded - Initializing...</div>
+    </div>
+    <button onclick="clearLog()" style="margin-top: 10px; padding: 5px 10px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Clear Log
+    </button>
 </div>
 
 <!-- Use CDN for SignalR client library -->
@@ -215,32 +246,18 @@
 
     // Initialize connection when page loads
     document.addEventListener('DOMContentLoaded', function() {
+        addLogEntry('🚀 Page loaded - Starting initialization...');
         initializeConnection();
         startHeartbeat(); // Start heartbeat when page loads
+        
+        // Get current driver status and update UI
+        addLogEntry('📡 Fetching current driver status...');
+        getCurrentDriverStatus();
     });
-
-    // Function to set driver as inactive
-    async function setDriverInactive() {
-        try {
-            const response = await fetch('/Driver/MakeUserInactive', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-
-            if (response.ok) {
-                console.log('Driver status set to inactive');
-            } else {
-                console.error('Failed to set driver as inactive');
-            }
-        } catch (err) {
-            console.error('Error setting driver as inactive:', err);
-        }
-    }
 
     // Function to set driver as active (for heartbeat)
     async function setDriverActive() {
+        addLogEntry('Setting driver as ACTIVE...');
         try {
             const response = await fetch('/Driver/MakeUserActive', {
                 method: 'POST',
@@ -250,15 +267,88 @@
             });
 
             if (response.ok) {
+                addLogEntry('✅ Driver status set to ACTIVE successfully');
                 console.log('Driver status set to active');
+                updateDriverStatusDisplay(true);
             } else {
-                console.error('Failed to set driver as active');
+                const errorData = await response.json();
+                addLogEntry(`❌ Failed to set driver as ACTIVE: ${errorData.message || 'Unknown error'}`);
+                console.error('Failed to set driver as active:', errorData);
             }
         } catch (err) {
+            addLogEntry(`❌ Error setting driver as ACTIVE: ${err.message}`);
             console.error('Error setting driver as active:', err);
         }
     }
 
+    // Function to set driver as inactive
+    async function setDriverInactive() {
+        addLogEntry('Setting driver as INACTIVE...');
+        try {
+            const response = await fetch('/Driver/MakeUserInactive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                addLogEntry('✅ Driver status set to INACTIVE successfully');
+                console.log('Driver status set to inactive');
+                updateDriverStatusDisplay(false);
+            } else {
+                const errorData = await response.json();
+                addLogEntry(`❌ Failed to set driver as INACTIVE: ${errorData.message || 'Unknown error'}`);
+                console.error('Failed to set driver as inactive:', errorData);
+            }
+        } catch (err) {
+            addLogEntry(`❌ Error setting driver as INACTIVE: ${err.message}`);
+            console.error('Error setting driver as inactive:', err);
+        }
+    }
+
+    // Function to update the driver status display
+    function updateDriverStatusDisplay(isActive) {
+        const statusElement = document.getElementById('driverStatus');
+        const toggleButton = document.getElementById('toggleStatusBtn');
+        
+        if (statusElement && toggleButton) {
+            if (isActive) {
+                statusElement.textContent = 'Active';
+                statusElement.style.backgroundColor = '#28a745';
+                toggleButton.textContent = 'Set Inactive';
+                toggleButton.style.backgroundColor = '#dc3545';
+            } else {
+                statusElement.textContent = 'Inactive';
+                statusElement.style.backgroundColor = '#6c757d';
+                toggleButton.textContent = 'Set Active';
+                toggleButton.style.backgroundColor = '#28a745';
+            }
+        }
+    }
+
+    // Function to get current driver status from server
+    async function getCurrentDriverStatus() {
+        addLogEntry('Fetching current driver status from server...');
+        try {
+            const response = await fetch('/Driver/GetCurrentDriverStatus');
+            if (response.ok) {
+                const data = await response.json();
+                addLogEntry(`📊 Current driver status: ${data.isActive ? 'ACTIVE' : 'INACTIVE'}`);
+                updateDriverStatusDisplay(data.isActive);
+                return data.isActive;
+            } else {
+                const errorData = await response.json();
+                addLogEntry(`❌ Failed to get current driver status: ${errorData.message || 'Unknown error'}`);
+                console.error('Failed to get current driver status:', errorData);
+                return null;
+            }
+        } catch (err) {
+            addLogEntry(`❌ Error getting current driver status: ${err.message}`);
+            console.error('Error getting current driver status:', err);
+            return null;
+        }
+    }
 
     // Event listeners for page unload
     window.addEventListener('beforeunload', function(e) {
@@ -411,13 +501,21 @@
     // Add a method to test the driver status functionality
     window.testDriverStatus = function() {
         console.log('Testing driver status functionality...');
+        console.log('Current connection state:', connection?.connectionState);
+        console.log('Current driver ID:', getCurrentDriverId());
+        
+        // Test setting active
         setDriverActive();
         setTimeout(() => {
+            // Test setting inactive
             setDriverInactive();
             setTimeout(() => {
+                // Test setting active again
                 setDriverActive();
             }, 1000);
         }, 1000);
+        
+        alert('Driver status test started. Check console for details.');
     };
 
     // Heartbeat mechanism to keep driver active while on the page
@@ -465,6 +563,7 @@
             endLng: -73.9851
         };
         displayRideRequest(testRide);
+        console.log('Test ride request displayed:', testRide);
     };
 </script>
 
@@ -486,28 +585,21 @@
     <button onclick="window.testDriverStatus()" style="padding: 8px 16px; margin: 5px; background-color: #ffc107; color: black; border: none; border-radius: 3px; cursor: pointer;">
         Test Driver Status
     </button>
+    <button onclick="getCurrentDriverStatus()" style="padding: 8px 16px; margin: 5px; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Get Current Status
+    </button>
     <button onclick="window.setDriverStatus(true)" style="padding: 8px 16px; margin: 5px; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
         Set Active
     </button>
     <button onclick="window.setDriverStatus(false)" style="padding: 8px 16px; margin: 5px; background-color: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">
         Set Inactive
     </button>
+    <button onclick="testDriverStatusAPI()" style="padding: 8px 16px; margin: 5px; background-color: #6f42c1; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Test Status API
+    </button>
 </div>
 
 <script>
-    // Test function to simulate receiving a ride request (for debugging)
-    window.testRideRequest = function() {
-        const testRide = {
-            rideId: 123,
-            rideGroup: "ride-123",
-            startLat: 40.7128,
-            startLng: -74.0060,
-            endLat: 40.7589,
-            endLng: -73.9851
-        };
-        displayRideRequest(testRide);
-    };
-
     // Test SignalR connection
     async function testSignalRConnection() {
         if (!connection || !isConnected) {
@@ -516,9 +608,12 @@
         }
         
         try {
-            const result = await connection.invoke("TestConnection");
-            console.log("SignalR test result:", result);
-            alert("SignalR connection test successful!");
+            // Test the connection by trying to invoke a simple method
+            const connectionId = connection.connectionId;
+            console.log("SignalR connection test successful!");
+            console.log("Connection ID:", connectionId);
+            console.log("Connection State:", connection.connectionState);
+            alert(`SignalR connection test successful!\nConnection ID: ${connectionId}\nState: ${connection.connectionState}`);
         } catch (err) {
             console.error("SignalR test error:", err);
             alert("SignalR test failed: " + err.message);
@@ -537,6 +632,7 @@
             if (driverId) {
                 await connection.invoke("JoinDriverGroup", driverId);
                 alert(`Successfully joined driver group: driver-${driverId}`);
+                console.log("Driver group test successful");
             } else {
                 alert("Could not get driver ID!");
             }
@@ -544,5 +640,75 @@
             console.error("Driver group test error:", err);
             alert("Driver group test failed: " + err.message);
         }
+    }
+
+    // Function to toggle driver status
+    window.toggleDriverStatus = async function() {
+        const currentStatus = document.getElementById("driverStatus").textContent;
+        const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
+        document.getElementById("driverStatus").textContent = newStatus;
+        document.getElementById("toggleStatusBtn").textContent = newStatus;
+
+        try {
+            const response = await fetch('/Driver/ToggleDriverStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    isActive: newStatus === "Active"
+                })
+            });
+
+            if (response.ok) {
+                console.log(`Driver status set to ${newStatus}`);
+                alert(`Driver status set to ${newStatus}`);
+            } else {
+                const errorData = await response.json();
+                alert(`Error setting driver status to ${newStatus}: ${errorData.message || "Unknown error"}`);
+                // Revert status if setting fails
+                document.getElementById("driverStatus").textContent = currentStatus;
+                document.getElementById("toggleStatusBtn").textContent = currentStatus;
+            }
+        } catch (err) {
+            console.error("Error toggling driver status:", err);
+            alert("Error toggling driver status. Please try again.");
+        }
+    };
+
+    // Test driver status API
+    async function testDriverStatusAPI() {
+        try {
+            const response = await fetch('/Driver/GetCurrentDriverStatus');
+            if (response.ok) {
+                const data = await response.json();
+                alert(`Current Driver Status: ${data.isActive ? 'Active' : 'Inactive'}`);
+                console.log('Current Driver Status:', data);
+            } else {
+                const errorData = await response.json();
+                alert(`Error fetching current driver status: ${errorData.message || 'Unknown error'}`);
+                console.error('Error fetching current driver status:', errorData);
+            }
+        } catch (err) {
+            console.error('Error testing driver status API:', err);
+            alert('Error testing driver status API. Please try again.');
+        }
+    }
+
+    // Function to add log entries
+    function addLogEntry(message) {
+        const logContent = document.getElementById('logContent');
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.innerHTML = `[${timestamp}] ${message}`;
+        logContent.appendChild(logEntry);
+        logContent.scrollTop = logContent.scrollHeight;
+        console.log(`[LOG] ${message}`);
+    }
+
+    // Function to clear the status log
+    function clearLog() {
+        const logContent = document.getElementById('logContent');
+        logContent.innerHTML = '<div>Page loaded - Initializing...</div>';
     }
 </script>

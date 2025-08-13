@@ -114,5 +114,10 @@ namespace Uber.BLL.Services.Impelementation
         {
             return driverRepo.MakeUserInactive(Id);
         }
+
+        public (string?, Driver?) GetByID(string id)
+        {
+            return driverRepo.GetByID(id);
+        }
     }
 }

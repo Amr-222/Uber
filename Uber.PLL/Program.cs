@@ -82,7 +82,7 @@ namespace Uber.PLL
                 app.UseHsts();
             }
             //SignalR
-            app.MapHub<RideHub>("/Hubs/rideHub");
+            app.MapHub<RideHub>("/rideHub");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

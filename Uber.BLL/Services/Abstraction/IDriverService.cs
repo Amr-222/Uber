@@ -13,7 +13,7 @@ namespace Uber.BLL.Services.Abstraction
     {
         public  Task<(bool, string?)> CreateAsync(CreateDriver driver);
         public (bool, string?) Delete(string id);
-        public (bool, string?, List<Driver>?) GetNearestDriver(double lat, double lng);
+        public (bool, string?, List<string>?) GetNearestDriver(double lat, double lng);
         object SendRequest(GetDriver getDriver, string id);
         //public (bool, string?) Edit();
     }

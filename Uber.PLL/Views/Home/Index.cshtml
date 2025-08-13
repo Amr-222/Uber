@@ -329,7 +329,7 @@
         console.log("Distance:", result.routeDistance, "km");
         console.log("Duration:", result.routeDuration, "minutes");
 
-        var price = result.routeDistance * 10;
+        var price = result.routeDistance * 7 + result.routeDuration * 1.5 + 7;
         console.log("Price:", price, "EGP");
 
         animateCar(result.path);

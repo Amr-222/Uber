@@ -86,17 +86,17 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
-        public (bool, string?, List<Driver>?) GetNearestDriver(double lat, double lng)
+        public (bool, string?, List<string>?) GetNearestDriver(double lat, double lng)
         {
             try
             {
                 var list = driverRepo.GetAll().Where(a => a.IsActive && (!a.IsDeleted)).OrderBy(d => ((d.CurrentLng - lng) * (d.CurrentLng - lng) + (d.CurrentLat - lat) * (d.CurrentLat - lat))).ToList();
-
-                return (true, null, list);
+                List<string> list2 = list.Select(a => a.Id).ToList();
+                return (true, null, list2);
             }
             catch (Exception ex)
             {
-                return (true, ex.Message, null);
+                return (false, ex.Message, null);
             }
         }
 

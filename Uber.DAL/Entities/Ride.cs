@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Uber.DAL.Enums;
 
 namespace Uber.DAL.Entities
-{   public class Ride
+{
+    public class Ride
     {
 
 
@@ -11,7 +12,7 @@ namespace Uber.DAL.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; private set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Coordinates
         public double StartLat { get; set; }
@@ -29,11 +30,19 @@ namespace Uber.DAL.Entities
         public RideStatus Status { get; set; } = RideStatus.Pending;
         public int? Rate { get; set; }
 
-        public bool IsCanceld { get; set; }
+
         public (bool, string?) Cancel()
         {
-            try { IsCanceld = true; Status = RideStatus.Cancelled; return (true, null); }
-            catch (Exception ex) { return (false, ex.Message); }
+            try
+            {
+                Status = RideStatus.Cancelled;
+                return (true, null);
+            }
+
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
         }
 
 

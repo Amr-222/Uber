@@ -84,6 +84,16 @@ namespace Uber.DAL.Entities
             }
         }
 
+        public (bool, string?) MakeActive()
+        {
+            try { IsActive = true; return (true, null); }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
 
+        public (bool, string?) MakeInactive()
+        {
+            try { IsActive = false; return (true, null); }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
     }
 }

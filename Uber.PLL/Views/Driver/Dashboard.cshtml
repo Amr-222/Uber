@@ -216,6 +216,242 @@
     // Initialize connection when page loads
     document.addEventListener('DOMContentLoaded', function() {
         initializeConnection();
+        startHeartbeat(); // Start heartbeat when page loads
+    });
+
+    // Function to set driver as inactive
+    async function setDriverInactive() {
+        try {
+            const response = await fetch('/Driver/MakeUserInactive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                console.log('Driver status set to inactive');
+            } else {
+                console.error('Failed to set driver as inactive');
+            }
+        } catch (err) {
+            console.error('Error setting driver as inactive:', err);
+        }
+    }
+
+    // Function to set driver as active (for heartbeat)
+    async function setDriverActive() {
+        try {
+            const response = await fetch('/Driver/MakeUserActive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (response.ok) {
+                console.log('Driver status set to active');
+            } else {
+                console.error('Failed to set driver as active');
+            }
+        } catch (err) {
+            console.error('Error setting driver as active:', err);
+        }
+    }
+
+
+    // Event listeners for page unload
+    window.addEventListener('beforeunload', function(e) {
+        // Set driver as inactive when leaving the page
+        setDriverInactive();
+    });
+
+    window.addEventListener('unload', function(e) {
+        // Set driver as inactive when leaving the page
+        setDriverInactive();
+    });
+
+    // Event listener for page visibility change (when user switches tabs or minimizes browser)
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            // Page is hidden (user switched tabs or minimized browser)
+            setDriverInactive();
+        } else {
+            // Page is visible again (user returned to the page)
+            setDriverActive();
+        }
+    });
+
+    // Event listener for page focus/blur (when user switches between applications)
+    window.addEventListener('blur', function() {
+        // User switched to another application
+        setDriverInactive();
+    });
+
+    window.addEventListener('focus', function() {
+        // User returned to the application
+        setDriverActive();
+    });
+
+    // Event listener for browser navigation (back/forward buttons)
+    window.addEventListener('popstate', function() {
+        // User navigated away using browser navigation
+        setDriverInactive();
+    });
+
+    // Event listener for beforeunload with confirmation dialog
+    window.addEventListener('beforeunload', function(e) {
+        // Show confirmation dialog and set driver as inactive
+        setDriverInactive();
+        e.preventDefault();
+        e.returnValue = '';
+    });
+
+    // Event listener for page hide (when closing tab/window)
+    window.addEventListener('pagehide', function() {
+        // User is closing the tab or window
+        setDriverInactive();
+    });
+
+    // Event listener for page show (when returning to the page)
+    window.addEventListener('pageshow', function() {
+        // User returned to the page
+        if (!document.hidden) {
+            setDriverActive();
+            startHeartbeat();
+        }
+    });
+
+    // Event listeners for online/offline status
+    window.addEventListener('online', function() {
+        // Internet connection restored
+        console.log('Internet connection restored');
+        // Reconnect SignalR if needed
+        if (connection && !isConnected) {
+            initializeConnection();
+        }
+    });
+
+    window.addEventListener('offline', function() {
+        // Internet connection lost
+        console.log('Internet connection lost');
+        // Set driver as inactive when offline
+        setDriverInactive();
+    });
+
+    // User activity monitoring to detect idle state
+    let userActivityTimeout;
+    const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+
+    function resetUserActivityTimer() {
+        clearTimeout(userActivityTimeout);
+        userActivityTimeout = setTimeout(() => {
+            // User has been idle for 5 minutes, set as inactive
+            console.log('User idle for 5 minutes, setting driver as inactive');
+            setDriverInactive();
+        }, IDLE_TIMEOUT);
+    }
+
+    // Reset timer on user activity
+    ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
+        document.addEventListener(event, resetUserActivityTimer, true);
+    });
+
+    // Initialize user activity timer
+    resetUserActivityTimer();
+
+    // Device sleep/wake detection
+    let wasPageVisible = true;
+    
+    function checkDeviceSleep() {
+        if (wasPageVisible && document.hidden) {
+            // Device might be going to sleep
+            console.log('Device might be going to sleep');
+            setDriverInactive();
+        }
+        wasPageVisible = !document.hidden;
+    }
+
+    // Check for device sleep every second
+    setInterval(checkDeviceSleep, 1000);
+
+    // Cleanup function to be called when leaving the page
+    function cleanup() {
+        stopHeartbeat();
+        clearTimeout(userActivityTimeout);
+        setDriverInactive();
+    }
+
+    // Call cleanup when page is unloaded
+    window.addEventListener('unload', cleanup);
+
+    // Add a method to manually set driver status (for debugging/testing)
+    window.setDriverStatus = function(active) {
+        if (active) {
+            setDriverActive();
+        } else {
+            setDriverInactive();
+        }
+    };
+
+    // Add a method to get current driver status (for debugging/testing)
+    window.getDriverStatus = async function() {
+        try {
+            const response = await fetch('/Driver/GetCurrentDriverId');
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Current driver ID:', data.driverId);
+                return data.driverId;
+            }
+        } catch (err) {
+            console.error('Error getting driver status:', err);
+        }
+    };
+
+    // Add a method to test the driver status functionality
+    window.testDriverStatus = function() {
+        console.log('Testing driver status functionality...');
+        setDriverActive();
+        setTimeout(() => {
+            setDriverInactive();
+            setTimeout(() => {
+                setDriverActive();
+            }, 1000);
+        }, 1000);
+    };
+
+    // Heartbeat mechanism to keep driver active while on the page
+    let heartbeatInterval;
+    
+    function startHeartbeat() {
+        // Send heartbeat every 30 seconds to keep driver active
+        heartbeatInterval = setInterval(async () => {
+            if (!document.hidden && navigator.onLine) {
+                try {
+                    await setDriverActive();
+                } catch (err) {
+                    console.error('Heartbeat error:', err);
+                }
+            }
+        }, 30000); // 30 seconds
+    }
+
+    function stopHeartbeat() {
+        if (heartbeatInterval) {
+            clearInterval(heartbeatInterval);
+            heartbeatInterval = null;
+        }
+    }
+
+    // Start heartbeat when page becomes visible
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            stopHeartbeat();
+            setDriverInactive();
+        } else {
+            startHeartbeat();
+            setDriverActive();
+        }
     });
 
     // Test function to simulate receiving a ride request (for debugging)
@@ -246,6 +482,15 @@
     </button>
     <button onclick="testDriverGroup()" style="padding: 8px 16px; margin: 5px; background-color: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
         Test Driver Group
+    </button>
+    <button onclick="window.testDriverStatus()" style="padding: 8px 16px; margin: 5px; background-color: #ffc107; color: black; border: none; border-radius: 3px; cursor: pointer;">
+        Test Driver Status
+    </button>
+    <button onclick="window.setDriverStatus(true)" style="padding: 8px 16px; margin: 5px; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Set Active
+    </button>
+    <button onclick="window.setDriverStatus(false)" style="padding: 8px 16px; margin: 5px; background-color: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">
+        Set Inactive
     </button>
 </div>
 

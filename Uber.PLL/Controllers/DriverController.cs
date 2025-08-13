@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
+using System.Security.Claims;
 using Uber.BLL.ModelVM.Account;
 using Uber.BLL.ModelVM.Driver;
 using Uber.BLL.Services.Abstraction;
@@ -75,6 +76,8 @@ namespace Uber.PLL.Controllers
         }
         public IActionResult Dashboard()
         {
+            var Id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = service.MakeUserActive(Id);
             return View();
         }
 
@@ -94,6 +97,60 @@ namespace Uber.PLL.Controllers
             catch (Exception ex)
             {
                 return BadRequest($"Error: {ex.Message}");
+            }
+        }
+
+        [HttpPost]
+        public IActionResult MakeUserInactive()
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var result = service.MakeUserInactive(userId);
+                if (result.Item1)
+                {
+                    return Json(new { success = true, message = "Driver status set to inactive" });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = result.Item2 });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = $"Error: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult MakeUserActive()
+        {
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not authenticated");
+                }
+
+                var result = service.MakeUserActive(userId);
+                if (result.Item1)
+                {
+                    return Json(new { success = true, message = "Driver status set to active" });
+                }
+                else
+                {
+                    return BadRequest(new { success = false, message = result.Item2 });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = $"Error: {ex.Message}" });
             }
         }
         [HttpPost]

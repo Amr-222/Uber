@@ -14,5 +14,7 @@ namespace Uber.DAL.Repo.Abstraction
         List<Driver> GetAll();
         (bool, string?) Delete(string id);
         (bool, string?) Edit(Driver driver);
+        (bool, string?) MakeUserActive(string id);
+        (bool, string?) MakeUserInactive(string id);
     }
 }

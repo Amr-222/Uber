@@ -104,5 +104,15 @@ namespace Uber.BLL.Services.Impelementation
         {
             throw new NotImplementedException();
         }
+
+        public (bool, string?) MakeUserActive(string Id)
+        {
+            return driverRepo.MakeUserActive(Id);
+        }
+
+        public (bool, string?) MakeUserInactive(string Id)
+        {
+            return driverRepo.MakeUserInactive(Id);
+        }
     }
 }

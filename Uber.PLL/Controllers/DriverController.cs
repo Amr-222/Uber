@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
@@ -36,7 +37,6 @@ namespace Uber.PLL.Controllers
                     ModelState.AddModelError("", error ?? "An error occurred");
                     return View("~/Views/Driver/Register.cshtml", driver);
                 }
-
                 return RedirectToAction("Login", "Driver");
             }
 

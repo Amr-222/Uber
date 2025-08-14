@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Uber.DAL.DataBase;
 
@@ -11,9 +12,11 @@ using Uber.DAL.DataBase;
 namespace Uber.DAL.Migrations
 {
     [DbContext(typeof(UberDBContext))]
-    partial class UberDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250814001844_ChangedMyServer")]
+    partial class ChangedMyServer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,23 +256,14 @@ namespace Uber.DAL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<double>("Distance")
-                        .HasColumnType("float");
-
                     b.Property<string>("DriverId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<double>("Duration")
-                        .HasColumnType("float");
 
                     b.Property<double>("EndLat")
                         .HasColumnType("float");
 
                     b.Property<double>("EndLng")
-                        .HasColumnType("float");
-
-                    b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.Property<int?>("Rate")

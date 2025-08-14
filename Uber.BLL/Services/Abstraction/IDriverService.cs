@@ -18,6 +18,8 @@ namespace Uber.BLL.Services.Abstraction
         public (bool,string?) MakeUserInactive(string Id);
         (string?, Driver?) GetByID(string id);
         object SendRequest(GetDriver getDriver, string id);
+        List<Driver> GetAllDrivers();
+        (bool, string?) UpdateDriver(Driver driver);
         //public (bool, string?) Edit();
     }
 }

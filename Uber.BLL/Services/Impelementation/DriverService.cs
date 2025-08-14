@@ -119,5 +119,31 @@ namespace Uber.BLL.Services.Impelementation
         {
             return driverRepo.GetByID(id);
         }
+
+        public List<Driver> GetAllDrivers()
+        {
+            try
+            {
+                return driverRepo.GetAll().Where(d => !d.IsDeleted).ToList();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return new List<Driver>();
+            }
+        }
+
+        public (bool, string?) UpdateDriver(Driver driver)
+        {
+            try
+            {
+                var result = driverRepo.Edit(driver);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
     }
 }

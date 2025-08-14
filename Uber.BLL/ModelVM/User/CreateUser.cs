@@ -14,6 +14,8 @@ namespace Uber.BLL.ModelVM.User
         public string Email { get;  set; }
         public string Password { get;  set; }
         public Gender Gender { get; set; }
+        public int PhoneNumber { get; set; }
+
         public DateTime DateOfBirth { get; set; }
     }
 }

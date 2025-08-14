@@ -53,9 +53,9 @@ namespace Uber.PLL
                     options.AccessDeniedPath = new PathString("/Account/ChooseLoginType");
                 });
 
-            builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
-                    .AddEntityFrameworkStores<UberDBContext>()
-                    .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
+            //builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+            //        .AddEntityFrameworkStores<UberDBContext>()
+            //        .AddTokenProvider<DataProtectorTokenProvider<ApplicationUser>>(TokenOptions.DefaultProvider);
 
 
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>

@@ -39,7 +39,7 @@ namespace Uber.BLL.Services.Impelementation
 
                 if (res.Succeeded)
                 {
-
+                    await userManager.AddToRoleAsync(user1, "User");
                     return (true,null);
                 }
                 else

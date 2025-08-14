@@ -30,7 +30,9 @@ namespace Uber.DAL.Entities
         public RideStatus Status { get; set; } = RideStatus.Pending;
         public int? Rate { get; set; }
 
-
+        public double Duration { get; set; }
+        public double Distance { get; set; }
+        public double Price { get; set; }
         public (bool, string?) Cancel()
         {
             try

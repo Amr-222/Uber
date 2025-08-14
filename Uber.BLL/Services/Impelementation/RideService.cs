@@ -22,7 +22,9 @@ namespace Uber.BLL.Services.Impelementation
         }
         public (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId,
-        double startLat, double startLng, double endLat, double endLng)
+        double startLat, double startLng, 
+        double endLat, double endLng/*,
+        double Distance, double Duration, double Price*/)
         {
             try
             {

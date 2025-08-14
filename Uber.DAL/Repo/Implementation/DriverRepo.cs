@@ -118,7 +118,9 @@ namespace Uber.DAL.Repo.Implementation
                 if (driver == null)
                     return (false, "No Driver with this Id");
                 var result = driver.MakeActive();
+
                 db.SaveChanges();
+
                 return result;
             }
             catch (Exception ex)

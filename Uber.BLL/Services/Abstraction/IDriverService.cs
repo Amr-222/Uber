@@ -16,6 +16,7 @@ namespace Uber.BLL.Services.Abstraction
         public (bool, string?, List<string>?) GetNearestDriver(double lat, double lng);
         public (bool,string?) MakeUserActive(string Id);
         public (bool,string?) MakeUserInactive(string Id);
+        (string?, Driver?) GetByID(string id);
         object SendRequest(GetDriver getDriver, string id);
         //public (bool, string?) Edit();
     }

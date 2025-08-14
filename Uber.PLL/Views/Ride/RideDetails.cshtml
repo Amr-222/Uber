@@ -150,12 +150,14 @@
         
         <div class="map-info">
             <div class="map-info-item">
-                <h5>🚀 Pickup Location</h5>
-                <p>@Model.StartLat.ToString("F6"), @Model.StartLng.ToString("F6")</p>
+                <h5>🚀 Price</h5>
+                <p id="price">Calculating...</p>
             </div>
             <div class="map-info-item">
-                <h5>🎯 Destination</h5>
-                <p>@Model.EndLat.ToString("F6"), @Model.EndLng.ToString("F6")</p>
+                <h5 style="color: #6c757d; margin-bottom: 10px;">🔄 Status</h5>
+                <span style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                    @Model.Status.ToString()
+                </span>
             </div>
             <div class="map-info-item">
                 <h5>📏 Distance</h5>
@@ -168,7 +170,7 @@
         </div>
     </div>
 
-    <!-- Ride Information -->
+    @* <!-- Ride Information -->
     <div style="background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
         <h4 style="color: #495057; margin-bottom: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">📍 Ride Details</h4>
         
@@ -205,7 +207,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> *@
 
     <!-- Driver Information (if user is viewing) -->
     @if (isUser && Model.Driver != null)
@@ -400,13 +402,15 @@
 
                 document.getElementById('routeDistance').textContent = distance + ' km';
                 document.getElementById('routeDuration').textContent = duration + ' min';
+                document.getElementById('price').textContent = (distance * 7 + duration * 1.5 + 7).toFixed(2) + 'pound';
 
-                console.log(`Route: ${distance} km, ${duration} min`);
+                console.log(`Route: ${distance} km, ${duration} min, ${price} pound`);
             }
         } catch (error) {
             console.error('Error drawing route:', error);
             document.getElementById('routeDistance').textContent = 'Error';
             document.getElementById('routeDuration').textContent = 'Error';
+            document.getElementById('price').textContent = 'Error';
         }
     }
     
@@ -438,16 +442,20 @@
                 // Update distance and duration
                 const distance = (route.distance / 1000).toFixed(2);
                 const duration = (route.duration / 60).toFixed(1);
+                const price = (distance * 7 + duration * 1.5 + 7).toFixed(2)
 
                 document.getElementById('routeDistance').textContent = distance + ' km';
                 document.getElementById('routeDuration').textContent = duration + ' min';
+                document.getElementById('price').textContent = price + 'pound';
 
-                console.log(`Route: ${distance} km, ${duration} min`);
+                console.log(`Route: ${distance} km, ${duration} min, ${price} pound`);
             }
         } catch (error) {
             console.error('Error drawing route:', error);
             document.getElementById('routeDistance').textContent = 'Error';
             document.getElementById('routeDuration').textContent = 'Error';
+            document.getElementById('price').textContent = 'Error';
+
         }
     }
 

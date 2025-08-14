@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -74,10 +75,9 @@ namespace Uber.PLL.Controllers
                 return View();
             }
         }
+        [Authorize(Roles = "Driver")]
         public IActionResult Dashboard()
         {
-            // Don't automatically set user as active - let the frontend handle this
-            // This prevents issues with the IsActive status being reset
             return View();
         }
 
@@ -101,6 +101,7 @@ namespace Uber.PLL.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Driver")]
         public IActionResult MakeUserInactive()
         {
             try
@@ -128,6 +129,7 @@ namespace Uber.PLL.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Driver")]
         public IActionResult MakeUserActive()
         {
             try

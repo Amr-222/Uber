@@ -350,44 +350,62 @@
         }
     }
 
+    // ===== DRIVER STATUS EVENT LISTENERS =====
+    // IMPORTANT CHANGES: Removed aggressive event listeners that were causing
+    // drivers to become inactive when they shouldn't (clicking outside window,
+    // switching tabs, etc.). Now drivers only become inactive when:
+    // - Actually leaving the page (unload, pagehide, beforeunload)
+    // - Losing internet connection (offline)
+    // - Being idle for 5 minutes (userActivityTimeout)
+    
     // Event listeners for page unload
-    window.addEventListener('beforeunload', function(e) {
-        // Set driver as inactive when leaving the page
-        setDriverInactive();
-    });
+    // REMOVED: Duplicate beforeunload event listener
+    // window.addEventListener('beforeunload', function(e) {
+    //     // Set driver as inactive when leaving the page
+    //     setDriverInactive();
+    // });
 
+    // IMPORTANT: Only these events will set driver as inactive:
+    // - unload: When the page is actually closed/refreshed
+    // - pagehide: When the tab/window is closed
+    // - beforeunload: When leaving the page (with confirmation dialog)
+    // - offline: When internet connection is lost
+    // - idle timeout: After 5 minutes of no user activity
     window.addEventListener('unload', function(e) {
         // Set driver as inactive when leaving the page
         setDriverInactive();
     });
 
     // Event listener for page visibility change (when user switches tabs or minimizes browser)
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden) {
-            // Page is hidden (user switched tabs or minimized browser)
-            setDriverInactive();
-        } else {
-            // Page is visible again (user returned to the page)
-            setDriverActive();
-        }
-    });
+    // REMOVED: This was causing drivers to become inactive when switching tabs
+    // document.addEventListener('visibilitychange', function() {
+    //     if (document.hidden) {
+    //         // Page is hidden (user switched tabs or minimized browser)
+    //         setDriverInactive();
+    //     } else {
+    //         // Page is visible again (user returned to the page)
+    //         setDriverActive();
+    //     }
+    // });
 
     // Event listener for page focus/blur (when user switches between applications)
-    window.addEventListener('blur', function() {
-        // User switched to another application
-        setDriverInactive();
-    });
+    // REMOVED: This was causing drivers to become inactive when clicking outside the window
+    // window.addEventListener('blur', function() {
+    //     // User switched to another application
+    //     setDriverInactive();
+    // });
 
-    window.addEventListener('focus', function() {
-        // User returned to the application
-        setDriverActive();
-    });
+    // window.addEventListener('focus', function() {
+    //     // User returned to the application
+    //     setDriverActive();
+    // });
 
     // Event listener for browser navigation (back/forward buttons)
-    window.addEventListener('popstate', function() {
-        // User navigated away using browser navigation
-        setDriverInactive();
-    });
+    // REMOVED: This was causing drivers to become inactive when using browser navigation
+    // window.addEventListener('popstate', function() {
+    //     // User navigated away using browser navigation
+    //     setDriverInactive();
+    // });
 
     // Event listener for beforeunload with confirmation dialog
     window.addEventListener('beforeunload', function(e) {
@@ -451,19 +469,20 @@
     resetUserActivityTimer();
 
     // Device sleep/wake detection
-    let wasPageVisible = true;
+    // REMOVED: This was too aggressive and caused false positives
+    // let wasPageVisible = true;
     
-    function checkDeviceSleep() {
-        if (wasPageVisible && document.hidden) {
-            // Device might be going to sleep
-            console.log('Device might be going to sleep');
-            setDriverInactive();
-        }
-        wasPageVisible = !document.hidden;
-    }
+    // function checkDeviceSleep() {
+    //     if (wasPageVisible && document.hidden) {
+    //         // Device might be going to sleep
+    //         console.log('Device might be going to sleep');
+    //         setDriverInactive();
+    //     }
+    //     wasPageVisible = !document.hidden;
+    // }
 
     // Check for device sleep every second
-    setInterval(checkDeviceSleep, 1000);
+    // setInterval(checkDeviceSleep, 1000);
 
     // Cleanup function to be called when leaving the page
     function cleanup() {
@@ -542,15 +561,16 @@
     }
 
     // Start heartbeat when page becomes visible
-    document.addEventListener('visibilitychange', function() {
-        if (document.hidden) {
-            stopHeartbeat();
-            setDriverInactive();
-        } else {
-            startHeartbeat();
-            setDriverActive();
-        }
-    });
+    // REMOVED: This was causing drivers to become inactive when switching tabs
+    // document.addEventListener('visibilitychange', function() {
+    //     if (document.hidden) {
+    //         stopHeartbeat();
+    //         setDriverInactive();
+    //     } else {
+    //         startHeartbeat();
+    //         setDriverActive();
+    //     }
+    // });
 
     // Test function to simulate receiving a ride request (for debugging)
     window.testRideRequest = function() {

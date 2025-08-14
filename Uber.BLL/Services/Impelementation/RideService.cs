@@ -23,8 +23,8 @@ namespace Uber.BLL.Services.Impelementation
         public (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId,
         double startLat, double startLng, 
-        double endLat, double endLng/*,
-        double Distance, double Duration, double Price*/)
+        double endLat, double endLng,
+        double Distance, double Duration, double Price)
         {
             try
             {
@@ -37,9 +37,9 @@ namespace Uber.BLL.Services.Impelementation
                     EndLat = endLat,
                     EndLng = endLng,
                     Status = RideStatus.Pending,
-                    Duration = null,  // Will be calculated later
-                    Distance = null,  // Will be calculated later
-                    Price = null      // Will be calculated later
+                    Duration = Duration,  // Will be calculated later
+                    Distance = Distance,  // Will be calculated later
+                    Price = Price      // Will be calculated later
                 };
                 var (ok, err) = rideRepo.Create(ride);
                 return (ok, err, ok ? ride : null);

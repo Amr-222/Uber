@@ -20,8 +20,8 @@ public class RideController : Controller
     }
 
     [Authorize] // user must be logged in
-    public async Task<IActionResult> RequestRide(double StartLat, double StartLng, double EndLat, double EndLng/*, 
-        double Distance, double Duration, double Price*/)
+    public async Task<IActionResult> RequestRide(double StartLat, double StartLng, double EndLat, double EndLng ,
+        double Distance, double Duration, double Price)
     {
         try
         {
@@ -45,7 +45,7 @@ public class RideController : Controller
                 return Unauthorized("User not authenticated");
             }
 
-            var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, StartLat, StartLng, EndLat, EndLng/*, Distance, Duration, Price*/);
+            var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, StartLat, StartLng, EndLat, EndLng, Distance, Duration, Price);
             if (!ok || ride == null)
             {
                 return BadRequest(err ?? "Failed to create ride");

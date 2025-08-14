@@ -51,7 +51,7 @@ namespace Uber.BLL.Services.Impelementation
 
                 if (res.Succeeded)
                 {
-
+                    await userManager.AddToRoleAsync(driv, "Driver");
                     return (true, null);
                 }
                 else

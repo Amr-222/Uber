@@ -36,7 +36,10 @@ namespace Uber.BLL.Services.Impelementation
                     StartLng = startLng,
                     EndLat = endLat,
                     EndLng = endLng,
-                    Status = RideStatus.Pending
+                    Status = RideStatus.Pending,
+                    Duration = null,  // Will be calculated later
+                    Distance = null,  // Will be calculated later
+                    Price = null      // Will be calculated later
                 };
                 var (ok, err) = rideRepo.Create(ride);
                 return (ok, err, ok ? ride : null);

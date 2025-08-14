@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -21,34 +22,53 @@ namespace Uber.PLL.Controllers
         public IActionResult ChooseLoginType() => View();
         public IActionResult ChooseRegisterType() => View();
 
+        //[HttpGet]
+        //public IActionResult Login(string role)
+        //{
+        //    if (role == "Driver")
+        //        return View("~/Views/Driver/Login.cshtml");
+
+        //    if (role == "User")
+        //        return View("~/Views/User/Login.cshtml");
+
+        //    return NotFound();
+        //}
         [HttpGet]
-        public IActionResult Login(string role)
+        [AllowAnonymous]
+        public IActionResult Login()
         {
-            if (role == "Driver")
-                return View("~/Views/Driver/Login.cshtml");
-
-            if (role == "User")
-                return View("~/Views/User/Login.cshtml");
-
-            return NotFound();
+            return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> Login(LoginVM model)
         {
-            if (ModelState.IsValid)
+            var result = await _signInManager.PasswordSignInAsync(
+            model.Email,
+            model.Password,
+            model.RememberMe,
+            lockoutOnFailure: false
+            );
+
+
+            if (result.Succeeded)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
-
-                if (result.Succeeded)
+                if (User.IsInRole("User"))
                     return RedirectToAction("Index", "Home");
-
-                ModelState.AddModelError("", "Invalid Username or Password");
+                else if (User.IsInRole("Driver"))
+                    return RedirectToAction("Dashboard", "Driver");
+                else if (User.IsInRole("Admin"))
+                    return RedirectToAction("AdminDashBoard", "Admin");
+                else
+                    return View();
             }
-            return View(model);
-        }
+            else
+            {
 
-        [HttpGet]
+                ViewBag.LoginError = "*Invalid username or password";
+                return View();
+            }
+        }
+            [HttpGet]
         public IActionResult Register(string role)
         {
             if (role == "Driver")

@@ -11,6 +11,7 @@ namespace Uber.BLL.Mapper
         public DomainProfile()
         {
             CreateMap<User, CreateUser>().ReverseMap();
+            CreateMap<User, UserProfileVM>().ReverseMap();
             CreateMap<Driver, CreateDriver>().ReverseMap();
             CreateMap<Driver, GetDriver>().ReverseMap();  
         }

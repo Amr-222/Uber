@@ -83,6 +83,12 @@ namespace Uber.PLL.Controllers
         {
             return View();
         }
+        [HttpGet]
+        public async Task<IActionResult> UserProfile()
+        {
+            var result = await service.GetProfileInfo();
+            return View(result.Item3);
+        }
         //[HttpPost]
         /*public IActionResult RequestRide(double StartLat, double StartLng, double EndLat, double EndLng, string Id)
         {

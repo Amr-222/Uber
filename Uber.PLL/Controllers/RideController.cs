@@ -301,6 +301,10 @@ public class RideController : Controller
             return BadRequest($"An error occurred: {ex.Message}");
         }
     }
+    public IActionResult WaitingForDriver()
+    {
+        return View();
+    }
 }
 
 

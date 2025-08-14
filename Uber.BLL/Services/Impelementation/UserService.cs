@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Uber.BLL.Helper;
 using Uber.BLL.ModelVM.User;
@@ -13,12 +14,14 @@ namespace Uber.BLL.Services.Impelementation
         private readonly IMapper mapper;
         private readonly IUserRepo userRepo;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public UserService(IUserRepo _userRepo, IMapper _mapper, UserManager<ApplicationUser> _userManager)
+        public UserService(IUserRepo _userRepo, IMapper _mapper, UserManager<ApplicationUser> _userManager, IHttpContextAccessor _httpContextAccessor)
         {
             userRepo = _userRepo;
             mapper = _mapper;
             userManager = _userManager;
+            httpContextAccessor = _httpContextAccessor;
         }
 
         public async Task<(bool, string?)> CreateAsync(CreateUser user)
@@ -94,6 +97,25 @@ namespace Uber.BLL.Services.Impelementation
         public List<User> GetAll()
         { 
             return userRepo.GetAll(); 
+        }
+        public async Task<(bool, string?, UserProfileVM?)> GetProfileInfo()
+        {
+            try
+            {
+                var user = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+                if (user == null)
+                {
+                    return (false, "User not found or not logged in.", null);
+                }
+
+                var userProfile = mapper.Map<UserProfileVM>(user);
+
+                return (true, null, userProfile);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null);
+            }
         }
     }
 }

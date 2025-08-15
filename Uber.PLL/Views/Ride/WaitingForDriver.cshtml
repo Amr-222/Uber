@@ -16,8 +16,6 @@
     // Initialize SignalR connection
     async function initializeConnection() {
         try {
-            console.log("Starting SignalR connection...");
-            
             // Create connection to RideHub
             connection = new signalR.HubConnectionBuilder()
                 .withUrl("/rideHub", { 
@@ -32,35 +30,27 @@
 
             // Connection event handlers
             connection.onreconnecting(() => {
-                console.log("Reconnecting...");
                 updateStatus("Reconnecting...", "orange");
             });
 
             connection.onreconnected(() => {
-                console.log("Reconnected");
                 updateStatus("Connected", "green");
                 isConnected = true;
             });
 
             connection.onclose(() => {
-                console.log("Connection closed");
                 updateStatus("Disconnected", "red");
                 isConnected = false;
             });
 
             // Start connection
-            console.log("Starting connection...");
             await connection.start();
-            console.log("Connection started successfully");
             
             updateStatus("Connected", "green");
             isConnected = true;
-            console.log("SignalR Connected. Connection ID:", connection.connectionId);
 
             // Join the ride group when page loads
-            console.log("Joining ride group: ride-@Model");
             await connection.invoke("JoinRideGroup", "ride-@Model");
-            console.log("Successfully joined ride group: ride-@Model");
 
         } catch (err) {
             console.error("SignalR Connection Error:", err);
@@ -82,15 +72,12 @@
     // Set up event listeners after connection is created
     function setupEventListeners() {
         if (!connection) {
-            console.error("Cannot setup event listeners: connection is null");
             return;
         }
 
         // Listen for ride accepted event
         connection.on("RideAccepted", function (rideId) {
-            console.log("Ride accepted event received:", rideId);
             if (rideId == @Model) {
-                console.log("Ride accepted! Updating UI...");
                 document.getElementById("status").innerHTML = `
                     <div style="color: green; padding: 20px; text-align: center;">
                         <h3>🚗 Driver accepted your request!</h3>
@@ -101,7 +88,6 @@
                 
                 // Redirect to ride details page after a short delay
                 setTimeout(() => {
-                    console.log("Redirecting to ride details...");
                     window.location.href = `/Ride/RideDetails/${rideId}`;
                 }, 3000);
             }
@@ -109,9 +95,7 @@
 
         // Listen for ride rejected event
         connection.on("RideRejected", function (rideId) {
-            console.log("Ride rejected event received:", rideId);
             if (rideId == @Model) {
-                console.log("Ride rejected! Updating UI...");
                 document.getElementById("status").innerHTML = `
                     <div style="color: orange; padding: 20px; text-align: center;">
                         <h3>⚠️ Driver rejected your request</h3>
@@ -123,7 +107,6 @@
 
         // Listen for test messages
         connection.on("TestMessage", function (message) {
-            console.log("Test message received:", message);
             document.getElementById("status").innerHTML = `
                 <div style="color: blue; padding: 20px; text-align: center;">
                     <h3>🧪 Test Message Received</h3>
@@ -138,93 +121,14 @@
         const statusText = document.getElementById("statusText");
         statusText.textContent = message;
         statusText.style.color = color;
-        console.log("Status updated:", message);
     }
 
     // Initialize connection when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM loaded, initializing connection...");
+
         initializeConnection();
-    });
+	});
 
-    // Add a manual test function for debugging
-    window.testRideAccepted = function() {
-        console.log("Testing ride accepted manually...");
-        if (connection) {
-            connection.invoke("TestRideAccepted", @Model);
-        } else {
-            alert("Connection not established yet. Please wait.");
-        }
-    };
-
-    // Add a manual test function for debugging
-    window.simulateRideAccepted = function() {
-        console.log("Simulating ride accepted...");
-        document.getElementById("status").innerHTML = `
-            <div style="color: green; padding: 20px; text-align: center;">
-                <h3>🚗 Driver accepted your request!</h3>
-                <p>Your driver is on the way!</p>
-                <p>Redirecting to ride details in 3 seconds...</p>
-            </div>
-        `;
-        
-        setTimeout(() => {
-            window.location.href = `/Ride/RideDetails/@Model`;
-        }, 3000);
-    };
-
-    // Test SignalR connection
-    window.testSignalR = async function() {
-        try {
-            if (!connection || !isConnected) {
-                alert("SignalR connection not established. Please wait for connection to be established.");
-                return;
-            }
-
-            const response = await fetch('/Ride/TestSignalR', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ rideId: @Model })
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                alert("Test message sent: " + data.message);
-            } else {
-                alert("Failed to send test message");
-            }
-        } catch (err) {
-            console.error("Error testing SignalR:", err);
-            alert("Error testing SignalR: " + err.message);
-        }
-    };
-
-    // Log connection status
-    window.logConnection = function() {
-        console.log("Connection object:", connection);
-        console.log("Connection state:", connection ? connection.state : "null");
-        console.log("Is connected:", isConnected);
-        if (connection) {
-            console.log("Connection ID:", connection.connectionId);
-        }
-    };
 </script>
 
-<!-- Debug section -->
-<div style="margin-top: 30px; padding: 20px; background-color: #f0f0f0; border-radius: 5px;">
-    <h4>Debug Tools:</h4>
-    <button onclick="window.logConnection()" style="padding: 8px 16px; margin: 5px; background-color: #6c757d; color: white; border: none; border-radius: 3px; cursor: pointer;">
-        Log Connection
-    </button>
-    <button onclick="window.simulateRideAccepted()" style="padding: 8px 16px; margin: 5px; background-color: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">
-        Simulate Ride Accepted
-    </button>
-    <button onclick="window.testSignalR()" style="padding: 8px 16px; margin: 5px; background-color: #17a2b8; color: white; border: none; border-radius: 3px; cursor: pointer;">
-        Test SignalR
-    </button>
-    <button onclick="location.reload()" style="padding: 8px 16px; margin: 5px; background-color: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">
-        🔄 Refresh Page
-    </button>
-</div>
+

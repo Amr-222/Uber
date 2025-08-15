@@ -364,6 +364,36 @@ namespace Uber.PLL.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> CancelRide([FromBody] AcceptRejectRequest request)
+        {
+            try
+            {
+                var (ok, err) = _rideService.Cancel(request.id);
+                if (!ok)
+                {
+                    return BadRequest(err ?? "Failed to cancel ride");
+                }
+
+                // Notify both user and driver that ride has been cancelled
+                await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideCancelled", request.id);
+                
+                // Also notify the driver specifically if they exist
+                var (rideErr, ride) = _rideService.GetByID(request.id);
+                if (rideErr == null && ride != null && !string.IsNullOrEmpty(ride.DriverId))
+                {
+                    await _hub.Clients.Group($"driver-{ride.DriverId}").SendAsync("RideCancelled", request.id);
+                }
+                
+                return Ok(new { success = true, message = "Ride cancelled successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+        }
+
         // Test method to verify SignalR is working
         [HttpPost]
         public async Task<IActionResult> TestSignalR([FromBody] AcceptRejectRequest request)

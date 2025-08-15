@@ -1,4 +1,4 @@
-﻿@model Uber.BLL.ModelVM.Driver.DriverProfileVM
+﻿@model Uber.BLL.ModelVM.Driver.DriverProfileEditVM
 @{
     ViewData["Title"] = "Driver Profile";
 }
@@ -57,8 +57,116 @@
         </section>
 
         <section id="settings" class="tab-content">
-            <h2>Settings</h2>
-            <a href="#" class="btn-update">Update Profile</a>
+            <h2 style="text-align:center; margin-bottom: 20px;">Profile</h2>
+            
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" style="text-align: center; margin-bottom: 20px; padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px;">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <div class="edit-controls">
+                <button type="button" id="editBtn" class="btn-edit">Edit Profile</button>
+                <button type="button" id="cancelBtn" class="btn-cancel" style="display: none;">Cancel</button>
+            </div>
+
+            <form asp-controller="Driver" asp-action="EditDriver" method="post" enctype="multipart/form-data" class="edit-driver-form" id="driverForm">
+
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="Name" type="text" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input asp-for="Email" type="email" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input asp-for="Phone" type="tel" class="form-control" required pattern="^0(10|11|12|15)\d{8}$" placeholder="01012345678" maxlength="11" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Gender</label>
+                    <input type="text" class="form-control" value="@Model.Edit.Gender" readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input asp-for="Dateofbirth" type="date" min="1925-01-01" max="2007-12-31" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" value="********" readonly />
+                </div>
+
+                <h3 style="margin-top: 20px;">Vehicle Info</h3>
+
+                <div class="form-group">
+                    <label>Brand</label>
+                    <input asp-for="Vehicle.Brand" type="text" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Model</label>
+                    <input asp-for="Vehicle.Model" type="text" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Year</label>
+                    <input asp-for="Vehicle.YearMade" type="number" min="2008" max="2025" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Plate</label>
+                    <input asp-for="Vehicle.Plate" type="text" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Color</label>
+                    <input asp-for="Vehicle.Color" type="text" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Seating Capacity</label>
+                    <input asp-for="Vehicle.SeatingCapacity" type="number" min="1" max="14" class="form-control" required readonly />
+                </div>
+
+                <div class="form-group">
+                    <label>Vehicle Type</label>
+                    <div class="radio-group">
+                        <label><input asp-for="Vehicle.Type" type="radio" value="Car" /> Car</label>
+                        <label><input asp-for="Vehicle.Type" type="radio" value="Scooter" /> Scooter</label>
+                        <label><input asp-for="Vehicle.Type" type="radio" value="Shuttle" /> Shuttle</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Transmission</label>
+                    <div class="radio-group">
+                        <label><input asp-for="Vehicle.Transmission" type="radio" value="Manual" /> Manual</label>
+                        <label><input asp-for="Vehicle.Transmission" type="radio" value="Automatic" /> Automatic</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Engine</label>
+                    <div class="radio-group">
+                        <label><input asp-for="Vehicle.VehicleEngine" type="radio" value="Gasoline" /> Gas</label>
+                        <label><input asp-for="Vehicle.VehicleEngine" type="radio" value="Electric" /> Electric</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Upload Image</label>
+                    <input asp-for="File" type="file" class="form-control" disabled />
+                </div>
+
+                <button type="submit" class="btn-save" disabled>Save</button>
+            </form>
         </section>
     </main>
 </div>
@@ -74,6 +182,77 @@
             item.classList.add("active");
             document.getElementById(item.dataset.tab).classList.add("active");
         });
+    });
+
+    // Edit confirmation functionality
+    let isEditMode = false;
+    let originalValues = {};
+
+    document.getElementById('editBtn').addEventListener('click', function() {
+        if (!isEditMode) {
+            // Store original values
+            const form = document.getElementById('driverForm');
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"]');
+            
+            inputs.forEach(input => {
+                originalValues[input.name] = input.value;
+            });
+
+            // Show confirmation dialog
+            const confirmed = confirm('Are you sure you want to edit your profile? You will be able to modify your personal and vehicle information.');
+            
+            if (confirmed) {
+                // Enable form fields
+                inputs.forEach(input => {
+                    input.readOnly = false;
+                });
+                
+                // Enable file upload and save button
+                document.querySelector('input[type="file"]').disabled = false;
+                document.querySelector('.btn-save').disabled = false;
+                
+                // Show cancel button, hide edit button
+                document.getElementById('editBtn').style.display = 'none';
+                document.getElementById('cancelBtn').style.display = 'inline-block';
+                
+                isEditMode = true;
+            }
+        }
+    });
+
+    document.getElementById('cancelBtn').addEventListener('click', function() {
+        if (isEditMode) {
+            // Restore original values
+            const form = document.getElementById('driverForm');
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"]');
+            
+            inputs.forEach(input => {
+                if (originalValues[input.name]) {
+                    input.value = originalValues[input.name];
+                }
+                input.readOnly = true;
+            });
+            
+            // Disable file upload and save button
+            document.querySelector('input[type="file"]').disabled = true;
+            document.querySelector('.btn-save').disabled = true;
+            
+            // Show edit button, hide cancel button
+            document.getElementById('editBtn').style.display = 'inline-block';
+            document.getElementById('cancelBtn').style.display = 'none';
+            
+            isEditMode = false;
+        }
+    });
+
+    // Form submission confirmation
+    document.getElementById('driverForm').addEventListener('submit', function(e) {
+        if (isEditMode) {
+            const confirmed = confirm('Are you sure you want to save these changes? This will update your profile information.');
+            if (!confirmed) {
+                e.preventDefault();
+            }
+        }
     });
 </script>
 
@@ -206,4 +385,99 @@
             background: #17a38a;
         }
 
+    .edit-driver-form {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .edit-driver-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    .edit-driver-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .edit-driver-form input[type="text"],
+    .edit-driver-form input[type="email"],
+    .edit-driver-form input[type="password"],
+    .edit-driver-form input[type="number"],
+    .edit-driver-form input[type="date"],
+    .edit-driver-form input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .edit-driver-form .radio-group label {
+        margin-right: 15px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        width: 100%;
+        padding: 12px;
+        background: #1CB5A3;
+        color: #fff;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .btn-save:hover {
+        background: #17a38a;
+    }
+
+    .edit-controls {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-edit, .btn-cancel {
+        padding: 10px 20px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-edit {
+        background: #1CB5A3;
+        color: #fff;
+    }
+
+    .btn-edit:hover {
+        background: #17a38a;
+    }
+
+    .btn-cancel {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .btn-cancel:hover {
+        background: #c82333;
+    }
+
+    .edit-driver-form input[readonly] {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+
+    .edit-driver-form input[disabled] {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
 </style>

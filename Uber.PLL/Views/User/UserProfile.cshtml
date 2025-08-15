@@ -1,4 +1,4 @@
-﻿@model Uber.BLL.ModelVM.User.UserProfileVM
+﻿@model Uber.BLL.ModelVM.User.UserProfileEditVM
 @{
     ViewData["Title"] = "User Profile";
 }
@@ -51,7 +51,7 @@
                     <span class="wallet-balance-label">Cash balance</span>
                 </div>
                 <div class="wallet-balance">
-                    $@Model.Balance
+                    $@Model.Profile.Balance
                 </div>
                 <div class="wallet-actions">
                     <button class="wallet-btn add">Add Cash</button>
@@ -104,11 +104,24 @@
             </div>
         </section>
 
-        <!-- Settings Tab -->
-        <section id="settings" class="tab-content">
-            <h2>Settings</h2>
-            <a href="#" class="btn-update">Update Profile</a>
-        </section>
+    <section id="settings" class="tab-content">
+    <h2>Settings</h2>
+      <form asp-controller="User" asp-action="UpdateProfile" method="post" class="settings-form">
+         <label>Name</label>
+         <input asp-for="Name" type="text" required />
+
+         <label>Email</label>
+         <input asp-for="Email" type="email" required />
+
+         <label>Phone Number</label>
+         <input asp-for="Phone" type="tel" pattern="^0(10|11|12|15)\d{8}$" required />
+
+         <label>Date of Birth</label>
+         <input asp-for="Dateofbirth" type="date" min="1925-01-01" max="2007-12-31" required />
+
+         <button type="submit" class="btn-update">Update Profile</button>
+    </form>
+   </section>
     </main>
 </div>
 
@@ -384,6 +397,45 @@
 
 .contact-section .btn-contact:hover {
     background: #17a38a;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    max-width: 400px;
+    margin-top: 20px;
+}
+
+.settings-form label {
+    margin-top: 10px;
+    font-weight: 500;
+}
+
+.settings-form input {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.settings-form input[readonly] {
+    background-color: #f0f0f0;
+    color: #555;
+    cursor: not-allowed;
+}
+
+.settings-form .btn-update {
+    margin-top: 20px;
+    padding: 12px;
+    background-color: #1CB5A3;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.settings-form .btn-update:hover {
+    background-color: #17a38a;
 }
 
 </style>

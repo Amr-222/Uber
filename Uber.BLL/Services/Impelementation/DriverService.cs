@@ -185,9 +185,10 @@ namespace Uber.BLL.Services.Impelementation
                 {
                     return (false, "Driver not found or not logged in.", null);
                 }
+                var div=driverRepo.GetByID(driver.Id);
 
 
-                var driverProfile = mapper.Map<DriverProfileVM>(driver);
+                var driverProfile = mapper.Map<DriverProfileVM>(div);
 
                 return (true, null, driverProfile);
             }

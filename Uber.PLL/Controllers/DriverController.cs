@@ -216,5 +216,19 @@ namespace Uber.PLL.Controllers
 
             return Json(new { success = true });
         }
+
+
+
+
+
+        [Authorize(Roles = "Driver")]
+        [HttpGet]
+        public async Task<IActionResult> DriverProfile()
+        {
+            var result = await service.GetDriverProfileInfo();
+            return View(result.Item3);
+        }
+
+
     }
 }

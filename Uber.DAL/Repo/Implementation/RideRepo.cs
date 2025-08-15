@@ -29,7 +29,7 @@ namespace Uber.DAL.Repo.Implementation
             }
             catch (Exception ex)
             {
-                return (false,  ex.Message);
+                return (false, ex.Message);
             }
         }
 
@@ -55,8 +55,8 @@ namespace Uber.DAL.Repo.Implementation
 
         public List<Ride> GetAll()
         {
-            
-            return db.Rides.ToList();  
+
+            return db.Rides.ToList();
 
         }
 
@@ -76,6 +76,8 @@ namespace Uber.DAL.Repo.Implementation
                 return (ex.Message, null);
             }
         }
+    
+    
         public (bool, string?) UpdateStatus(int id, RideStatus status)
         {
             var r = db.Rides.Find(id);

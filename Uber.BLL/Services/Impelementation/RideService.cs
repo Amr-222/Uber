@@ -81,6 +81,8 @@ namespace Uber.BLL.Services.Impelementation
         {
             return rideRepo.GetByID(id);
         }
+
+      
         public List<Ride> GetAll()
         {
             return rideRepo.GetAll();

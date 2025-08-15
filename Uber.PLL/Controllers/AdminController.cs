@@ -84,8 +84,8 @@
 //        }
 
 //        [HttpPost]
-//        public IActionResult EditDriver(string id, string Name, DateTime DateOfBirth, IFormFile ProfilePhoto, 
-//            string VehicleBrand, string VehicleModel, int VehicleYear, string VehiclePlate, 
+//        public IActionResult EditDriver(string id, string Name, DateTime DateOfBirth, IFormFile ProfilePhoto,
+//            string VehicleBrand, string VehicleModel, int VehicleYear, string VehiclePlate,
 //            string VehicleColor, int VehicleSeatingCapacity, bool IsActive)
 //        {
 //            try
@@ -348,7 +348,7 @@
 //                // In a real application, you'd update in database
 //                var admins = TempData["Admins"] as List<Admin> ?? new List<Admin>();
 //                var admin = admins.FirstOrDefault(a => a.Id == id);
-                
+
 //                if (admin != null)
 //                {
 //                    admin.Name = name;
@@ -356,7 +356,7 @@
 //                    admin.PhoneNumber = phoneNumber;
 //                    admin.DateOfBirth = dateOfBirth;
 //                    admin.Gender = gender;
-                    
+
 //                    TempData["Admins"] = admins;
 //                    TempData["SuccessMessage"] = "Admin updated successfully!";
 //                }
@@ -382,7 +382,7 @@
 //                // In a real application, you'd delete from database
 //                var admins = TempData["Admins"] as List<Admin> ?? new List<Admin>();
 //                var admin = admins.FirstOrDefault(a => a.Id == id);
-                
+
 //                if (admin != null)
 //                {
 //                    admins.Remove(admin);

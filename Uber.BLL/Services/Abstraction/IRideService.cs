@@ -13,7 +13,6 @@ namespace Uber.BLL.Services.Abstraction
         (bool, string?) Cancel(int id);
         (string?, Ride?) GetByID(int id);
         List<Ride> GetAll();
-
         (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId, double startLat, double startLng,
         double endLat, double endLng, double Distance, double Duration, double Price);

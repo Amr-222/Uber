@@ -110,16 +110,18 @@ namespace Uber.PLL.Controllers
                 {
                     // Create a new user without password if we do not have a user already
                     var user = await _userManager.FindByEmailAsync(email);
-
+                    bool created = false;
                     if (user == null)
                     {
-                        user = new ApplicationUser()
+                        user = new User()
                         {
                             UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
                             Email = info.Principal.FindFirstValue(ClaimTypes.Email),
-                            Name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email.Split("@")[0]
+                            Name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email.Split("@")[0],
+                            DateOfBirth = DateTime.Now.AddYears(-18),
+                            Gender = 0
                         };
-
+                        created = true;
                         await _userManager.CreateAsync(user);
                         await _userManager.AddToRoleAsync(user, "User");
                     }
@@ -227,21 +229,29 @@ namespace Uber.PLL.Controllers
 
                 var user = await _userManager.FindByEmailAsync(model.Email);
 
-                if (user != null && await _userManager.IsEmailConfirmedAsync(user))
+                if (user != null)
                 {
-                    // Generate the reset password token
                     var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                    // Build the password reset link
-                    var passwordResetLink = Url.Action("ResetPassword", "Account",
-                            new { email = model.Email, token = token }, Request.Scheme);
-                    MailSender.Mail(token, passwordResetLink, model.Email);
-                    // Send the user to Forgot Password Confirmation view
-                    return View("ForgotPasswordConfirmation");
+                    var passwordResetLink = Url.Action(
+                        "ResetPassword",
+                        "Account",
+                        new { Email = model.Email, Token = token },
+                        Request.Scheme
+                    );
+
+                    // HTML email body
+                    var emailBody = $"<p>Hello,</p>" +
+                                    $"<p>You requested a password reset. Click the link below to reset your password:</p>" +
+                                    $"<p><a href='{passwordResetLink}'>Reset Your Password</a></p>" +
+                                    $"<p>If you did not request this, please ignore this email.</p>";
+
+                    MailSender.Mail("Password Reset", emailBody, model.Email);
+
+                    return RedirectToAction("ConfirmForgotPassword");
                 }
 
-
-                return View("ForgotPasswordConfirmation");
+                return RedirectToAction("ConfirmForgotPassword");
             }
 
             return View(model);
@@ -290,5 +300,7 @@ namespace Uber.PLL.Controllers
 
             return View(model);
         }
+        [AllowAnonymous]
+        public IActionResult ForgotPasswordConfirmation() { return View(); }
     }
 }

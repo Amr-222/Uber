@@ -2,8 +2,6 @@
 @{
     ViewData["Title"] = "Login";
 }
-
-
 <style>
     .login-container {
         max-width: 400px;
@@ -69,13 +67,39 @@
                 text-decoration: underline;
             }
 
-
-    /* Small red text for errors */
     .small-error {
         color: red;
         font-size: 15px;
         margin-bottom: 8px;
         display: block;
+    }
+
+    .social-btn {
+        display: block;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+        margin-bottom: 10px;
+        text-decoration: none;
+        background: white;
+        border: 1px solid #ccc;
+        color: #444;
+    }
+
+    .facebook-btn i {
+        color: #3b5998;
+    }
+
+    .google-btn i {
+        color: #DB4437;
+    }
+
+    .divider {
+        text-align: center;
+        margin: 20px 0;
+        color: #777;
+        font-weight: bold;
     }
 </style>
 
@@ -83,34 +107,34 @@
     <h2>Login @ViewBag.Role</h2>
     <form asp-controller="Account" asp-action="Login" method="post">
         <input type="hidden" name="Role" value="@ViewBag.Role" />
-
-
-
         <label>Email</label>
         <input asp-for="Email" type="email" required />
-
         <label>Password</label>
         <input asp-for="Password" type="password" required />
-        
         @if (!string.IsNullOrEmpty(ViewBag.LoginError))
         {
             <span class="small-error">@ViewBag.LoginError</span>
         }
-
         <button type="submit">Login</button>
     </form>
-
     <a asp-action="ForgotPassword" class="forgot-link">Forgot Password?</a>
+
+    <div class="divider">OR</div>
     <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
         <div>
             @foreach (var provider in Model.ExternalLogins)
             {
-                <button type="submit" class="btn btn-primary"
+                var btnClass = provider.Name == "Facebook" ? "facebook-btn" : "google-btn";
+                var iconClass = provider.Name == "Facebook" ? "fab fa-facebook-f" : "fab fa-google";
+
+                <button type="submit" class="social-btn @btnClass"
                         name="provider" value="@provider.Name"
                         title="Log in using your @provider.DisplayName account">
-                    @provider.DisplayName
+                    <i class="@iconClass" style="margin-right:8px;"></i> Continue with @provider.DisplayName
                 </button>
             }
         </div>
     </form>
+
 </div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

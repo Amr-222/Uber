@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Uber.PLL.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css"   />
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.css" />
 
 </head>
 <body style="margin: 0; padding: 0;">
@@ -15,12 +15,6 @@
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
-
-    <footer class="border-top footer text-muted">
-        <div class="container text-center">
-            &copy; 2025 - Uber
-        </div>
-    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -52,4 +46,3 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-

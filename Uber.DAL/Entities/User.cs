@@ -83,17 +83,23 @@ namespace Uber.DAL.Entities
         //}
 
 
-
+       
 
         
-        public (bool, string?) Edit(string name, DateTime dateofbirth)
+        public (bool, string?) Edit(string name, DateTime dateofbirth, string Email, string PhoneNumber,bool isdeleted)
         {
+
+         
+
             try
             {
                 this.Name = name;
                 this.DateOfBirth = dateofbirth;
-              
-              
+                this.Email = Email;
+                this.PhoneNumber = PhoneNumber;
+                this.IsDeleted = isdeleted;
+
+
                 ModifiedAt = DateTime.Now;
                 return (true, null);
             }

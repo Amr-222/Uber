@@ -3,7 +3,7 @@ using Uber.DAL.Enums;
 
 namespace Uber.DAL.Entities
 {
-    public class Driver: ApplicationUser
+    public class Driver : ApplicationUser
     {
         //License  **
 
@@ -46,7 +46,7 @@ namespace Uber.DAL.Entities
         public Driver(string name, Gender gender, DateTime DateOfBirth, string? ImagePath/*, string street, string city*/)
         {
             this.Name = name;
-            this.Gender = gender;     
+            this.Gender = gender;
             this.DateOfBirth = DateOfBirth;
             this.ImagePath = ImagePath;
             //Wallet = new Wallet();
@@ -85,15 +85,21 @@ namespace Uber.DAL.Entities
             if (IsDeleted) return;
             ImagePath = path;
         }
-
-        public (bool, string?) Edit(string name,DateTime dateofbirth,string? imagepath/*, Location address*/)
+        public (bool, string?) Edit(string name, DateTime dateofbirth,string ImagePath, string Email, string PhoneNumber,bool isdeleted)
         {
+
+
+
             try
             {
                 this.Name = name;
                 this.DateOfBirth = dateofbirth;
-                this.ImagePath = imagepath;
-                //this.Address = address;
+                this.Email = Email;
+                this.PhoneNumber = PhoneNumber;
+                this.ImagePath = ImagePath;
+                this.IsDeleted = isdeleted; 
+
+
                 ModifiedAt = DateTime.Now;
                 return (true, null);
             }
@@ -105,14 +111,33 @@ namespace Uber.DAL.Entities
 
         public (bool, string?) MakeActive()
         {
-            try { IsActive = true; return (true, null); }
-            catch (Exception ex) { return (false, ex.Message); }
+            try
+            {
+                IsActive = true;
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+
         }
 
         public (bool, string?) MakeInactive()
         {
-            try { IsActive = false; return (true, null); }
-            catch (Exception ex) { return (false, ex.Message); }
+
+            try
+            {
+                IsActive = false; return (true, null);
+            }
+
+            catch (Exception ex) 
+            { 
+                return (false, ex.Message); 
+            }
+
         }
+
+
     }
 }

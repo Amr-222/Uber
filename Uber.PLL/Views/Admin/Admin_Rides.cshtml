@@ -106,6 +106,8 @@
             <th>Ride Time</th>
             <th>Duration</th>
             <th>Distance</th>
+            <th>Status</th>
+
         </tr>
     </thead>
     <tbody>
@@ -115,10 +117,11 @@
                 <td>@ride.ID</td>
                 <td>@ride.DriverName</td>
                 <td>@ride.RiderName</td>
-                <td>@ride.Price</td>
-                <td>@ride.CreatedAt.ToString("dd MMM yyyy")</td>
+                <td>@ride.Price.ToString("F2")</td>
+                <td>@ride.CreatedAt.ToString()</td>
                 <td>@ride.Duration</td>
                 <td>@ride.Distance</td>
+                <td>@ride.Status</td>
             </tr>
         }
     </tbody>

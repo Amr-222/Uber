@@ -11,13 +11,16 @@ namespace Uber.BLL.Services.Abstraction
 {
     public interface IDriverService
     {
-        public  Task<(bool, string?)> CreateAsync(CreateDriver driver);
+        public Task<(bool, string?)> CreateAsync(CreateDriver driver);
         public (bool, string?) Delete(string id);
         public (bool, string?, List<string>?) GetNearestDriver(double lat, double lng);
-        public (bool,string?) MakeUserActive(string Id);
-        public (bool,string?) MakeUserInactive(string Id);
+        public (bool, string?) MakeUserActive(string Id);
+        public (bool, string?) MakeUserInactive(string Id);
         (string?, Driver?) GetByID(string id);
         object SendRequest(GetDriver getDriver, string id);
+        string? GetAll();
+        string? GetById(string id);
+        void EditDriver(EditDriver model);
         //public (bool, string?) Edit();
     }
 }

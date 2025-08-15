@@ -7,7 +7,7 @@ namespace Uber.DAL.Entities
     {
         public ApplicationUser() { }
 
-        public string Name { get; protected set; }
+        public string Name { get; set; }
 
         public Gender Gender { get; protected set; }
 

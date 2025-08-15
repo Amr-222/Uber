@@ -32,5 +32,9 @@ namespace Uber.PLL.Controllers
         {
             return View();
         }
+        public IActionResult DataDeletion()
+        {
+            return View();
+        }
     }
 }

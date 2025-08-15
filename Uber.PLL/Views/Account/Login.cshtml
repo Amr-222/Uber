@@ -91,7 +91,7 @@
 
         <label>Password</label>
         <input asp-for="Password" type="password" required />
-        @* This will show only if there's a login error *@
+        
         @if (!string.IsNullOrEmpty(ViewBag.LoginError))
         {
             <span class="small-error">@ViewBag.LoginError</span>
@@ -101,4 +101,16 @@
     </form>
 
     <a asp-action="ForgotPassword" class="forgot-link">Forgot Password?</a>
+    <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+        <div>
+            @foreach (var provider in Model.ExternalLogins)
+            {
+                <button type="submit" class="btn btn-primary"
+                        name="provider" value="@provider.Name"
+                        title="Log in using your @provider.DisplayName account">
+                    @provider.DisplayName
+                </button>
+            }
+        </div>
+    </form>
 </div>

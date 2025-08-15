@@ -13,16 +13,16 @@ using Uber.DAL.Repo.Impelementation;
 
 namespace Uber.BLL.Services.Impelementation
 {
-     public class RideService : IRideService
+    public class RideService : IRideService
     {
         private readonly IRideRepo rideRepo;
         public RideService(IRideRepo rideRepo)
         {
-            this.rideRepo = rideRepo;   
+            this.rideRepo = rideRepo;
         }
         public (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId,
-        double startLat, double startLng, 
+        double startLat, double startLng,
         double endLat, double endLng,
         double Distance, double Duration, double Price)
         {
@@ -77,7 +77,7 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
-        public (string?, Ride?) GetByID(int id) 
+        public (string?, Ride?) GetByID(int id)
         {
             return rideRepo.GetByID(id);
         }
@@ -123,6 +123,11 @@ namespace Uber.BLL.Services.Impelementation
             {
                 return (false, ex.Message);
             }
+        }
+
+        public string? GetRideById(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

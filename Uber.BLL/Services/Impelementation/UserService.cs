@@ -43,7 +43,7 @@ namespace Uber.BLL.Services.Impelementation
                 if (res.Succeeded)
                 {
                     await userManager.AddToRoleAsync(user1, "User");
-                    return (true,null);
+                    return (true, null);
                 }
                 else
                 {
@@ -54,7 +54,7 @@ namespace Uber.BLL.Services.Impelementation
 
                     return (false, errors);
                 }
-               
+
 
             }
             catch (Exception ex)
@@ -79,24 +79,37 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                //
-                //Mappppppppppp
-              //  userRepo.Edit();
-                return (true,null);
+                var result = userRepo.GetByID(user.Id);
+                var existingUser = result.Item2;
+                if (existingUser == null)
+                    return (false, "User not found");
+                existingUser.Edit(user.Name, user.DateOfBirth);
+                existingUser.Email = user.Email;
+                existingUser.PhoneNumber = user.PhoneNumber;
+                userRepo.Edit(existingUser);
 
+                return (true, null);
             }
             catch (Exception ex)
             {
                 return (false, ex.Message);
             }
         }
+
+
         public (string?, User?) GetByID(string id)
         {
             return userRepo.GetByID(id);
         }
-        public List<User> GetAll()
-        { 
-            return userRepo.GetAll(); 
+        public List<EditUser> GetAll()
+        {
+            var result = userRepo.GetAll();
+            var list = new List<EditUser>();
+            foreach (var user in result)
+            {
+                list.Add(mapper.Map<EditUser>(user));
+            }
+            return list;
         }
         public async Task<(bool, string?, UserProfileVM?)> GetProfileInfo()
         {
@@ -115,6 +128,31 @@ namespace Uber.BLL.Services.Impelementation
             catch (Exception ex)
             {
                 return (false, ex.Message, null);
+            }
+        }
+
+        public void Delete(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string? GetById(int id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public (string?, EditUser?) GetByIDToEdit(string id)
+        {
+            try
+            {
+                var result = userRepo.GetByID(id);
+                if (result.Item1 != null) return (result.Item1, null);
+                var user = mapper.Map<EditUser>(result.Item2);
+                return (null, user);
+            }
+            catch (Exception ex)
+            {
+                return (ex.Message, null);
             }
         }
     }

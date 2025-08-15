@@ -45,4 +45,25 @@ public class RideHub : Hub
         System.Console.WriteLine($"RejectRide called: rideGroupId={rideGroupId}, rideDbId={rideDbId}");
         await Clients.Group(rideGroupId).SendAsync("RideRejected", rideDbId);
     }
+
+    // Driver calls this when they arrive at pickup location
+    public async Task DriverArrived(string rideGroupId, int rideDbId)
+    {
+        System.Console.WriteLine($"DriverArrived called: rideGroupId={rideGroupId}, rideDbId={rideDbId}");
+        await Clients.Group(rideGroupId).SendAsync("DriverArrived", rideDbId);
+    }
+
+    // User calls this to rate the driver
+    public async Task RateDriver(string rideGroupId, int rideDbId, int rating)
+    {
+        System.Console.WriteLine($"RateDriver called: rideGroupId={rideGroupId}, rideDbId={rideDbId}, rating={rating}");
+        await Clients.Group(rideGroupId).SendAsync("DriverRated", rideDbId, rating);
+    }
+
+    // Driver calls this to rate the user
+    public async Task RateUser(string rideGroupId, int rideDbId, int rating)
+    {
+        System.Console.WriteLine($"RateUser called: rideGroupId={rideGroupId}, rideDbId={rideDbId}, rating={rating}");
+        await Clients.Group(rideGroupId).SendAsync("UserRated", rideDbId, rating);
+    }
 }

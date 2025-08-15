@@ -162,7 +162,7 @@ namespace Uber.PLL.Controllers
             {
 
                 ViewBag.LoginError = "*Invalid username or password";
-                return View();
+                return View(model);
             }
         }
             [HttpGet]

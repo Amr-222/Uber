@@ -87,7 +87,6 @@ namespace Uber.PLL
                     options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
                     options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
                 }); var app = builder.Build();
-
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {

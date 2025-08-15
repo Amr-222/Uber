@@ -135,6 +135,7 @@
     }
 
     function displayRideRequest(ride) {
+        console.log('Displaying ride request:', ride);
         const container = document.getElementById("rideRequests");
         
         // Clear previous requests
@@ -147,9 +148,27 @@
         rideDiv.innerHTML = `
             <h4 style="color: #007bff; margin-bottom: 15px;">🚗 New Ride Request</h4>
             <div style="margin-bottom: 15px;">
-                <p><strong>Pickup Location:</strong> ${ride.startLat.toFixed(6)}, ${ride.startLng.toFixed(6)}</p>
-                <p><strong>Destination:</strong> ${ride.endLat.toFixed(6)}, ${ride.endLng.toFixed(6)}</p>
-                <p><strong>Ride ID:</strong> ${ride.rideId}</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #007bff;">
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">📏 Distance</p>
+                        <p style="margin: 0; font-size: 18px; color: #007bff;">${(ride.distance && ride.distance > 0) ? ride.distance.toFixed(1) + ' km' : 'N/A'}</p>
+                    </div>
+                    <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #28a745;">
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">⏱️ Duration</p>
+                        <p style="margin: 0; font-size: 18px; color: #28a745;">${(ride.duration && ride.duration > 0) ? Math.round(ride.duration) + ' min' : 'N/A'}</p>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+                    <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #ffc107;">
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">💰 Price</p>
+                        <p style="margin: 0; font-size: 18px; color: #ffc107;">${(ride.price && ride.price > 0) ? '£' + ride.price.toFixed(2) : 'N/A'}</p>
+                    </div>
+                    <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #6f42c1;">
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">⭐ User Rating</p>
+                        <p style="margin: 0; font-size: 18px; color: #6f42c1;">${(ride.userRating && ride.userRating > 0) ? ride.userRating + '/5' : 'N/A'}</p>
+                    </div>
+                </div>
+                <p style="margin: 0; font-size: 14px; color: #6c757d;"><strong>Ride ID:</strong> ${ride.rideId}</p>
             </div>
             <div style="display: flex; gap: 10px;">
                 <button onclick="acceptRide('${ride.rideId}', '${ride.rideGroup}')" 

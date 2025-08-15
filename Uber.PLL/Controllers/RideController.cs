@@ -5,6 +5,7 @@ using Uber.BLL.ModelVM.Ride;
 using Uber.BLL.Services.Abstraction;
 using Uber.DAL.Entities;
 using Uber.DAL.Enums;
+using System;
 
 namespace Uber.PLL.Controllers
 {
@@ -32,12 +33,14 @@ namespace Uber.PLL.Controllers
         private readonly IHubContext<RideHub> _hub;
         private readonly IDriverService _driverService;
         private readonly IRideService _rideService;
+        private readonly IUserService _userService;
 
-        public RideController(IHubContext<RideHub> hub, IDriverService driverService, IRideService rideService)
+        public RideController(IHubContext<RideHub> hub, IDriverService driverService, IRideService rideService, IUserService userService)
         {
             _hub = hub;
             _driverService = driverService;
             _rideService = rideService;
+            _userService = userService;
         }
 
         [Authorize] // user must be logged in
@@ -78,8 +81,21 @@ namespace Uber.PLL.Controllers
                 // 3) Notify the target driver - use a driver-specific group instead of user ID
                 var driverGroup = $"driver-{chosenDriverId}";
                 Console.WriteLine($"Sending ride request to driver group: {driverGroup}");
-                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = StartLat, startLng = StartLng, endLat = EndLat, endLng = EndLng, userId })}");
+                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = StartLat, startLng = StartLng, endLat = EndLat, endLng = EndLng, userId, distance = Distance, duration = Duration, price = Price })}");
 
+                // Get user information for rating display
+                var (userErr, user) = _userService.GetByID(userId);
+                var userRating = 5.0; // Default to 5 if user not found
+                if (userErr != null)
+                {
+                    Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
+                }
+                else if (user != null)
+                {
+                    userRating = user.Rating();
+                    Console.WriteLine($"User rating retrieved: {userRating}");
+                }
+                
                 await _hub.Clients.Group(driverGroup).SendAsync("ReceiveRideRequest", new
                 {
                     rideId = ride.Id,
@@ -88,7 +104,11 @@ namespace Uber.PLL.Controllers
                     startLng = StartLng,
                     endLat = EndLat,
                     endLng = EndLng,
-                    userId
+                    userId,
+                    distance = Distance,
+                    duration = Duration,
+                    price = Price,
+                    userRating = Math.Round(userRating, 1)
                 });
 
                 Console.WriteLine($"Ride request sent successfully to driver {chosenDriverId}");
@@ -140,8 +160,21 @@ namespace Uber.PLL.Controllers
                 // 3) Notify the target driver
                 var driverGroup = $"driver-{chosenDriverId}";
                 Console.WriteLine($"Sending ride request to driver group: {driverGroup}");
-                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = request.StartLat, startLng = request.StartLng, endLat = request.EndLat, endLng = request.EndLng, userId })}");
+                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = request.StartLat, startLng = request.StartLng, endLat = request.EndLat, endLng = request.EndLng, userId, distance = request.Distance, duration = request.Duration, price = request.Price })}");
 
+                // Get user information for rating display
+                var (userErr, user) = _userService.GetByID(userId);
+                var userRating = 5.0; // Default to 5 if user not found
+                if (userErr != null)
+                {
+                    Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
+                }
+                else if (user != null)
+                {
+                    userRating = user.Rating();
+                    Console.WriteLine($"User rating retrieved: {userRating}");
+                }
+                
                 await _hub.Clients.Group(driverGroup).SendAsync("ReceiveRideRequest", new
                 {
                     rideId = ride.Id,
@@ -150,7 +183,11 @@ namespace Uber.PLL.Controllers
                     startLng = request.StartLng,
                     endLat = request.EndLat,
                     endLng = request.EndLng,
-                    userId
+                    userId,
+                    distance = request.Distance,
+                    duration = request.Duration,
+                    price = request.Price,
+                    userRating = Math.Round(userRating, 1)
                 });
 
                 Console.WriteLine($"Ride request sent successfully to driver {chosenDriverId}");
@@ -235,6 +272,19 @@ namespace Uber.PLL.Controllers
                         var (updateOk, updateErr) = _rideService.AssignNewDriver(request.id, nextDriverId);
                         if (updateOk)
                         {
+                            // Get user information for rating display
+                            var (userErr, user) = _userService.GetByID(ride.UserId);
+                            var userRating = 5.0; // Default to 5 if user not found
+                            if (userErr != null)
+                            {
+                                Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
+                            }
+                            else if (user != null)
+                            {
+                                userRating = user.Rating();
+                                Console.WriteLine($"User rating retrieved: {userRating}");
+                            }
+                            
                             // Notify the new driver
                             await _hub.Clients.Group($"driver-{nextDriverId}").SendAsync("ReceiveRideRequest", new
                             {
@@ -244,7 +294,11 @@ namespace Uber.PLL.Controllers
                                 startLng = ride.StartLng,
                                 endLat = ride.EndLat,
                                 endLng = ride.EndLng,
-                                userId = ride.UserId
+                                userId = ride.UserId,
+                                distance = ride.Distance,
+                                duration = ride.Duration,
+                                price = ride.Price,
+                                userRating = Math.Round(userRating, 1)
                             });
 
                             // Notify user that request was sent to another driver

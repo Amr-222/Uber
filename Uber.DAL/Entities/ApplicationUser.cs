@@ -9,7 +9,7 @@ namespace Uber.DAL.Entities
 
         public string Name { get; set; }
 
-        public Gender Gender { get; protected set; }
+        public Gender Gender { get; set; }
 
         public int Age()
         {
@@ -21,7 +21,7 @@ namespace Uber.DAL.Entities
 
             return age;
         }
-        public DateTime DateOfBirth { get; protected set; }
+        public DateTime DateOfBirth { get; set; }
 
         public bool IsDeleted { get; protected set; } = false;
         public DateTime CreatedAt { get; } = DateTime.Now;

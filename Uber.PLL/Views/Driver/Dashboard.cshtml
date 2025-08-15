@@ -1,15 +1,66 @@
 ﻿@{
     ViewData["Title"] = "Driver Dashboard";
 }
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<header>
+    <div class="nav-left">
+        <h1>Uber</h1>
+    </div>
+    <div class="nav-right">
+        <a asp-controller="Driver" asp-action="DriverProfile" title="My Profile" class="user-icon">
+            <i class="fas fa-user"></i>
+        </a>
+    </div>
+</header>
+
+<style>
+    header {
+        background: #000;
+        color: #fff;
+        padding: 20px 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .nav-left {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .nav-right a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+        .nav-right a:hover {
+            color: #1CB5A3;
+        }
+
+    .nav-right .signup-btn {
+        background: #fff;
+        color: #000;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: bold;
+        transition: background 0.3s ease, color 0.3s ease;
+    }
+
+        .nav-right .signup-btn:hover {
+            background: #1CB5A3;
+            color: #fff;
+        }
+</style>
 
 <h2>Driver Dashboard</h2>
-
-<!-- Driver Status Section -->
 <div style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e8; border-radius: 8px; border-left: 4px solid #28a745;">
     <h4 style="color: #28a745; margin: 0 0 10px 0;">🚗 Driver Status</h4>
     <div style="display: flex; align-items: center; gap: 15px;">
         <div>
-            <strong>Current Status:</strong> 
+            <strong>Current Status:</strong>
             <span id="driverStatus" style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">
                 Active
             </span>
@@ -22,54 +73,38 @@
         Active drivers receive ride requests. Inactive drivers are not considered for new rides.
     </small>
 </div>
-
 <p>Waiting for ride requests...</p>
-
 <div id="rideRequests"></div>
 <div id="connectionStatus" style="margin-top: 20px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
     <strong>Connection Status:</strong> <span id="statusText">Connecting...</span>
 </div>
 
-
-
-<!-- Use CDN for SignalR client library -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
 <script>
     let connection;
     let isConnected = false;
-
-    // Initialize SignalR connection
     async function initializeConnection() {
         try {
-            // Create connection to RideHub
             connection = new signalR.HubConnectionBuilder()
-                .withUrl("/rideHub", { 
+                .withUrl("/rideHub", {
                     skipNegotiation: true,
                     transport: signalR.HttpTransportType.WebSockets
                 })
                 .withAutomaticReconnect()
                 .build();
-
-            // Connection event handlers
             connection.onreconnecting(() => {
                 updateStatus("Reconnecting...", "orange");
             });
-
             connection.onreconnected(() => {
                 updateStatus("Connected", "green");
                 isConnected = true;
             });
-
             connection.onclose(() => {
                 updateStatus("Disconnected", "red");
                 isConnected = false;
             });
-
-            // When a ride request is received from RideController
             connection.on("ReceiveRideRequest", function (ride) {
                 displayRideRequest(ride);
-                
-                // Show notification
                 if (Notification.permission === "granted") {
                     new Notification("New Ride Request", {
                         body: "You have a new ride request!",
@@ -77,26 +112,17 @@
                     });
                 }
             });
-
-            // Start connection
             await connection.start();
             updateStatus("Connected", "green");
             isConnected = true;
-
-            // Join driver-specific group - this is crucial for receiving ride requests
             await joinDriverGroup();
-
         } catch (err) {
             console.error("SignalR Connection Error:", err);
             updateStatus("Connection Failed: " + err.message, "red");
         }
     }
-
-    // Function to join driver-specific group
     async function joinDriverGroup() {
         try {
-            // Get the current user's ID from the page or authentication context
-            // For now, we'll use a placeholder - in production, this should come from the server
             const driverId = await getCurrentDriverId();
             if (driverId) {
                 await connection.invoke("JoinDriverGroup", driverId);
@@ -110,8 +136,6 @@
             console.error("Error joining driver group:", err);
         }
     }
-
-    // Function to get current driver ID - this should be implemented based on your auth system
     async function getCurrentDriverId() {
         try {
             const response = await fetch('/Driver/GetCurrentDriverId');
@@ -127,24 +151,20 @@
             return null;
         }
     }
-
     function updateStatus(message, color) {
         const statusText = document.getElementById("statusText");
         statusText.textContent = message;
         statusText.style.color = color;
     }
-
     function displayRideRequest(ride) {
         console.log('Displaying ride request:', ride);
         const container = document.getElementById("rideRequests");
-        
-        // Clear previous requests
         container.innerHTML = "";
 
         const rideDiv = document.createElement("div");
         rideDiv.className = "ride-request";
         rideDiv.style.cssText = "border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 15px; background-color: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.1);";
-        
+
         rideDiv.innerHTML = `
             <h4 style="color: #007bff; margin-bottom: 15px;">🚗 New Ride Request</h4>
             <div style="margin-bottom: 15px;">
@@ -154,7 +174,7 @@
                         <p style="margin: 0; font-size: 18px; color: #007bff;">${(ride.distance && ride.distance > 0) ? ride.distance.toFixed(1) + ' km' : 'N/A'}</p>
                     </div>
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #28a745;">
-                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">⏱️ Duration</p>
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">⏱ Duration</p>
                         <p style="margin: 0; font-size: 18px; color: #28a745;">${(ride.duration && ride.duration > 0) ? Math.round(ride.duration) + ' min' : 'N/A'}</p>
                     </div>
                 </div>
@@ -171,21 +191,18 @@
                 <p style="margin: 0; font-size: 14px; color: #6c757d;"><strong>Ride ID:</strong> ${ride.rideId}</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button onclick="acceptRide('${ride.rideId}', '${ride.rideGroup}')" 
+                <button onclick="acceptRide('${ride.rideId}', '${ride.rideGroup}')"
                         style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
                     ✅ Accept Ride
                 </button>
-                <button onclick="rejectRide('${ride.rideId}', '${ride.rideGroup}')" 
+                <button onclick="rejectRide('${ride.rideId}', '${ride.rideGroup}')"
                         style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
                     ❌ Reject Ride
                 </button>
             </div>
         `;
-        
         container.appendChild(rideDiv);
     }
-
-    // Function to accept ride
     async function acceptRide(rideId, rideGroup) {
         try {
             const response = await fetch(`/Ride/DriverAccept`, {
@@ -198,11 +215,8 @@
                     rideGroup: rideGroup
                 })
             });
-
             if (response.ok) {
                 document.getElementById("rideRequests").innerHTML = "<div style='color: green; padding: 20px; text-align: center;'><h3>✅ Ride Accepted!</h3><p>Redirecting to ride details...</p></div>";
-                
-                // Redirect to ride details page after a short delay
                 setTimeout(() => {
                     window.location.href = `/Ride/RideDetails/${rideId}`;
                 }, 2000);
@@ -215,8 +229,6 @@
             alert("Error accepting ride. Please try again.");
         }
     }
-
-    // Function to reject ride
     async function rejectRide(rideId, rideGroup) {
         try {
             const response = await fetch(`/Ride/DriverReject`, {
@@ -229,11 +241,8 @@
                     rideGroup: rideGroup
                 })
             });
-
             if (response.ok) {
-                document.getElementById("rideRequests").innerHTML = "<div style='color: orange; padding: 20px; text-align: center;'><h3>⚠️ Ride Rejected</h3><p>You have rejected the ride request.</p></div>";
-                
-                // Clear the ride request after rejecting
+                document.getElementById("rideRequests").innerHTML = "<div style='color: orange; padding: 20px; text-align: center;'><h3>⚠ Ride Rejected</h3><p>You have rejected the ride request.</p></div>";
                 setTimeout(() => {
                     document.getElementById("rideRequests").innerHTML = "<p>Waiting for new ride requests...</p>";
                 }, 3000);
@@ -246,26 +255,16 @@
             alert("Error rejecting ride. Please try again.");
         }
     }
-
-    // Request notification permission
     if (Notification.permission === "default") {
         Notification.requestPermission();
     }
-
-    // Initialize connection when page loads
     document.addEventListener('DOMContentLoaded', function() {
-        // addLogEntry('🚀 Page loaded - Starting initialization...');
         initializeConnection();
-        startHeartbeat(); // Start heartbeat when page loads
-        
-        // Get current driver status and update UI
-        addLogEntry('📡 Fetching current driver status...');
+        startHeartbeat();
+        // addLogEntry('📡 Fetching current driver status...');
         getCurrentDriverStatus();
     });
-
-    // Function to set driver as active (for heartbeat)
     async function setDriverActive() {
-
         try {
             const response = await fetch('/Driver/MakeUserActive', {
                 method: 'POST',
@@ -273,9 +272,7 @@
                     'Content-Type': 'application/json',
                 }
             });
-
             if (response.ok) {
-
                 updateDriverStatusDisplay(true);
             } else {
                 const errorData = await response.json();
@@ -285,10 +282,7 @@
             console.error('Error setting driver as active:', err);
         }
     }
-
-    // Function to set driver as inactive
     async function setDriverInactive() {
-
         try {
             const response = await fetch('/Driver/MakeUserInactive', {
                 method: 'POST',
@@ -296,10 +290,7 @@
                     'Content-Type': 'application/json',
                 }
             });
-
             if (response.ok) {
-
-
                 updateDriverStatusDisplay(false);
             } else {
                 const errorData = await response.json();
@@ -309,12 +300,10 @@
             console.error('Error setting driver as inactive:', err);
         }
     }
-
-    // Function to update the driver status display
     function updateDriverStatusDisplay(isActive) {
         const statusElement = document.getElementById('driverStatus');
         const toggleButton = document.getElementById('toggleStatusBtn');
-        
+
         if (statusElement && toggleButton) {
             if (isActive) {
                 statusElement.textContent = 'Active';
@@ -329,8 +318,6 @@
             }
         }
     }
-
-    // Function to get current driver status from server
     async function getCurrentDriverStatus() {
         try {
             const response = await fetch('/Driver/GetCurrentDriverStatus');
@@ -348,152 +335,52 @@
             return null;
         }
     }
-
-    // ===== DRIVER STATUS EVENT LISTENERS =====
-    // IMPORTANT CHANGES: Removed aggressive event listeners that were causing
-    // drivers to become inactive when they shouldn't (clicking outside window,
-    // switching tabs, etc.). Now drivers only become inactive when:
-    // - Actually leaving the page (unload, pagehide, beforeunload)
-    // - Losing internet connection (offline)
-    // - Being idle for 5 minutes (userActivityTimeout)
-    
-    // Event listeners for page unload
-    // REMOVED: Duplicate beforeunload event listener
-    // window.addEventListener('beforeunload', function(e) {
-    //     // Set driver as inactive when leaving the page
-    //     setDriverInactive();
-    // });
-
-    // IMPORTANT: Only these events will set driver as inactive:
-    // - unload: When the page is actually closed/refreshed
-    // - pagehide: When the tab/window is closed
-    // - beforeunload: When leaving the page (with confirmation dialog)
-    // - offline: When internet connection is lost
-    // - idle timeout: After 5 minutes of no user activity
     window.addEventListener('unload', function(e) {
-        // Set driver as inactive when leaving the page
         setDriverInactive();
     });
-
-    // Event listener for page visibility change (when user switches tabs or minimizes browser)
-    // REMOVED: This was causing drivers to become inactive when switching tabs
-    // document.addEventListener('visibilitychange', function() {
-    //     if (document.hidden) {
-    //         // Page is hidden (user switched tabs or minimized browser)
-    //         setDriverInactive();
-    //     } else {
-    //         // Page is visible again (user returned to the page)
-    //         setDriverActive();
-    //     }
-    // });
-
-    // Event listener for page focus/blur (when user switches between applications)
-    // REMOVED: This was causing drivers to become inactive when clicking outside the window
-    // window.addEventListener('blur', function() {
-    //     // User switched to another application
-    //     setDriverInactive();
-    // });
-
-    // window.addEventListener('focus', function() {
-    //     // User returned to the application
-    //     setDriverActive();
-    // });
-
-    // Event listener for browser navigation (back/forward buttons)
-    // REMOVED: This was causing drivers to become inactive when using browser navigation
-    // window.addEventListener('popstate', function() {
-    //     // User navigated away using browser navigation
-    //     setDriverInactive();
-    // });
-
-    // Event listener for beforeunload with confirmation dialog
     window.addEventListener('beforeunload', function(e) {
-        // Show confirmation dialog and set driver as inactive
         setDriverInactive();
         e.preventDefault();
         e.returnValue = '';
     });
-
-    // Event listener for page hide (when closing tab/window)
     window.addEventListener('pagehide', function() {
-        // User is closing the tab or window
         setDriverInactive();
     });
-
-    // Event listener for page show (when returning to the page)
     window.addEventListener('pageshow', function() {
-        // User returned to the page
         if (!document.hidden) {
             setDriverActive();
             startHeartbeat();
         }
     });
-
-    // Event listeners for online/offline status
     window.addEventListener('online', function() {
-        // Internet connection restored
         console.log('Internet connection restored');
-        // Reconnect SignalR if needed
         if (connection && !isConnected) {
             initializeConnection();
         }
     });
-
     window.addEventListener('offline', function() {
-        // Internet connection lost
         console.log('Internet connection lost');
-        // Set driver as inactive when offline
         setDriverInactive();
     });
-
-    // User activity monitoring to detect idle state
     let userActivityTimeout;
-    const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes
-
+    const IDLE_TIMEOUT = 5 * 60 * 1000;
     function resetUserActivityTimer() {
         clearTimeout(userActivityTimeout);
         userActivityTimeout = setTimeout(() => {
-            // User has been idle for 5 minutes, set as inactive
             console.log('User idle for 5 minutes, setting driver as inactive');
             setDriverInactive();
         }, IDLE_TIMEOUT);
     }
-
-    // Reset timer on user activity
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'].forEach(event => {
         document.addEventListener(event, resetUserActivityTimer, true);
     });
-
-    // Initialize user activity timer
     resetUserActivityTimer();
-
-    // Device sleep/wake detection
-    // REMOVED: This was too aggressive and caused false positives
-    // let wasPageVisible = true;
-    
-    // function checkDeviceSleep() {
-    //     if (wasPageVisible && document.hidden) {
-    //         // Device might be going to sleep
-    //         console.log('Device might be going to sleep');
-    //         setDriverInactive();
-    //     }
-    //     wasPageVisible = !document.hidden;
-    // }
-
-    // Check for device sleep every second
-    // setInterval(checkDeviceSleep, 1000);
-
-    // Cleanup function to be called when leaving the page
     function cleanup() {
         stopHeartbeat();
         clearTimeout(userActivityTimeout);
         setDriverInactive();
     }
-
-    // Call cleanup when page is unloaded
     window.addEventListener('unload', cleanup);
-
-    // Add a method to manually set driver status (for debugging/testing)
     window.setDriverStatus = function(active) {
         if (active) {
             setDriverActive();
@@ -501,14 +388,8 @@
             setDriverInactive();
         }
     };
-
-
-
-    // Heartbeat mechanism to keep driver active while on the page
     let heartbeatInterval;
-    
     function startHeartbeat() {
-        // Send heartbeat every 30 seconds to keep driver active
         heartbeatInterval = setInterval(async () => {
             if (!document.hidden && navigator.onLine) {
                 try {
@@ -517,7 +398,7 @@
                     console.error('Heartbeat error:', err);
                 }
             }
-        }, 30000); // 30 seconds
+        }, 30000);
     }
 
     function stopHeartbeat() {
@@ -526,34 +407,13 @@
             heartbeatInterval = null;
         }
     }
-
-    // Start heartbeat when page becomes visible
-    // REMOVED: This was causing drivers to become inactive when switching tabs
-    // document.addEventListener('visibilitychange', function() {
-    //     if (document.hidden) {
-    //         stopHeartbeat();
-    //         setDriverInactive();
-    //     } else {
-    //         startHeartbeat();
-    //         setDriverActive();
-    //     }
-    // });
-
-
 </script>
-
-
-
 <script>
-
-
-    // Function to toggle driver status
     window.toggleDriverStatus = async function() {
         const currentStatus = document.getElementById("driverStatus").textContent;
         const newStatus = currentStatus === "Active" ? "Inactive" : "Active";
         document.getElementById("driverStatus").textContent = newStatus;
         document.getElementById("toggleStatusBtn").textContent = newStatus;
-
         try {
             const response = await fetch('/Driver/ToggleDriverStatus', {
                 method: 'POST',
@@ -564,14 +424,12 @@
                     isActive: newStatus === "Active"
                 })
             });
-
             if (response.ok) {
                 console.log(`Driver status set to ${newStatus}`);
                 alert(`Driver status set to ${newStatus}`);
             } else {
                 const errorData = await response.json();
                 alert(`Error setting driver status to ${newStatus}: ${errorData.message || "Unknown error"}`);
-                // Revert status if setting fails
                 document.getElementById("driverStatus").textContent = currentStatus;
                 document.getElementById("toggleStatusBtn").textContent = currentStatus;
             }
@@ -580,8 +438,4 @@
             alert("Error toggling driver status. Please try again.");
         }
     };
-
-
-
-
 </script>

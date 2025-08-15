@@ -93,6 +93,13 @@
     }
 </style>
 
+
+<header>
+    <div class="nav-left">
+        <h1>Uber</h1>
+    </div>
+</header>
+
 <div class="page-title">Drivers Management</div>
 
 
@@ -125,10 +132,10 @@
                         <span>No Image</span>
                     }
                 </td>
-                <td>@driver.Name</td>
+                <td contenteditable="true">@driver.Name</td>
                 <td>@driver.Email</td>
-                <td>@driver.PhoneNumber</td>
-                <td>@driver.DateOfBirth</td>
+                <td>@("0" + driver.PhoneNumber)</td>
+                <td>@driver.DateOfBirth.ToString("dd MMM yyyy")</td>
                 <td>
                     @if (driver.IsDeleted == true)
                     {

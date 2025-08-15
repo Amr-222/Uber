@@ -5,20 +5,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Uber.BLL.Helper;
+using Uber.BLL.ModelVM.Driver;
+using Uber.BLL.ModelVM.Ride;
+using Uber.BLL.ModelVM.User;
 using Uber.BLL.Services.Abstraction;
 using Uber.DAL.Entities;
 using Uber.DAL.Enums;
 using Uber.DAL.Repo.Abstraction;
 using Uber.DAL.Repo.Impelementation;
+using Uber.DAL.Repo.Implementation;
 
 namespace Uber.BLL.Services.Impelementation
 {
     public class RideService : IRideService
     {
         private readonly IRideRepo rideRepo;
-        public RideService(IRideRepo rideRepo)
+        private readonly IMapper mapper;
+        public RideService(IRideRepo rideRepo, IMapper mapper)
         {
             this.rideRepo = rideRepo;
+            this.mapper = mapper;
         }
         public (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId,
@@ -82,11 +88,19 @@ namespace Uber.BLL.Services.Impelementation
             return rideRepo.GetByID(id);
         }
 
-      
-        public List<Ride> GetAll()
+
+        public List<RideVM> GetAll()
         {
-            return rideRepo.GetAll();
+            var result = rideRepo.GetAll();
+            var list = new List<RideVM>();
+            foreach (var user in result)
+            {
+                list.Add(mapper.Map<RideVM>(user));
+            }
+            return list;
         }
+
+      
 
         public (bool, string?) AssignNewDriver(int rideId, string newDriverId)
         {
@@ -127,9 +141,12 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
-        public string? GetRideById(int id)
-        {
-            throw new NotImplementedException();
-        }
+
+       
+
+
+      
+
+
     }
 }

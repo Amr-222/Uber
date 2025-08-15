@@ -5,6 +5,7 @@ using Uber.BLL.ModelVM.Ride;
 using Uber.BLL.Services.Abstraction;
 using Uber.DAL.Entities;
 using Uber.DAL.Enums;
+using System;
 
 namespace Uber.PLL.Controllers
 {
@@ -20,17 +21,26 @@ namespace Uber.PLL.Controllers
         public double Price { get; set; }
     }
 
+    // Model for rating requests
+    public class RatingRequest
+    {
+        public int RideId { get; set; }
+        public int Rating { get; set; }
+    }
+
     public class RideController : Controller
     {
         private readonly IHubContext<RideHub> _hub;
         private readonly IDriverService _driverService;
         private readonly IRideService _rideService;
+        private readonly IUserService _userService;
 
-        public RideController(IHubContext<RideHub> hub, IDriverService driverService, IRideService rideService)
+        public RideController(IHubContext<RideHub> hub, IDriverService driverService, IRideService rideService, IUserService userService)
         {
             _hub = hub;
             _driverService = driverService;
             _rideService = rideService;
+            _userService = userService;
         }
 
         [Authorize] // user must be logged in
@@ -71,8 +81,21 @@ namespace Uber.PLL.Controllers
                 // 3) Notify the target driver - use a driver-specific group instead of user ID
                 var driverGroup = $"driver-{chosenDriverId}";
                 Console.WriteLine($"Sending ride request to driver group: {driverGroup}");
-                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = StartLat, startLng = StartLng, endLat = EndLat, endLng = EndLng, userId })}");
+                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = StartLat, startLng = StartLng, endLat = EndLat, endLng = EndLng, userId, distance = Distance, duration = Duration, price = Price })}");
 
+                // Get user information for rating display
+                var (userErr, user) = _userService.GetByID(userId);
+                var userRating = 5.0; // Default to 5 if user not found
+                if (userErr != null)
+                {
+                    Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
+                }
+                else if (user != null)
+                {
+                    userRating = user.Rating();
+                    Console.WriteLine($"User rating retrieved: {userRating}");
+                }
+                
                 await _hub.Clients.Group(driverGroup).SendAsync("ReceiveRideRequest", new
                 {
                     rideId = ride.Id,
@@ -81,7 +104,11 @@ namespace Uber.PLL.Controllers
                     startLng = StartLng,
                     endLat = EndLat,
                     endLng = EndLng,
-                    userId
+                    userId,
+                    distance = Distance,
+                    duration = Duration,
+                    price = Price,
+                    userRating = Math.Round(userRating, 1)
                 });
 
                 Console.WriteLine($"Ride request sent successfully to driver {chosenDriverId}");
@@ -133,8 +160,21 @@ namespace Uber.PLL.Controllers
                 // 3) Notify the target driver
                 var driverGroup = $"driver-{chosenDriverId}";
                 Console.WriteLine($"Sending ride request to driver group: {driverGroup}");
-                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = request.StartLat, startLng = request.StartLng, endLat = request.EndLat, endLng = request.EndLng, userId })}");
+                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = request.StartLat, startLng = request.StartLng, endLat = request.EndLat, endLng = request.EndLng, userId, distance = request.Distance, duration = request.Duration, price = request.Price })}");
 
+                // Get user information for rating display
+                var (userErr, user) = _userService.GetByID(userId);
+                var userRating = 5.0; // Default to 5 if user not found
+                if (userErr != null)
+                {
+                    Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
+                }
+                else if (user != null)
+                {
+                    userRating = user.Rating();
+                    Console.WriteLine($"User rating retrieved: {userRating}");
+                }
+                
                 await _hub.Clients.Group(driverGroup).SendAsync("ReceiveRideRequest", new
                 {
                     rideId = ride.Id,
@@ -143,7 +183,11 @@ namespace Uber.PLL.Controllers
                     startLng = request.StartLng,
                     endLat = request.EndLat,
                     endLng = request.EndLng,
-                    userId
+                    userId,
+                    distance = request.Distance,
+                    duration = request.Duration,
+                    price = request.Price,
+                    userRating = Math.Round(userRating, 1)
                 });
 
                 Console.WriteLine($"Ride request sent successfully to driver {chosenDriverId}");
@@ -228,6 +272,19 @@ namespace Uber.PLL.Controllers
                         var (updateOk, updateErr) = _rideService.AssignNewDriver(request.id, nextDriverId);
                         if (updateOk)
                         {
+                            // Get user information for rating display
+                            var (userErr, user) = _userService.GetByID(ride.UserId);
+                            var userRating = 5.0; // Default to 5 if user not found
+                            if (userErr != null)
+                            {
+                                Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
+                            }
+                            else if (user != null)
+                            {
+                                userRating = user.Rating();
+                                Console.WriteLine($"User rating retrieved: {userRating}");
+                            }
+                            
                             // Notify the new driver
                             await _hub.Clients.Group($"driver-{nextDriverId}").SendAsync("ReceiveRideRequest", new
                             {
@@ -237,7 +294,11 @@ namespace Uber.PLL.Controllers
                                 startLng = ride.StartLng,
                                 endLat = ride.EndLat,
                                 endLng = ride.EndLng,
-                                userId = ride.UserId
+                                userId = ride.UserId,
+                                distance = ride.Distance,
+                                duration = ride.Duration,
+                                price = ride.Price,
+                                userRating = Math.Round(userRating, 1)
                             });
 
                             // Notify user that request was sent to another driver
@@ -320,21 +381,93 @@ namespace Uber.PLL.Controllers
             }
         }
 
-        [Authorize]
+        [Authorize(Roles = "Driver")]
         [HttpPost]
-        public async Task<IActionResult> StartRide(int rideId)
+        public async Task<IActionResult> StartRide([FromBody] AcceptRejectRequest request)
         {
             try
             {
-                var (ok, err) = _rideService.MarkInProgress(rideId);
+                var (ok, err) = _rideService.MarkInProgress(request.id);
                 if (!ok)
                 {
                     return BadRequest(err ?? "Failed to start ride");
                 }
 
                 // Notify both user and driver that ride has started
-                await _hub.Clients.Group($"ride-{rideId}").SendAsync("RideStarted", rideId);
+                await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideStarted", request.id);
                 return Ok(new { success = true, message = "Ride started successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "Driver")]
+        [HttpPost]
+        public async Task<IActionResult> CompleteRide([FromBody] AcceptRejectRequest request)
+        {
+            try
+            {
+                var (ok, err) = _rideService.MarkCompleted(request.id);
+                if (!ok)
+                {
+                    return BadRequest(err ?? "Failed to complete ride");
+                }
+
+                // Notify both user and driver that ride has completed
+                await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideCompleted", request.id);
+                return Ok(new { success = true, message = "Ride completed successfully" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+        }
+
+        [Authorize(Roles = "Driver")]
+        [HttpPost]
+        public async Task<IActionResult> DriverArrived([FromBody] AcceptRejectRequest request)
+        {
+            try
+            {
+                Console.WriteLine($"DriverArrived called with ride ID: {request.id}");
+                
+                var (ok, err) = _rideService.MarkDriverWaiting(request.id);
+                if (!ok)
+                {
+                    Console.WriteLine($"Failed to mark driver as arrived: {err}");
+                    return BadRequest(err ?? "Failed to mark driver as arrived");
+                }
+
+                Console.WriteLine($"Driver marked as arrived successfully for ride {request.id}");
+
+                // Notify both user and driver that driver has arrived
+                await _hub.Clients.Group($"ride-{request.id}").SendAsync("DriverArrived", request.id);
+                return Ok(new { success = true, message = "Driver arrived at pickup location" });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in DriverArrived: {ex.Message}");
+                return BadRequest($"An error occurred: {ex.Message}");
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> AddUserRating([FromBody] RatingRequest request)
+        {
+            try
+            {
+                var (ok, err) = _rideService.AddUserRating(request.RideId, request.Rating);
+                if (!ok)
+                {
+                    return BadRequest(err ?? "Failed to add user rating");
+                }
+
+                // Notify both user and driver that user rating was added
+                await _hub.Clients.Group($"ride-{request.RideId}").SendAsync("UserRated", request.RideId, request.Rating);
+                return Ok(new { success = true, message = "User rating added successfully" });
             }
             catch (Exception ex)
             {
@@ -344,19 +477,19 @@ namespace Uber.PLL.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CompleteRide(int rideId)
+        public async Task<IActionResult> AddDriverRating([FromBody] RatingRequest request)
         {
             try
             {
-                var (ok, err) = _rideService.MarkCompleted(rideId);
+                var (ok, err) = _rideService.AddDriverRating(request.RideId, request.Rating);
                 if (!ok)
                 {
-                    return BadRequest(err ?? "Failed to complete ride");
+                    return BadRequest(err ?? "Failed to add driver rating");
                 }
 
-                // Notify both user and driver that ride has completed
-                await _hub.Clients.Group($"ride-{rideId}").SendAsync("RideCompleted", rideId);
-                return Ok(new { success = true, message = "Ride completed successfully" });
+                // Notify both user and driver that driver rating was added
+                await _hub.Clients.Group($"ride-{request.RideId}").SendAsync("DriverRated", request.RideId, request.Rating);
+                return Ok(new { success = true, message = "Driver rating added successfully" });
             }
             catch (Exception ex)
             {

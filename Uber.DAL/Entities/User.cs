@@ -11,12 +11,31 @@ namespace Uber.DAL.Entities
         // Phone
         //public string Email { get; private set; }
 
-        public DateTime? ModifiedAt { get; private set; }
+        public DateTime? ModifiedAt { get; set; }
 
 
-        public int TotalRatingPoints { get; private set; } 
-        public int TotalRatings { get; private set; } 
+        public int TotalRatingPoints { get; set; } 
+        public int TotalRatings { get; set; } 
         public double Rating() => TotalRatings != 0 ? (double)TotalRatingPoints / TotalRatings : 5; 
+
+        public (bool, string?) AddRating(int rating)
+        {
+            try
+            {
+                if (rating < 1 || rating > 5)
+                {
+                    return (false, "Rating must be between 1 and 5");
+                }
+                
+                TotalRatingPoints += rating;
+                TotalRatings += 1;
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
 
         public User() { }
 

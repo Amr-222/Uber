@@ -28,7 +28,6 @@ namespace Uber.DAL.Entities
 
         // Workflow
         public RideStatus Status { get; set; } = RideStatus.Pending;
-        public int? Rate { get; set; }
 
         public double? Duration { get; set; }
         public double? Distance { get; set; }

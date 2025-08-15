@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Uber.DAL.DataBase;
 using Uber.DAL.Entities;
 using Uber.DAL.Enums;
@@ -64,7 +65,12 @@ namespace Uber.DAL.Repo.Implementation
         {
             try
             {
-                var ride = db.Rides.Where(a => a.Id == id).FirstOrDefault();
+                var ride = db.Rides
+                    .Include(r => r.User)
+                    .Include(r => r.Driver)
+                    .Where(a => a.Id == id)
+                    .FirstOrDefault();
+                    
                 if (ride == null)
                 {
                     return ("Ride not found", null);
@@ -96,6 +102,52 @@ namespace Uber.DAL.Repo.Implementation
                 
                 ride.DriverId = newDriverId;
                 ride.Status = RideStatus.Pending; // Reset status to pending for new driver
+                db.SaveChanges();
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) UpdateUserRating(int rideId, User user)
+        {
+            try
+            {
+                var ride = db.Rides.Find(rideId);
+                if (ride == null) return (false, "Ride not found");
+                
+                // Update the user's rating in the database
+                var existingUser = db.Users.Find(user.Id);
+                if (existingUser == null) return (false, "User not found");
+                
+                existingUser.TotalRatingPoints = user.TotalRatingPoints;
+                existingUser.TotalRatings = user.TotalRatings;
+                
+                db.SaveChanges();
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) UpdateDriverRating(int rideId, Driver driver)
+        {
+            try
+            {
+                var ride = db.Rides.Find(rideId);
+                if (ride == null) return (false, "Ride not found");
+                
+                // Update the driver's rating in the database
+                var existingDriver = db.Drivers.Find(driver.Id);
+                if (existingDriver == null) return (false, "Driver not found");
+                
+                existingDriver.TotalRatingPoints = driver.TotalRatingPoints;
+                existingDriver.TotalRatings = driver.TotalRatings;
+                
                 db.SaveChanges();
                 return (true, null);
             }

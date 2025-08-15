@@ -1,5 +1,7 @@
-﻿@{
-    ViewData["Title"] = "Rides";
+﻿@using Uber.DAL.Entities
+@model List<Ride>
+@{
+    ViewData["Title"] = "Rides Management";
 }
 
 <style>
@@ -46,10 +48,39 @@
 
     .page-title {
         text-align: center;
-        font-size: 28px;
+        font-size: 32px;
         font-weight: bold;
         color: #000;
-        margin-top: 40px;
+        margin: 40px 0 20px 0;
+    }
+
+    table {
+        width: 90%;
+        margin: auto;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    th, td {
+        padding: 12px 15px;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #000;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f8f8;
+    }
+
+    tr:hover {
+        background-color: #f1f1f1;
     }
 </style>
 
@@ -65,5 +96,27 @@
     </div>
 </header>
 
-<div class="page-title">Rides</div>
+<div class="page-title">Rides Management</div>
 
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Driver</th>
+            <th>Rider</th>
+            <th>Price</th>
+            <th>Ride Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ride in Model)
+        {
+            <tr>
+                <td>@ride.Id</td>
+                <td>@ride.Driver.Name</td>
+                <td>@ride.User.Name</td>
+                <td>@ride.Price</td>
+            </tr>
+        }
+    </tbody>
+</table>

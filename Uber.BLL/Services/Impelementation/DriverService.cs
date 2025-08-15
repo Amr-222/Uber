@@ -65,8 +65,8 @@ namespace Uber.BLL.Services.Impelementation
                 }
 
 
-               
-            
+
+
             }
             catch (Exception ex)
             {
@@ -118,6 +118,45 @@ namespace Uber.BLL.Services.Impelementation
         public (string?, Driver?) GetByID(string id)
         {
             return driverRepo.GetByID(id);
+        }
+
+        public (bool, string?) Edit(EditDriver driver)
+        {
+            try
+            {
+                var result = driverRepo.GetByID(driver.Id);
+                var existingDriver = result.Item2;
+                if (existingDriver == null)
+                {
+                    return (false, "Driver not found");
+                }
+                existingDriver.Edit(driver.Name, driver.DateOfBirth, driver.ImagePath);
+                existingDriver.Email = driver.Email;
+                existingDriver.PhoneNumber = driver.PhoneNumber;
+
+                driverRepo.Edit(existingDriver);
+
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public string? GetAll()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string? GetById(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void EditDriver(EditDriver model)
+        {
+            throw new NotImplementedException();
         }
     }
 }

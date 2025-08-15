@@ -4,14 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Uber.BLL.ModelVM.User
+namespace Uber.BLL.ModelVM.Driver
 {
-    public class EditUser
+    public class EditDriver
     {
         public string Id { get; set; }
         public required string Name { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
+        public string? Imagepath { get; set; }
+        public string? ImagePath { get; internal set; }
     }
 }

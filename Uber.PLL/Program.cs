@@ -75,7 +75,18 @@ namespace Uber.PLL
             builder.Services.AddSingleton<IUserIdProvider, NameIdentifierUserIdProvider>();
             // 
             builder.Services.AddHttpContextAccessor();
-            var app = builder.Build();
+            // Adding Google and Facebook
+            builder.Services.AddAuthentication()
+                .AddGoogle(options =>
+                {
+                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+                })
+                .AddFacebook(options =>
+                {
+                    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
+                    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
+                }); var app = builder.Build();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())

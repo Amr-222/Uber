@@ -9,8 +9,9 @@ namespace Uber.BLL.Services.Abstraction
         public (bool, string?) Delete(string id);
         public (bool, string?) Edit(EditUser user);
         public (string?, User?) GetByID(string id); // TODO Change this
-        public List<User> GetAll();
+        public List<EditUser> GetAll();
 
         public Task<(bool, string?, UserProfileVM?)> GetProfileInfo();
+        public (string?, EditUser?) GetByIDToEdit(string id);
     }
 }

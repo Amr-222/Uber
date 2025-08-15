@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -78,11 +79,13 @@ namespace Uber.PLL.Controllers
 
 
         }
+
         [HttpGet]
         public IActionResult RequestRide()
         {
             return View();
         }
+        [Authorize(Roles = "User")]
         [HttpGet]
         public async Task<IActionResult> UserProfile()
         {

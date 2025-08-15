@@ -119,8 +119,21 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                var (ok, err) = rideRepo.UpdateStatus(id, RideStatus.InProgress);
-                return (ok, err);
+                // Get the ride first to check its current status
+                var (err, ride) = rideRepo.GetByID(id);
+                if (err != null || ride == null)
+                {
+                    return (false, "Ride not found");
+                }
+
+                // Only allow status change if ride is currently DriverWaiting
+                if (ride.Status != RideStatus.DriverWaiting)
+                {
+                    return (false, $"Cannot start ride. Ride is currently in {ride.Status} status. Expected: DriverWaiting");
+                }
+
+                var (ok, updateErr) = rideRepo.UpdateStatus(id, RideStatus.InProgress);
+                return (ok, updateErr);
             }
             catch (Exception ex)
             {
@@ -132,11 +145,152 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                var (ok, err) = rideRepo.UpdateStatus(id, RideStatus.Completed);
-                return (ok, err);
+                // Get the ride first to check its current status
+                var (err, ride) = rideRepo.GetByID(id);
+                if (err != null || ride == null)
+                {
+                    return (false, "Ride not found");
+                }
+
+                // Only allow status change if ride is currently InProgress
+                if (ride.Status != RideStatus.InProgress)
+                {
+                    return (false, $"Cannot complete ride. Ride is currently in {ride.Status} status. Expected: InProgress");
+                }
+
+                var (ok, updateErr) = rideRepo.UpdateStatus(id, RideStatus.Completed);
+                return (ok, updateErr);
             }
             catch (Exception ex)
             {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) MarkDriverWaiting(int id)
+        {
+            try
+            {
+                // Get the ride first to check its current status
+                var (err, ride) = rideRepo.GetByID(id);
+                if (err != null || ride == null)
+                {
+                    return (false, "Ride not found");
+                }
+
+                // Only allow status change if ride is currently Accepted
+                if (ride.Status != RideStatus.Accepted)
+                {
+                    return (false, $"Cannot mark driver as arrived. Ride is currently in {ride.Status} status. Expected: Accepted");
+                }
+
+                var (ok, updateErr) = rideRepo.UpdateStatus(id, RideStatus.DriverWaiting);
+                return (ok, updateErr);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) AddUserRating(int rideId, int rating)
+        {
+            try
+            {
+                Console.WriteLine($"AddUserRating called with rideId: {rideId}, rating: {rating}");
+                
+                var (err, ride) = GetByID(rideId);
+                if (err != null || ride == null)
+                {
+                    Console.WriteLine($"Ride not found: {err}");
+                    return (false, "Ride not found");
+                }
+
+                Console.WriteLine($"Ride found: Id={ride.Id}, UserId={ride.UserId}, DriverId={ride.DriverId}");
+                Console.WriteLine($"User navigation property: {(ride.User != null ? "Loaded" : "NULL")}");
+                Console.WriteLine($"Driver navigation property: {(ride.Driver != null ? "Loaded" : "NULL")}");
+
+                if (ride.User == null)
+                {
+                    Console.WriteLine($"User navigation property is null for ride {rideId}");
+                    return (false, "User not found - navigation property not loaded");
+                }
+
+                var (ok, ratingErr) = ride.User.AddRating(rating);
+                if (!ok)
+                {
+                    Console.WriteLine($"Failed to add rating to user: {ratingErr}");
+                    return (false, ratingErr);
+                }
+
+                Console.WriteLine($"Rating added to user successfully. New total: {ride.User.TotalRatingPoints}/{ride.User.TotalRatings}");
+
+                // Update the user in the database
+                var (updateOk, updateErr) = rideRepo.UpdateUserRating(rideId, ride.User);
+                if (!updateOk)
+                {
+                    Console.WriteLine($"Failed to update user rating in database: {updateErr}");
+                    return (false, updateErr);
+                }
+                
+                Console.WriteLine($"User rating updated in database successfully");
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in AddUserRating: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) AddDriverRating(int rideId, int rating)
+        {
+            try
+            {
+                Console.WriteLine($"AddDriverRating called with rideId: {rideId}, rating: {rating}");
+                
+                var (err, ride) = GetByID(rideId);
+                if (err != null || ride == null)
+                {
+                    Console.WriteLine($"Ride not found: {err}");
+                    return (false, "Ride not found");
+                }
+
+                Console.WriteLine($"Ride found: Id={ride.Id}, UserId={ride.UserId}, DriverId={ride.DriverId}");
+                Console.WriteLine($"User navigation property: {(ride.User != null ? "Loaded" : "NULL")}");
+                Console.WriteLine($"Driver navigation property: {(ride.Driver != null ? "Loaded" : "NULL")}");
+
+                if (ride.Driver == null)
+                {
+                    Console.WriteLine($"Driver navigation property is null for ride {rideId}");
+                    return (false, "Driver not found - navigation property not loaded");
+                }
+
+                var (ok, ratingErr) = ride.Driver.AddRating(rating);
+                if (!ok)
+                {
+                    Console.WriteLine($"Failed to add rating to driver: {ratingErr}");
+                    return (false, ratingErr);
+                }
+
+                Console.WriteLine($"Rating added to driver successfully. New total: {ride.Driver.TotalRatingPoints}/{ride.Driver.TotalRatings}");
+
+                // Update the driver in the database
+                var (updateOk, updateErr) = rideRepo.UpdateDriverRating(rideId, ride.Driver);
+                if (!updateOk)
+                {
+                    Console.WriteLine($"Failed to update driver rating in database: {updateErr}");
+                    return (false, updateErr);
+                }
+                
+                Console.WriteLine($"Driver rating updated in database successfully");
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception in AddDriverRating: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return (false, ex.Message);
             }
         }

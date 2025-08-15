@@ -87,6 +87,79 @@
         color: #495057;
         font-size: 18px;
     }
+    
+    /* Rating stars styles */
+    .star {
+        transition: color 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .star:hover {
+        color: #ffc107 !important;
+        transform: scale(1.1);
+    }
+    
+    .star:hover ~ .star {
+        color: #ddd !important;
+    }
+    
+    /* Rating modal enhancements */
+    .modal-content {
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+    
+    .rating-stars {
+        margin: 30px 0;
+    }
+    
+    .star {
+        font-size: 40px !important;
+        margin: 0 8px !important;
+    }
+    
+    #selectedRating {
+        font-size: 20px;
+        margin: 20px 0;
+        min-height: 30px;
+    }
+    
+    .modal-actions button {
+        font-size: 16px;
+        padding: 12px 24px;
+        margin: 0 10px;
+    }
+    
+    /* Driver workflow button enhancements */
+    .action-buttons button {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .action-buttons button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .action-buttons button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    /* Ride price display */
+    #completedRidePrice {
+        animation: fadeInUp 0.5s ease-out;
+    }
+    keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 
 <div style="max-width: 1000px; margin: 0 auto; padding: 20px;">
@@ -111,6 +184,9 @@
                 case Uber.DAL.Enums.RideStatus.InProgress:
                     <text>🚀 Ride In Progress</text>
                     break;
+                case Uber.DAL.Enums.RideStatus.DriverWaiting:
+                    <text>🚗 Driver Waiting at Pickup</text>
+                    break;
                 case Uber.DAL.Enums.RideStatus.Completed:
                     <text>✅ Ride Completed</text>
                     break;
@@ -130,6 +206,9 @@
                     break;
                 case Uber.DAL.Enums.RideStatus.Accepted:
                     <text>Your ride is confirmed and on the way!</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.DriverWaiting:
+                    <text>Driver has arrived at pickup location. Please proceed to the vehicle.</text>
                     break;
                 case Uber.DAL.Enums.RideStatus.InProgress:
                     <text>Your ride is now in progress!</text>
@@ -268,10 +347,16 @@
     <div class="action-buttons" style="text-align: center; margin-top: 30px;">
         @if (isDriver)
         {
-            <button onclick="startRide()" style="padding: 15px 30px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px;">
+            <!-- All driver buttons are always present but controlled by JavaScript -->
+            <button id="arrivedAtPickupBtn" onclick="driverArrived()" style="padding: 15px 30px; background-color: #17a2b8; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px; display: none;">
+                🚗 Arrived at Pickup
+            </button>
+            
+            <button id="startRideBtn" onclick="startRide()" style="padding: 15px 30px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px; display: none;">
                 🚀 Start Ride
             </button>
-            <button onclick="completeRide()" style="padding: 15px 30px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px;">
+            
+            <button id="completeRideBtn" onclick="completeRide()" style="padding: 15px 30px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px; display: none;">
                 ✅ Complete Ride
             </button>
         }
@@ -293,6 +378,41 @@
         }
     </div>
 
+    <!-- Rating Modal -->
+    <div id="ratingModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px;">
+            <div class="modal-header" style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px;">
+                <h3 id="ratingModalTitle" style="margin: 0; color: #495057;">Rate Your Experience</h3>
+                <span class="close" onclick="closeRatingModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            </div>
+            
+            <div class="modal-body">
+                <p id="ratingModalMessage" style="margin-bottom: 20px; color: #6c757d;">Please rate your experience with this ride.</p>
+                
+                <div class="rating-stars" style="text-align: center;">
+                    <span class="star" data-rating="1">★</span>
+                    <span class="star" data-rating="2">★</span>
+                    <span class="star" data-rating="3">★</span>
+                    <span class="star" data-rating="4">★</span>
+                    <span class="star" data-rating="5">★</span>
+                </div>
+                
+                <div id="selectedRating" style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 18px; color: #6c757d;">Select a rating</span>
+                </div>
+                
+                <div class="modal-actions" style="text-align: center;">
+                    <button id="submitRatingBtn" onclick="submitRating()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;" disabled>
+                        Submit Rating
+                    </button>
+                    <button onclick="closeRatingModal()" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Real-time Updates -->
     <div id="rideUpdates" style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; display: none;">
         <h4 style="color: #495057; margin-bottom: 15px;">🔄 Live Updates</h4>
@@ -311,6 +431,9 @@
     let connection;
     let isConnected = false;
     let map, pickupMarker, dropoffMarker, routeLine;
+    let currentRating = 0;
+    let ratingTarget = ''; // 'user' or 'driver'
+    let currentRideId = @Model.Id;
 
     // Initialize map
     function initializeMap() {
@@ -571,63 +694,166 @@
              }
              
              // Listen for real-time ride updates
-             connection.on("RideStarted", function (rideId) {
+
+              // Event listener for driver workflow
+              connection.on("DriverArrived", function (rideId) {
+                  if (rideId == @Model.Id) {
+                      // Update UI to show driver arrived
+                      updateRideStatusDisplay("DriverWaiting");
+                      updateButtonVisibility("DriverWaiting");
+                      
+                      // Show success message
+                      alert("Driver has arrived at pickup location!");
+                  }
+              });
+
+              // Event listener for when ride starts
+              connection.on("RideStarted", function (rideId) {
+                  if (rideId == @Model.Id) {
+                      // Update UI to show ride started
+                      updateRideStatusDisplay("InProgress");
+                      updateButtonVisibility("InProgress");
+                      
+                      // Show success message
+                      alert("Ride has started!");
+                  }
+              });
+
+              // Event listener for when ride is completed
+              connection.on("RideCompleted", function (rideId) {
+                  if (rideId == @Model.Id) {
+                      console.log('RideCompleted SignalR event received for ride:', rideId);
+                      
+                      // Update UI to show ride completed
+                      updateRideStatusDisplay("Completed");
+                      
+                      // Show rating modal only for drivers to rate users
+                      if (@isDriver.ToString().ToLower()) {
+                          showRatingModal('user', 'Please rate your passenger for this ride.');
+                      }
+                  }
+              });
+
+              // Event listener for when ride is cancelled
+              connection.on("RideCancelled", function (rideId) {
+                  if (rideId == @Model.Id) {
+                      // Update ride status display immediately
+                      updateRideStatusDisplay("Cancelled");
+                      updateButtonVisibility("Cancelled");
+                      
+                      // Show the Back to Home button
+                      showBackToHomeButton();
+                      
+                      // Show cancellation message
+                      alert("Ride has been cancelled.");
+                  }
+              });
+
+             // Rating event listeners
+             connection.on("UserRated", function (rideId, rating) {
                  if (rideId == @Model.Id) {
-                     // Update UI to show ride started
-                     document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #ffc107; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">In Progress</span>';
-                     document.querySelector('.ride-status-info h4').textContent = '🚀 Ride Started';
-                     document.querySelector('.ride-status-info p').textContent = 'Your ride is now in progress!';
-                     document.querySelector('.ride-status-info').style.backgroundColor = '#fff3cd';
-                     document.querySelector('.ride-status-info').style.borderLeftColor = '#ffc107';
-                 }
-             });
- 
-             connection.on("RideCompleted", function (rideId) {
-                 if (rideId == @Model.Id) {
-                     // Update UI to show ride completed
-                     document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">Completed</span>';
-                     document.querySelector('.ride-status-info h4').textContent = '✅ Ride Completed';
-                     document.querySelector('.ride-status-info p').textContent = 'Your ride has been completed successfully!';
-                     document.querySelector('.ride-status-info').style.backgroundColor = '#e8f5e8';
-                     document.querySelector('.ride-status-info').style.borderLeftColor = '#28a745';
-                 }
-             });
- 
-             connection.on("RideCancelled", function (rideId) {
-                 if (rideId == @Model.Id) {
-                     // Update UI to show ride cancelled
-                     updateRideStatusDisplay("Cancelled");
+                     // Show success message for user rating
+                     alert(`User has been rated ${rating} star${rating > 1 ? 's' : ''}!`);
                      
-                     // Hide the cancel button
-                     const cancelBtn = document.getElementById('cancelRideBtn');
-                     if (cancelBtn) {
-                         cancelBtn.style.display = 'none';
+                     // Show rating modal for user to rate driver (only if user hasn't rated yet)
+                     if (!@isDriver.ToString().ToLower()) {
+                         showRatingModal('driver', 'Please rate your driver for this ride.');
                      }
-                     
-                     // Show the Back to Home button
-                     showBackToHomeButton();
-                     
-                     // Show cancellation message
-                     alert("Ride has been cancelled.");
                  }
              });
-             
+
+             connection.on("DriverRated", function (rideId, rating) {
+                 if (rideId == @Model.Id) {
+                     // Show success message for driver rating
+                     alert(`Driver has been rated ${rating} star${rating > 1 ? 's' : ''}!`);
+                     
+                     // Check if both parties have rated (only if user hasn't rated yet)
+                     if (!@isDriver.ToString().ToLower()) {
+                         checkBothRated();
+                     }
+                 }
+             });
+
              // Mark listeners as set up
              window.signalRListenersSet = true;
     }
 
     // Driver functions
-    function startRide() {
+    async function startRide() {
         if (confirm("Are you sure you want to start the ride?")) {
-            updateRideStatus("InProgress", @Model.Id);
+            try {
+                console.log('Start ride called for ride:', currentRideId);
+                
+                const response = await fetch('/Ride/StartRide', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: currentRideId })
+                });
+
+                console.log('Start ride response status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Start ride success:', data);
+                    
+                    // Update ride status display immediately
+                    updateRideStatusDisplay("InProgress");
+                    
+                    // Show success message
+                    alert(data.message);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Start ride error:', errorData);
+                    alert("Error starting ride: " + (errorData.message || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Start ride error:", err);
+                alert("Error starting ride. Please try again.");
+            }
         }
     }
 
-    function completeRide() {
-        if (confirm("Are you sure you complete the ride?")) {
-            updateRideStatus("Completed", @Model.Id);
+    async function completeRide() {
+        if (confirm("Are you sure you want to complete the ride?")) {
+            try {
+                console.log('Complete ride called for ride:', currentRideId);
+                
+                const response = await fetch('/Ride/CompleteRide', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: currentRideId })
+                });
+
+                console.log('Complete ride response status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Complete ride success:', data);
+                    
+                    // Update ride status display immediately
+                    updateRideStatusDisplay("Completed");
+                    
+                    // Show rating modal for driver to rate user
+                    if (@isDriver.ToString().ToLower()) {
+                        showRatingModal('user', 'Please rate your passenger for this ride.');
+                    }
+                } else {
+                    const errorData = await response.json();
+                    console.error('Complete ride error:', errorData);
+                    alert("Error completing ride: " + (errorData.message || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Complete ride error:", err);
+                alert("Error completing ride. Please try again.");
+            }
         }
     }
+
+    // Remove duplicate function - use the async version below
 
         // Cancel ride function for both roles
     async function cancelRide() {
@@ -700,17 +926,9 @@
                 
                 // Update the UI based on the new status
                 if (status === 'InProgress') {
-                    document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #ffc107; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">In Progress</span>';
-                    document.querySelector('.ride-status-info h4').textContent = '🚀 Ride Started';
-                    document.querySelector('.ride-status-info p').textContent = 'Your ride is now in progress!';
-                    document.querySelector('.ride-status-info').style.backgroundColor = '#fff3cd';
-                    document.querySelector('.ride-status-info').style.borderLeftColor = '#ffc107';
+                    updateRideStatusDisplay("InProgress");
                 } else if (status === 'Completed') {
-                    document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">Completed</span>';
-                    document.querySelector('.ride-status-info h4').textContent = '✅ Ride Completed';
-                    document.querySelector('.ride-status-info p').textContent = 'Your ride has been completed successfully!';
-                    document.querySelector('.ride-status-info').style.backgroundColor = '#e8f5e8';
-                    document.querySelector('.ride-status-info').style.borderLeftColor = '#28a745';
+                    updateRideStatusDisplay("Completed");
                 }
             } else {
                 const errorData = await response.json();
@@ -724,6 +942,15 @@
 
     // Function to update ride status display
     function updateRideStatusDisplay(status) {
+        console.log('updateRideStatusDisplay called with status:', status);
+        
+        // Check if this status has already been displayed for this ride
+        const statusKey = `statusDisplayed_${currentRideId}_${status}`;
+        if (window[statusKey]) {
+            console.log(`Status ${status} already displayed for this ride, skipping...`);
+            return;
+        }
+        
         const statusInfo = document.querySelector('.ride-status-info');
         const statusBadge = document.getElementById('statusBadge');
         
@@ -736,6 +963,55 @@
                 `;
                 statusInfo.style.backgroundColor = '#f8d7da';
                 statusInfo.style.borderLeftColor = '#dc3545';
+            } else if (status === "Pending") {
+                statusInfo.innerHTML = `
+                    <h4 style="color: #6c757d; margin: 0;">⏳ Ride Pending</h4>
+                    <p style="margin: 10px 0 0 0; color: #495057;">Waiting for driver to accept your ride request.</p>
+                `;
+                statusInfo.style.backgroundColor = '#f8f9fa';
+                statusInfo.style.borderLeftColor = '#6c757d';
+            } else if (status === "Accepted") {
+                statusInfo.innerHTML = `
+                    <h4 style="color: #28a745; margin: 0;">✅ Ride Accepted</h4>
+                    <p style="margin: 10px 0 0 0; color: #155724;">Your ride is confirmed and on the way!</p>
+                `;
+                statusInfo.style.backgroundColor = '#e8f5e8';
+                statusInfo.style.borderLeftColor = '#28a745';
+            } else if (status === "Rejected") {
+                statusInfo.innerHTML = `
+                    <h4 style="color: #dc3545; margin: 0;">❌ Ride Rejected</h4>
+                    <p style="margin: 10px 0 0 0; color: #721c24;">This ride has been rejected.</p>
+                `;
+                statusInfo.style.backgroundColor = '#f8d7da';
+                statusInfo.style.borderLeftColor = '#dc3545';
+            } else if (status === "DriverWaiting") {
+                statusInfo.innerHTML = `
+                    <h4 style="color: #17a2b8; margin: 0;">🚗 Driver Waiting at Pickup</h4>
+                    <p style="margin: 10px 0 0 0; color: #0c5460;">Driver has arrived at pickup location. Please proceed to the vehicle.</p>
+                `;
+                statusInfo.style.backgroundColor = '#d1ecf1';
+                statusInfo.style.borderLeftColor = '#17a2b8';
+            } else if (status === "InProgress") {
+                statusInfo.innerHTML = `
+                    <h4 style="color: #ffc107; margin: 0;">🚀 Ride In Progress</h4>
+                    <p style="margin: 10px 0 0 0; color: #856404;">Your ride is now in progress!</p>
+                `;
+                statusInfo.style.backgroundColor = '#fff3cd';
+                statusInfo.style.borderLeftColor = '#ffc107';
+            } else if (status === "Completed") {
+                statusInfo.innerHTML = `
+                    <h4 style="color: #28a745; margin: 0;">✅ Ride Completed</h4>
+                    <p style="margin: 10px 0 0 0; color: #155724;">Your ride has been completed successfully!</p>
+                `;
+                statusInfo.style.backgroundColor = '#e8f5e8';
+                statusInfo.style.borderLeftColor = '#28a745';
+            } else if (status === "Rejected") {
+                statusInfo.innerHTML = `
+                    <h4 style="color: #dc3545; margin: 0;">❌ Ride Rejected</h4>
+                    <p style="margin: 10px 0 0 0; color: #721c24;">This ride has been rejected.</p>
+                `;
+                statusInfo.style.backgroundColor = '#f8d7da';
+                statusInfo.style.borderLeftColor = '#dc3545';
             }
         }
         
@@ -743,17 +1019,150 @@
             if (status === "Cancelled") {
                 statusBadge.textContent = "Cancelled";
                 statusBadge.style.backgroundColor = "#dc3545";
+            } else if (status === "Pending") {
+                statusBadge.textContent = "Pending";
+                statusBadge.style.backgroundColor = "#6c757d";
+            } else if (status === "Accepted") {
+                statusBadge.textContent = "Accepted";
+                statusBadge.style.backgroundColor = "#28a745";
+            } else if (status === "Rejected") {
+                statusBadge.textContent = "Rejected";
+                statusBadge.style.backgroundColor = "#dc3545";
+            } else if (status === "DriverWaiting") {
+                statusBadge.textContent = "Driver Waiting";
+                statusBadge.style.backgroundColor = "#17a2b8";
+            } else if (status === "InProgress") {
+                statusBadge.textContent = "In Progress";
+                statusBadge.style.backgroundColor = "#ffc107";
+            } else if (status === "Completed") {
+                statusBadge.textContent = "Completed";
+                statusBadge.style.backgroundColor = "#28a745";
+            } else if (status === "Rejected") {
+                statusBadge.textContent = "Rejected";
+                statusBadge.style.backgroundColor = "#dc3545";
             }
         }
         
-        // Show the Back to Home button when ride is cancelled
-        if (status === "Cancelled") {
+        // Show the Back to Home button when ride is cancelled or completed
+        if (status === "Cancelled" || status === "Completed") {
             showBackToHomeButton();
         }
+        
+        // Update button visibility based on status (only if not already updated for this status)
+        const buttonVisibilityKey = `buttonVisibilityUpdated_${currentRideId}_${status}`;
+        if (!window[buttonVisibilityKey]) {
+            updateButtonVisibility(status);
+            window[buttonVisibilityKey] = true;
+            console.log(`Button visibility updated for status: ${status}`);
+        } else {
+            console.log(`Button visibility already updated for status: ${status}, skipping...`);
+        }
+        
+        // Show ride price prominently when completed
+        if (status === "Completed") {
+            showRidePrice();
+        }
+        
+        // Mark that this status has been displayed for this ride
+        window[statusKey] = true;
+        console.log(`Status ${status} displayed and marked as shown for this ride`);
+    }
+    
+    // Function to initialize buttons based on current ride status
+    function initializeButtons(status) {
+        console.log('initializeButtons called with status:', status);
+        
+        // Check if user is driver by looking for driver buttons
+        const arrivedBtn = document.getElementById('arrivedAtPickupBtn');
+        const startBtn = document.getElementById('startRideBtn');
+        const completeBtn = document.getElementById('completeRideBtn');
+        
+        if (arrivedBtn && startBtn && completeBtn) {
+            console.log('User is driver, initializing buttons for status:', status);
+            
+            // Hide all buttons first
+            arrivedBtn.style.display = 'none';
+            startBtn.style.display = 'none';
+            completeBtn.style.display = 'none';
+            
+            // Show appropriate button based on status
+            switch (status) {
+                case "Accepted":
+                    arrivedBtn.style.display = 'inline-block';
+                    console.log('Initialized: showing arrived button');
+                    break;
+                case "DriverWaiting":
+                    startBtn.style.display = 'inline-block';
+                    console.log('Initialized: showing start button');
+                    break;
+                case "InProgress":
+                    completeBtn.style.display = 'inline-block';
+                    console.log('Initialized: showing complete button');
+                    break;
+                default:
+                    console.log('Initialized: no buttons shown for status:', status);
+                    break;
+            }
+        } else {
+            console.log('User is not driver or buttons not found');
+        }
+    }
+    
+    // Function to update button visibility based on ride status
+    function updateButtonVisibility(status) {
+        console.log('updateButtonVisibility called with status:', status);
+        
+        const arrivedBtn = document.getElementById('arrivedAtPickupBtn');
+        const startBtn = document.getElementById('startRideBtn');
+        const completeBtn = document.getElementById('completeRideBtn');
+        const cancelBtn = document.getElementById('cancelRideBtn');
+        
+        console.log('Button elements found:', { 
+            arrivedBtn: !!arrivedBtn, 
+            startBtn: !!startBtn, 
+            completeBtn: !!completeBtn, 
+            cancelBtn: !!cancelBtn 
+        });
+        
+        // Hide all driver buttons first
+        if (arrivedBtn) arrivedBtn.style.display = 'none';
+        if (startBtn) startBtn.style.display = 'none';
+        if (completeBtn) completeBtn.style.display = 'none';
+        
+        // Show buttons based on status (only for drivers)
+        if (arrivedBtn && startBtn && completeBtn) { // Check if user is driver
+            switch (status) {
+                case "Accepted":
+                    arrivedBtn.style.display = 'inline-block';
+                    console.log('Showing arrived button');
+                    break;
+                case "DriverWaiting":
+                    startBtn.style.display = 'inline-block';
+                    console.log('Showing start button');
+                    break;
+                case "InProgress":
+                    completeBtn.style.display = 'inline-block';
+                    console.log('Showing complete button');
+                    break;
+            }
+        }
+        
+        // Cancel button is always visible unless ride is completed or cancelled
+        if (cancelBtn && (status === "Completed" || status === "Cancelled")) {
+            cancelBtn.style.display = 'none';
+        }
+        
+        console.log('Button visibility updated for status:', status);
     }
     
     // Function to show the Back to Home button
     function showBackToHomeButton() {
+        // Check if back to home button has already been shown for this ride
+        if (window.backToHomeShown) {
+            console.log('Back to home button already shown, skipping...');
+            return;
+        }
+        
         // Create the Back to Home button if it doesn't exist
         let backButton = document.querySelector('.back-to-home-btn');
         if (!backButton) {
@@ -769,28 +1178,295 @@
                 actionButtonsDiv.appendChild(backButton);
             }
         }
+        
+        // Mark that back to home button has been shown
+        window.backToHomeShown = true;
+        console.log('Back to home button displayed and marked as shown');
+    }
+    
+    // Function to show ride price prominently
+    function showRidePrice() {
+        // Check if price has already been shown for this ride
+        if (window.ridePriceShown) {
+            console.log('Ride price already shown, skipping...');
+            return;
+        }
+        
+        // Remove any existing price display to prevent duplicates
+        const existingPrice = document.getElementById('completedRidePrice');
+        if (existingPrice) {
+            existingPrice.remove();
+        }
+        
+        const price = document.getElementById('price').textContent;
+        const priceDisplay = document.createElement('div');
+        priceDisplay.id = 'completedRidePrice';
+        priceDisplay.style.cssText = 'background-color: #28a745; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; font-size: 18px; font-weight: bold;';
+        priceDisplay.innerHTML = `🎉 Ride Completed! Total Price: ${price}`;
+        
+        // Insert before the action buttons
+        const actionButtonsDiv = document.querySelector('.action-buttons');
+        if (actionButtonsDiv) {
+            actionButtonsDiv.parentNode.insertBefore(priceDisplay, actionButtonsDiv);
+        }
+        
+        // Mark that price has been shown
+        window.ridePriceShown = true;
+        console.log('Ride price displayed and marked as shown');
     }
 
+    // Rating system functions
+    function showRatingModal(target, message) {
+        // Check if rating modal has already been shown for this target
+        const ratingKey = `ratingModalShown_${currentRideId}_${target}`;
+        if (window[ratingKey]) {
+            console.log(`Rating modal already shown for ${target}, skipping...`);
+            return;
+        }
+        
+        ratingTarget = target;
+        currentRating = 0;
+        
+        document.getElementById('ratingModalTitle').textContent = `Rate ${target === 'user' ? 'Passenger' : 'Driver'}`;
+        document.getElementById('ratingModalMessage').textContent = message;
+        document.getElementById('selectedRating').innerHTML = '<span style="font-size: 18px; color: #6c757d;">Select a rating</span>';
+        document.getElementById('submitRatingBtn').disabled = true;
+        
+        // Reset star colors
+        document.querySelectorAll('.star').forEach(star => {
+            star.style.color = '#ddd';
+        });
+        
+        document.getElementById('ratingModal').style.display = 'block';
+        
+        // Mark that rating modal has been shown for this target
+        window[ratingKey] = true;
+        console.log(`Rating modal displayed for ${target} and marked as shown`);
+    }
+
+    function closeRatingModal() {
+        document.getElementById('ratingModal').style.display = 'none';
+        currentRating = 0;
+        ratingTarget = '';
+    }
+
+    function selectRating(rating) {
+        currentRating = rating;
+        
+        // Update star colors
+        document.querySelectorAll('.star').forEach((star, index) => {
+            if (index < rating) {
+                star.style.color = '#ffc107';
+            } else {
+                star.style.color = '#ddd';
+            }
+        });
+        
+        // Update selected rating text
+        document.getElementById('selectedRating').innerHTML = `<span style="font-size: 18px; color: #28a745;">${rating} star${rating > 1 ? 's' : ''} selected</span>`;
+        document.getElementById('submitRatingBtn').disabled = false;
+    }
+
+    async function submitRating() {
+        if (currentRating === 0 || !ratingTarget) {
+            alert('Please select a rating');
+            return;
+        }
+
+        try {
+            const endpoint = ratingTarget === 'user' ? '/Ride/AddUserRating' : '/Ride/AddDriverRating';
+            const requestBody = { 
+                RideId: currentRideId, 
+                Rating: currentRating 
+            };
+            
+            console.log('Submitting rating:', { endpoint, requestBody, currentRideId, currentRating, ratingTarget });
+            
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            console.log('Rating response status:', response.status);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Rating success:', data);
+                alert(data.message);
+                closeRatingModal();
+                
+                // Mark this user as rated
+                markUserAsRated();
+                
+                // Check if both parties have rated
+                checkBothRated();
+            } else {
+                let errorMessage = "Unknown error";
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || "Unknown error";
+                    console.error('Rating error response:', errorData);
+                } catch (parseError) {
+                    // If response is not JSON, try to get it as text
+                    try {
+                        const errorText = await response.text();
+                        errorMessage = errorText || "Unknown error";
+                        console.error('Rating error text:', errorText);
+                    } catch (textError) {
+                        console.error('Could not read error response:', textError);
+                    }
+                }
+                alert("Error submitting rating: " + errorMessage);
+            }
+        } catch (err) {
+            console.error("Rating submission error:", err);
+            alert("Error submitting rating. Please try again.");
+        }
+    }
+
+    // Driver workflow functions
+    async function driverArrived() {
+        if (confirm("Are you sure you have arrived at the pickup location?")) {
+            try {
+                console.log('Driver arrived called for ride:', currentRideId);
+                
+                const response = await fetch('/Ride/DriverArrived', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: currentRideId })
+                });
+
+                console.log('Driver arrived response status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Driver arrived success:', data);
+                    
+                    // Update ride status display immediately
+                    updateRideStatusDisplay("DriverWaiting");
+                    
+                    // Show success message
+                    alert(data.message);
+                } else {
+                    const errorData = await response.json();
+                    console.error('Driver arrived error:', errorData);
+                    alert("Error updating ride status: " + (errorData.message || "Unknown error"));
+                }
+            } catch (err) {
+                console.error("Driver arrived error:", err);
+                alert("Error updating ride status. Please try again.");
+            }
+        }
+    }
+
+    // Function to check if user has already rated
+    function hasUserRated() {
+        return localStorage.getItem(`rated_${currentRideId}_${ratingTarget}`) === 'true';
+    }
+    
+    // Function to mark user as rated
+    function markUserAsRated() {
+        localStorage.setItem(`rated_${currentRideId}_${ratingTarget}`, 'true');
+    }
+    
+    // Function to check if both parties have rated
+    function checkBothRated() {
+        // Check if this function has already been called for this ride
+        const checkKey = `checkBothRatedCalled_${currentRideId}`;
+        if (window[checkKey]) {
+            console.log('checkBothRated already called for this ride, skipping...');
+            return;
+        }
+        
+        const driverRated = localStorage.getItem(`rated_${currentRideId}_user`) === 'true';
+        const userRated = localStorage.getItem(`rated_${currentRideId}_driver`) === 'true';
+        
+        console.log(`Checking ratings - Driver rated: ${driverRated}, User rated: ${userRated}`);
+        
+        if (driverRated && userRated) {
+            console.log('Both parties have rated, showing back to home button');
+            showBackToHomeButton();
+        }
+        
+        // Mark that this function has been called for this ride
+        window[checkKey] = true;
+        console.log('checkBothRated marked as called for this ride');
+    }
+    
     // SignalR event listeners are now set up in setupSignalRListeners() function
     // which is called after the connection is established
 
     // Initialize everything when page loads
      document.addEventListener('DOMContentLoaded', async function() {
+         // Clear any existing rating data for this ride
+         localStorage.removeItem(`rated_${@Model.Id}_user`);
+         localStorage.removeItem(`rated_${@Model.Id}_driver`);
 
          
          // Check if ride is already cancelled and update UI accordingly
          const currentStatus = '@Model.Status.ToString()';
+         console.log('Page loaded with ride status:', currentStatus);
+         
+         // Check if we're in the middle of a rating process
+         const driverRated = localStorage.getItem(`rated_${@Model.Id}_user`) === 'true';
+         const userRated = localStorage.getItem(`rated_${@Model.Id}_driver`) === 'true';
          if (currentStatus === 'Cancelled') {
              updateRideStatusDisplay("Cancelled");
              
-             // Hide the cancel button if ride is already cancelled
-             const cancelBtn = document.getElementById('cancelRideBtn');
-             if (cancelBtn) {
-                 cancelBtn.style.display = 'none';
-             }
-             
              // Show the Back to Home button if ride is already cancelled
              showBackToHomeButton();
+         } else if (currentStatus === 'Completed') {
+             updateRideStatusDisplay("Completed");
+             
+             // Show the Back to Home button
+             showBackToHomeButton();
+             
+             // Show rating modal if user hasn't rated yet
+             if (!@isDriver) {
+                 // User should rate the driver first
+                 if (!userRated) {
+                     showRatingModal('driver', 'Please rate your driver for this ride.');
+                 } else if (driverRated) {
+                     // Both have rated, show back to home
+                     showBackToHomeButton();
+                 }
+             } else {
+                 // Driver should rate the user first
+                 if (!driverRated) {
+                     showRatingModal('user', 'Please rate your passenger for this ride.');
+                 } else if (userRated) {
+                     // Both have rated, show back to home
+                     showBackToHomeButton();
+                 }
+             }
+         } else {
+             // For other statuses, update button visibility automatically
+             updateRideStatusDisplay(currentStatus);
+         }
+         
+         // Always update button visibility for initial state (only if not already updated)
+         const initialButtonVisibilityKey = `buttonVisibilityUpdated_${@Model.Id}_${currentStatus}`;
+         if (!window[initialButtonVisibilityKey]) {
+             updateButtonVisibility(currentStatus);
+             window[initialButtonVisibilityKey] = true;
+             console.log(`Initial button visibility updated for status: ${currentStatus}`);
+         } else {
+             console.log(`Initial button visibility already updated for status: ${currentStatus}, skipping...`);
+         }
+         
+         // Initialize buttons based on current status (only if not already initialized)
+         const initializeButtonsKey = `buttonsInitialized_${@Model.Id}_${currentStatus}`;
+         if (!window[initializeButtonsKey]) {
+             initializeButtons(currentStatus);
+             window[initializeButtonsKey] = true;
+             console.log(`Buttons initialized for status: ${currentStatus}`);
+         } else {
+             console.log(`Buttons already initialized for status: ${currentStatus}, skipping...`);
          }
          
          // Initialize SignalR status
@@ -810,6 +1486,13 @@
                  }
              }, 2000);
          }
+         
+         // Add event listeners for rating stars
+         document.querySelectorAll('.star').forEach(star => {
+             star.addEventListener('click', function() {
+                 selectRating(parseInt(this.dataset.rating));
+             });
+         });
          
                             const mapContainer = document.getElementById('rideMap');
         

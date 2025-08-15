@@ -6,7 +6,8 @@
         Accepted = 1,
         Rejected = 2,
         Cancelled = 3,
-        InProgress = 4,
-        Completed = 5
+        DriverWaiting = 4,
+        InProgress = 5,
+        Completed = 6
     }
 }

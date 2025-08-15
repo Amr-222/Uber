@@ -11,13 +11,32 @@ namespace Uber.DAL.Entities
 
 
         public double Balance { get; private set; } = 0;
-        public string? ImagePath { get; protected set; }
+        public string? ImagePath { get; set; }
 
 
-        public int TotalRatingPoints { get; private set; } 
+        public int TotalRatingPoints { get; set; } 
                                                            
-        public int TotalRatings { get; private set; } 
+        public int TotalRatings { get; set; } 
         public double Rating() => TotalRatings != 0 ? (double)TotalRatingPoints / TotalRatings : 5;
+
+        public (bool, string?) AddRating(int rating)
+        {
+            try
+            {
+                if (rating < 1 || rating > 5)
+                {
+                    return (false, "Rating must be between 1 and 5");
+                }
+                
+                TotalRatingPoints += rating;
+                TotalRatings += 1;
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
 
         public Driver() 
         { 
@@ -42,8 +61,8 @@ namespace Uber.DAL.Entities
 
         //public Wallet Wallet { get; set; }
 
-        public double CurrentLng { get; private set; }
-        public double CurrentLat { get; private set; }
+        public double CurrentLng { get; set; }
+        public double CurrentLat { get; set; }
         public bool IsActive { get; private set; } = false;
         public List<Ride> Rides { get; set; }
         public int VehicleId { get; set; }

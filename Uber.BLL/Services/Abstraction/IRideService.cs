@@ -20,8 +20,11 @@ namespace Uber.BLL.Services.Abstraction
         (bool, string?) MarkAccepted(int id);
         (bool, string?) MarkRejected(int id);
         (bool, string?) AssignNewDriver(int rideId, string newDriverId);
+        (bool, string?) MarkDriverWaiting(int id);  // New method for when driver arrives at pickup
         (bool, string?) MarkInProgress(int id);
         (bool, string?) MarkCompleted(int id);
+        (bool, string?) AddUserRating(int rideId, int rating);  // New method for rating user
+        (bool, string?) AddDriverRating(int rideId, int rating);  // New method for rating driver
         string? GetRideById(int id);
     }
 }

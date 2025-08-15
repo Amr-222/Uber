@@ -42,6 +42,9 @@ namespace Uber.PLL
             builder.Services.AddScoped<IRideService, RideService>();
             builder.Services.AddScoped<IRideRepo, RideRepo>();
 
+            builder.Services.AddScoped<IAdminService, AdminService>();
+            builder.Services.AddScoped<IAdminRepo, AdminRepo>();
+
             // Stripe
             var stripeSettings = builder.Configuration.GetSection("Stripe");
             StripeConfiguration.ApiKey = stripeSettings["SecretKey"];

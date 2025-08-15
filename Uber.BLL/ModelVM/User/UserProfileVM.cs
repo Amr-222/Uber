@@ -11,6 +11,9 @@ namespace Uber.BLL.ModelVM.User
     {
         public string Name { get; set; }
         public List<Uber.DAL.Entities.Ride> Rides { get; set; }
-        public string PaymentMethod { get; set; }
+        public double Balance { get; set; }
+
+        public string Id{ get; set; }
+
     }
 }

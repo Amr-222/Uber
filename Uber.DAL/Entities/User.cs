@@ -60,7 +60,7 @@ namespace Uber.DAL.Entities
 
 
 
-        public double Balance { get; private set; } = 0;
+        public double Balance { get;  set; } = 0;
 
 
         public (bool, string?) Delete()

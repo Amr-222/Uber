@@ -94,7 +94,7 @@
         background-color: #c82333;
     }
 </style>
-
+@* 
 <header>
     <div class="nav-left">
         <h1>Uber</h1>
@@ -106,8 +106,8 @@
         <a asp-controller="Account" asp-action="ChooseRegisterType" class="signup-btn">Sign up</a>
     </div>
 </header>
+ *@
 
-<div class="page-title">Admins</div>
 
 
 
@@ -118,17 +118,14 @@
 <header>
     <div class="nav-left">
         <h1>Uber</h1>
-        <a href="#">Ride</a>
-        <a href="#">Drive</a>
     </div>
 </header>
 
-
+<div class="page-title">Admins Management</div>
 <table id="Admins" class="display">
     <thead class="thead-dark">
         <tr>
-@*             <th>ID</th>
- *@            <th>Name</th>
+           <th>Name</th>
             <th>Email</th>
             <th>Phone Number</th>
             <th>Date of Birth</th>
@@ -136,16 +133,16 @@
         </tr>
     </thead>
     <tbody id="ridersTable">
-        @foreach (var rider in Model)
+        @foreach (var admin in Model)
         {
-            <tr data-id="@rider.Id">
-@*                 <td>@rider.Id</td>
- *@                <td>@rider.Name</td>
-                <td>@rider.Email</td>
-                <td>@rider.PhoneNumber</td>
-                <td>@rider.DateOfBirth.ToString("yyyy-MM-dd")</td>
-                <td @* scope="Col" *@>
-                    @if (rider.IsDeleted == true)
+            <tr data-id="@admin.Id">
+
+                <td>@admin.Name</td>
+                <td>@admin.Email</td>
+                <td>@("0" + admin.PhoneNumber)</td>
+                <td>@admin.DateOfBirth.ToString("dd MMM yyyy")</td>
+                <td >
+                    @if (admin.IsDeleted == true)
                     {
                         <span class="badge bg-danger">Deleted</span>
                     }

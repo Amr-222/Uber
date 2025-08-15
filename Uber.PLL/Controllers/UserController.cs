@@ -92,6 +92,9 @@ namespace Uber.PLL.Controllers
             var result = await service.GetProfileInfo();
             return View(result.Item3);
         }
+
+
+
         //[HttpPost]
         /*public IActionResult RequestRide(double StartLat, double StartLng, double EndLat, double EndLng, string Id)
         {

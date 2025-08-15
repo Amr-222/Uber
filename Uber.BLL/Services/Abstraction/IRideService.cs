@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Uber.BLL.ModelVM.Ride;
 using Uber.DAL.Entities;
 
 namespace Uber.BLL.Services.Abstraction
@@ -12,7 +13,7 @@ namespace Uber.BLL.Services.Abstraction
         (bool, string?) Create(Ride ride);
         (bool, string?) Cancel(int id);
         (string?, Ride?) GetByID(int id);
-        List<Ride> GetAll();
+        public List<RideVM> GetAll();
         (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId, double startLat, double startLng,
         double endLat, double endLng, double Distance, double Duration, double Price);

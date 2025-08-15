@@ -17,5 +17,42 @@ namespace Uber.DAL.Entities
         {
            
         }
+
+        public (bool, string?) Delete()
+        {
+            try
+            {
+                IsDeleted = true;
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) Edit(string name, DateTime dateofbirth, string Email, string PhoneNumber,bool isdeleted)
+        {
+
+
+
+            try
+            {
+                this.Name = name;
+                this.DateOfBirth = dateofbirth;
+                this.Email = Email;
+                this.PhoneNumber = PhoneNumber;
+                this.IsDeleted = isdeleted;
+
+
+
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using Stripe;
@@ -9,9 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Uber.BLL.Helper;
 using Uber.BLL.ModelVM.Driver;
+using Uber.BLL.ModelVM.User;
 using Uber.BLL.Services.Abstraction;
 using Uber.DAL.Entities;
 using Uber.DAL.Repo.Abstraction;
+using Uber.DAL.Repo.Impelementation;
 
 namespace Uber.BLL.Services.Impelementation
 {
@@ -20,12 +23,14 @@ namespace Uber.BLL.Services.Impelementation
         private readonly IMapper mapper;
         private readonly IDriverRepo driverRepo;
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public DriverService(IDriverRepo _driverRepo, IMapper _mapper, UserManager<ApplicationUser> userManager)
+        public DriverService(IDriverRepo _driverRepo, IMapper _mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
         {
             this.driverRepo = _driverRepo;
             mapper = _mapper;
             this.userManager = userManager;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<(bool, string?)> CreateAsync(CreateDriver driver)
@@ -100,10 +105,10 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
-        public object SendRequest(GetDriver getDriver, string id)
-        {
-            throw new NotImplementedException();
-        }
+        //public object SendRequest(GetDriver getDriver, string id)
+        //{
+        //    throw new NotImplementedException();
+        //}
 
         public (bool, string?) MakeUserActive(string Id)
         {
@@ -130,10 +135,7 @@ namespace Uber.BLL.Services.Impelementation
                 {
                     return (false, "Driver not found");
                 }
-                existingDriver.Edit(driver.Name, driver.DateOfBirth, driver.ImagePath);
-                existingDriver.Email = driver.Email;
-                existingDriver.PhoneNumber = driver.PhoneNumber;
-
+              
                 driverRepo.Edit(existingDriver);
 
                 return (true, null);
@@ -144,19 +146,60 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
-        public string? GetAll()
+        public List<EditDriver> GetAll()
         {
-            throw new NotImplementedException();
+
+            var result = driverRepo.GetAll();
+            var list = new List<EditDriver>();
+            foreach (var driv in result)
+            {
+                list.Add(mapper.Map<EditDriver>(driv));
+            }
+            return list;
         }
 
-        public string? GetById(string id)
+
+        public (string?, EditDriver?) GetByIDToEdit(string id)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var result = driverRepo.GetByID(id);
+                if (result.Item1 != null) return (result.Item1, null);
+                var driv = mapper.Map<EditDriver>(result.Item2);
+                return (null, driv);
+            }
+            catch (Exception ex)
+            {
+                return (ex.Message, null);
+            }
         }
 
-        public void EditDriver(EditDriver model)
+
+
+        public async Task<(bool, string?, DriverProfileVM?)> GetDriverProfileInfo()
         {
-            throw new NotImplementedException();
+            try
+            {
+                var driver = await userManager.GetUserAsync(httpContextAccessor.HttpContext.User);
+                if (driver == null)
+                {
+                    return (false, "Driver not found or not logged in.", null);
+                }
+
+
+                var driverProfile = mapper.Map<DriverProfileVM>(driver);
+
+                return (true, null, driverProfile);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message, null);
+            }
         }
+
+        //public Task<(bool, string?, DriverProfileVM?)> GetProfileInfo()
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

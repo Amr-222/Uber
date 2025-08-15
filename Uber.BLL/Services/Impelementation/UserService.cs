@@ -83,9 +83,9 @@ namespace Uber.BLL.Services.Impelementation
                 var existingUser = result.Item2;
                 if (existingUser == null)
                     return (false, "User not found");
-                existingUser.Edit(user.Name, user.DateOfBirth);
-                existingUser.Email = user.Email;
-                existingUser.PhoneNumber = user.PhoneNumber;
+
+                //existingUser.Edit(user.Name, user.DateOfBirth,user.Email,user.PhoneNumber);
+
                 userRepo.Edit(existingUser);
 
                 return (true, null);
@@ -111,6 +111,7 @@ namespace Uber.BLL.Services.Impelementation
             }
             return list;
         }
+
         public async Task<(bool, string?, UserProfileVM?)> GetProfileInfo()
         {
             try
@@ -131,15 +132,7 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
-        public void Delete(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string? GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
+        
 
         public (string?, EditUser?) GetByIDToEdit(string id)
         {
@@ -155,5 +148,7 @@ namespace Uber.BLL.Services.Impelementation
                 return (ex.Message, null);
             }
         }
+
+
     }
 }

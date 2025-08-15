@@ -1,4 +1,4 @@
-﻿
+﻿@model Uber.BLL.ModelVM.Driver.DriverProfileVM
 @{
     ViewData["Title"] = "Driver Profile";
 }
@@ -7,16 +7,16 @@
     <aside class="sidebar">
         <div class="user-info">
             <div class="icon-placeholder" style="background: none; padding: 0;">
-                @if (!string.IsNullOrEmpty(Model.Driver.PhotoPath))
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
                 {
-                    <img src="@Url.Content(Model.Driver.PhotoPath)" alt="Driver Photo" style="width:80px; height:80px; border-radius:50%; object-fit:cover;">
+                    <img src="~/Files/@Model.ImagePath" alt="Driver Photo" class="user-icon" />
                 }
                 else
                 {
                     <i class="fas fa-user"></i>
                 }
             </div>
-            <h3>@Model.Driver.Name</h3>
+            <h3>@Model.Name</h3>
         </div>
 
         <ul>
@@ -37,11 +37,11 @@
                 foreach (var ride in Model.Rides)
                 {
                     <div class="ride-card">
-                        <p><strong>From:</strong> @ride.Pickup</p>
-                        <p><strong>To:</strong> @ride.Dropoff</p>
-                        <p><strong>Date & Time:</strong> @ride.RideTime.ToString("dd MMM yyyy - HH:mm")</p>
-                        <p><strong>Price:</strong> @ride.PriceEgp EGP</p>
-                        <p><strong>Passenger:</strong> @ride.PassengerName</p>
+                        <p><strong>From:</strong> @ride.StartLat,@ride.StartLng</p>
+                        <p><strong>To:</strong> @ride.EndLat,@ride.EndLng</p>
+                        <p><strong>Date & Time:</strong> @ride.CreatedAt.ToString("dd MMM yyyy - HH:mm")</p>
+                        <p><strong>Price:</strong> @ride.Price EGP</p>
+                        <p><strong>Passenger:</strong> @ride.User.Name</p>
                     </div>
                 }
             }
@@ -53,7 +53,7 @@
 
         <section id="payment" class="tab-content">
             <h2>Total Earnings</h2>
-            <p><strong>@Model.TotalEarnings</strong> EGP</p>
+            <p><strong>@Model.Balance</strong> EGP</p>
         </section>
 
         <section id="settings" class="tab-content">
@@ -111,6 +111,13 @@
         margin: 0 auto 8px;
         font-size: 35px;
         color: #fff;
+    }
+
+    .user-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
     }
 
     .user-info h3 {

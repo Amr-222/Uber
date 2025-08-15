@@ -17,10 +17,13 @@ namespace Uber.BLL.Services.Abstraction
         public (bool, string?) MakeUserActive(string Id);
         public (bool, string?) MakeUserInactive(string Id);
         (string?, Driver?) GetByID(string id);
-        object SendRequest(GetDriver getDriver, string id);
-        string? GetAll();
-        string? GetById(string id);
-        void EditDriver(EditDriver model);
-        //public (bool, string?) Edit();
+
+        //object SendRequest(GetDriver getDriver, string id);
+        public (string?, EditDriver?) GetByIDToEdit(string id);
+        public List<EditDriver> GetAll();
+
+        public (bool, string?) Edit(EditDriver driv);
+
+        public Task<(bool, string?, DriverProfileVM?)> GetDriverProfileInfo();
     }
 }

@@ -69,7 +69,8 @@ namespace Uber.DAL.Repo.Implementation
                     return (false, "Driver not found");
                 }
 
-                d.Edit(driver.Name,driver.DateOfBirth,driver.ImagePath/*,driver.Address*/);               
+                d.Edit(driver.Name,driver.DateOfBirth,driver.ImagePath,driver.Email,driver.PhoneNumber,driver.IsDeleted);               
+               
                 db.SaveChanges ();
 
                 return (true, null);

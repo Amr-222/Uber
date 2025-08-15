@@ -99,8 +99,6 @@
 <header>
     <div class="nav-left">
         <h1>Uber</h1>
-        <a href="#">Ride</a>
-        <a href="#">Drive</a>
     </div>
 </header>
 
@@ -125,8 +123,8 @@
 @*                 <td>@rider.Id</td>
  *@                <td>@rider.Name</td>
                 <td>@rider.Email</td>
-                <td>@rider.PhoneNumber</td>
-                <td>@rider.DateOfBirth.ToString("yyyy-MM-dd")</td>
+                <td>@("0" + rider.PhoneNumber)</td>
+                <td>@rider.DateOfBirth.ToString("dd MMM yyyy")</td>
                 <td @* scope="Col" *@>
                     @if (rider.IsDeleted == true)
                     {

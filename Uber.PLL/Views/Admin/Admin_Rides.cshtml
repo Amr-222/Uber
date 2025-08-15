@@ -1,5 +1,5 @@
-﻿@using Uber.DAL.Entities
-@model List<Ride>
+﻿
+@model IEnumerable<Uber.BLL.ModelVM.Ride.RideVM>
 @{
     ViewData["Title"] = "Rides Management";
 }
@@ -84,38 +84,41 @@
     }
 </style>
 
+
+
+
+
 <header>
     <div class="nav-left">
         <h1>Uber</h1>
-        <a href="#">Ride</a>
-        <a href="#">Drive</a>
-    </div>
-    <div class="nav-right">
-        <a asp-controller="Account" asp-action="ChooseLoginType">Log in</a>
-        <a asp-controller="Account" asp-action="ChooseRegisterType" class="signup-btn">Sign up</a>
     </div>
 </header>
 
 <div class="page-title">Rides Management</div>
 
-<table>
-    <thead>
-        <tr>
+<table id="Admins" class="display">
+    <thead class="thead-dark">
+      <tr>
             <th>ID</th>
             <th>Driver</th>
             <th>Rider</th>
             <th>Price</th>
             <th>Ride Time</th>
+            <th>Duration</th>
+            <th>Distance</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var ride in Model)
         {
             <tr>
-                <td>@ride.Id</td>
-                <td>@ride.Driver.Name</td>
-                <td>@ride.User.Name</td>
+                <td>@ride.ID</td>
+                <td>@ride.DriverName</td>
+                <td>@ride.RiderName</td>
                 <td>@ride.Price</td>
+                <td>@ride.CreatedAt.ToString("dd MMM yyyy")</td>
+                <td>@ride.Duration</td>
+                <td>@ride.Distance</td>
             </tr>
         }
     </tbody>

@@ -66,7 +66,7 @@ namespace Uber.BLL.Services.Impelementation
             }
             return list;
 
-
+             
         }
 
         public (string?, Admin?) GetByID(string id)

@@ -13,11 +13,12 @@ namespace Uber.PLL.Controllers
         private readonly IRideService _rideService;
         private readonly IUserService _userService;
         private readonly IAdminService _adminService;
-        public AdminController(IDriverService driverService, IRideService rideService, IUserService userService)
+        public AdminController(IDriverService driverService, IRideService rideService, IUserService userService , IAdminService adminService)
         {
             _driverService = driverService;
             _rideService = rideService;
             _userService = userService;
+            _adminService = adminService;
         }
         public IActionResult AdminDashBoard()
         {
@@ -129,6 +130,17 @@ namespace Uber.PLL.Controllers
             return RedirectToAction("Admin_Admins");
         }
 
+
+
+
+
+        public IActionResult Admin_Rides()
+        {
+            var rides = _rideService.GetAll();
+            return View(rides);
+        }
+
+    
 
 
 

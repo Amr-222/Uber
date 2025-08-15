@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using System.Linq;
 using Uber.BLL.Helper;
 using Uber.BLL.ModelVM.User;
 using Uber.BLL.Services.Abstraction;
@@ -15,13 +16,15 @@ namespace Uber.BLL.Services.Impelementation
         private readonly IUserRepo userRepo;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IRideRepo rideRepo;
 
-        public UserService(IUserRepo _userRepo, IMapper _mapper, UserManager<ApplicationUser> _userManager, IHttpContextAccessor _httpContextAccessor)
+        public UserService(IUserRepo _userRepo, IMapper _mapper, UserManager<ApplicationUser> _userManager, IHttpContextAccessor _httpContextAccessor, IRideRepo rideRepo)
         {
             userRepo = _userRepo;
             mapper = _mapper;
             userManager = _userManager;
             httpContextAccessor = _httpContextAccessor;
+            this.rideRepo = rideRepo;
         }
 
         public async Task<(bool, string?)> CreateAsync(CreateUser user)
@@ -121,9 +124,28 @@ namespace Uber.BLL.Services.Impelementation
                 {
                     return (false, "User not found or not logged in.", null);
                 }
+                var us = userRepo.GetByID(user.Id);
 
-                var userProfile = mapper.Map<UserProfileVM>(user);
+                // Manual mapping instead of AutoMapper
+                var userProfile = new UserProfileVM
+                {
+                    Name = us.Item2.Name,
+                    Id = us.Item2.Id,
+                    Balance = us.Item2.Balance,
+                    Rides = new List<Uber.DAL.Entities.Ride>()
+                };
 
+
+
+
+                userProfile.Rides = rideRepo.GetAll().Where(a => a.UserId != null && a.UserId == userProfile.Id).ToList();
+
+
+
+        
+
+
+              
                 return (true, null, userProfile);
             }
             catch (Exception ex)

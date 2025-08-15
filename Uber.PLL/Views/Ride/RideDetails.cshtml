@@ -14,7 +14,6 @@
 <script>
     // Check if Leaflet loaded from primary CDN
     if (typeof L === 'undefined') {
-        console.log('Primary Leaflet CDN failed, trying fallback...');
         // Load from fallback CDN
         const link = document.createElement('link');
         link.rel = 'stylesheet';
@@ -24,26 +23,11 @@
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
         script.onload = function() {
-            console.log('Leaflet loaded from fallback CDN');
-            // Trigger map initialization if DOM is already loaded
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                if (typeof autoInitializeMap === 'function') {
-                    autoInitializeMap();
-                }
-            }
         };
         script.onerror = function() {
             console.error('Both Leaflet CDNs failed to load');
-            // Show error in debug indicator if available
-            const mapDebug = document.getElementById('mapDebug');
-            if (mapDebug) {
-                mapDebug.innerHTML = 'Failed to load Leaflet library!';
-                mapDebug.style.background = 'rgba(255,0,0,0.9)';
-            }
         };
         document.head.appendChild(script);
-    } else {
-        console.log('Leaflet loaded successfully from primary CDN');
     }
 </script>
 
@@ -115,38 +99,71 @@
 
     <!-- Ride Status -->
     <div class="ride-status-info" style="background-color: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
-        <h4 style="color: #28a745; margin: 0;">✅ Ride Accepted</h4>
-        <p style="margin: 10px 0 0 0; color: #2d5a2d;">Your ride is confirmed and on the way!</p>
+        <h4 style="color: #28a745; margin: 0;">
+            @switch (Model.Status)
+            {
+                case Uber.DAL.Enums.RideStatus.Pending:
+                    <text>⏳ Ride Pending</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.Accepted:
+                    <text>✅ Ride Accepted</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.InProgress:
+                    <text>🚀 Ride In Progress</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.Completed:
+                    <text>✅ Ride Completed</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.Cancelled:
+                    <text>❌ Ride Cancelled</text>
+                    break;
+                default:
+                    <text>✅ Ride Accepted</text>
+                    break;
+            }
+        </h4>
+        <p style="margin: 10px 0 0 0; color: #2d5a2d;">
+            @switch (Model.Status)
+            {
+                case Uber.DAL.Enums.RideStatus.Pending:
+                    <text>Waiting for driver to accept your ride request.</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.Accepted:
+                    <text>Your ride is confirmed and on the way!</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.InProgress:
+                    <text>Your ride is now in progress!</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.Completed:
+                    <text>Your ride has been completed successfully!</text>
+                    break;
+                case Uber.DAL.Enums.RideStatus.Cancelled:
+                    <text>This ride has been cancelled.</text>
+                    break;
+                default:
+                    <text>Your ride is confirmed and on the way!</text>
+                    break;
+            }
+        </p>
     </div>
 
     <!-- Map Section -->
     <div class="map-container">
         <h4 style="color: #495057; margin-bottom: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">🗺️ Ride Route</h4>
         <div id="rideMap">
-            <!-- Debug indicator -->
-            <div id="mapDebug" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; background: rgba(255,0,0,0.8); color: white; padding: 10px; border-radius: 5px; display: none;">
-                Map Loading... Check Console for Debug Info
-            </div>
         </div>
         
-        <!-- Debug controls -->
-        <div style="margin-top: 10px; text-align: center;">
-            <button onclick="testMapContainer()" style="padding: 5px 10px; margin: 0 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">Test Map Container</button>
-            <button onclick="forceMapInit()" style="padding: 5px 10px; margin: 0 5px; background: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer;">Force Map Init</button>
-            <button onclick="checkLeaflet()" style="padding: 5px 10px; margin: 0 5px; background: #ffc107; color: white; border: none; border-radius: 3px; cursor: pointer;">Check Leaflet</button>
-            <button onclick="createTestMap()" style="padding: 5px 10px; margin: 0 5px; background: #dc3545; color: white; border: none; border-radius: 3px; cursor: pointer;">Test Map</button>
+        
+        
+        <!-- SignalR Status Indicator -->
+        <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; text-align: center;">
+            <strong>SignalR Status:</strong> 
+            <span id="signalRStatus" style="padding: 5px 10px; border-radius: 3px; font-weight: bold; margin-left: 10px;">
+                Connecting...
+            </span>
         </div>
         
-        <!-- Coordinate debug info -->
-        <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-family: monospace; font-size: 12px;">
-            <strong>Debug Info:</strong><br>
-            Start: @Model.StartLat, @Model.StartLng<br>
-            End: @Model.EndLat, @Model.EndLng<br>
-            Start Type: @Model.StartLat.GetType().Name, @Model.StartLng.GetType().Name<br>
-            End Type: @Model.EndLat.GetType().Name, @Model.EndLng.GetType().Name<br>
-            Start Valid: @(!double.IsNaN(Model.StartLat) && !double.IsInfinity(Model.StartLat)), @(!double.IsNaN(Model.StartLng) && !double.IsInfinity(Model.StartLng))<br>
-            End Valid: @(!double.IsNaN(Model.EndLat) && !double.IsInfinity(Model.EndLat)), @(!double.IsNaN(Model.EndLng) && !double.IsInfinity(Model.EndLng))
-        </div>
+        
         
         <div class="map-info">
             <div class="map-info-item">
@@ -155,7 +172,7 @@
             </div>
             <div class="map-info-item">
                 <h5 style="color: #6c757d; margin-bottom: 10px;">🔄 Status</h5>
-                <span style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">
+                <span id="statusBadge" style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">
                     @Model.Status.ToString()
                 </span>
             </div>
@@ -248,7 +265,7 @@
     }
 
     <!-- Action Buttons -->
-    <div style="text-align: center; margin-top: 30px;">
+    <div class="action-buttons" style="text-align: center; margin-top: 30px;">
         @if (isDriver)
         {
             <button onclick="startRide()" style="padding: 15px 30px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px;">
@@ -259,9 +276,21 @@
             </button>
         }
         
+        <!-- Cancel Ride Button - Visible for both roles unless ride is completed or cancelled -->
+        @if (Model.Status != Uber.DAL.Enums.RideStatus.Completed && Model.Status != Uber.DAL.Enums.RideStatus.Cancelled)
+        {
+            <button id="cancelRideBtn" onclick="cancelRide()" style="padding: 15px 30px; background-color: #dc3545; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px;">
+                ❌ Cancel Ride
+            </button>
+        }
+        
+        <!-- Back to Home Button - Only visible when ride is completed or cancelled -->
+        @if (Model.Status == Uber.DAL.Enums.RideStatus.Completed || Model.Status == Uber.DAL.Enums.RideStatus.Cancelled)
+        {
         <a href="/Home" style="display: inline-block; padding: 15px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 0 10px;">
             🏠 Back to Home
         </a>
+        }
     </div>
 
     <!-- Real-time Updates -->
@@ -285,8 +314,10 @@
 
     // Initialize map
     function initializeMap() {
-        console.log('Initializing map...');
-        console.log('Map container:', document.getElementById('rideMap'));
+             // Prevent multiple map initializations
+             if (window.mapInitialized) {
+                 return;
+             }
         
         // Check if Leaflet is loaded
         if (typeof L === 'undefined') {
@@ -294,15 +325,11 @@
             return;
         }
         
-        console.log('Leaflet loaded successfully');
-        
         // Validate coordinates
         const startLat = @Model.StartLat;
         const startLng = @Model.StartLng;
         const endLat = @Model.EndLat;
         const endLng = @Model.EndLng;
-        
-        console.log('Coordinates:', { startLat, startLng, endLat, endLng });
         
         // Check if coordinates are valid numbers
         if (isNaN(startLat) || isNaN(startLng) || isNaN(endLat) || isNaN(endLng)) {
@@ -326,16 +353,12 @@
             const centerLat = (startLat + endLat) / 2;
             const centerLng = (startLng + endLng) / 2;
             
-            console.log('Map center:', { centerLat, centerLng });
-            
             map = L.map('rideMap').setView([centerLat, centerLng], 13);
-            console.log('Map created successfully');
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
-            console.log('Tile layer added');
 
             // Add pickup and dropoff markers
             pickupMarker = L.marker([startLat, startLng], {
@@ -344,7 +367,6 @@
                     iconSize: [32, 32]
                 })
             }).addTo(map).bindPopup("🚀 Pickup Location").openPopup();
-            console.log('Pickup marker added');
 
             dropoffMarker = L.marker([endLat, endLng], {
                 icon: L.icon({
@@ -352,21 +374,14 @@
                     iconSize: [32, 32]
                 })
             }).addTo(map).bindPopup("🎯 Destination").openPopup();
-            console.log('Dropoff marker added');
-
-            // Hide debug indicator since map loaded successfully
-            hideMapDebug();
 
             // Draw route between points
             drawRouteWithCoordinates(startLat, startLng, endLat, endLng);
+             
+             // Mark map as initialized
+             window.mapInitialized = true;
         } catch (error) {
             console.error('Error initializing map:', error);
-            // Show error in debug indicator
-            const mapDebug = document.getElementById('mapDebug');
-            if (mapDebug) {
-                mapDebug.innerHTML = 'Map Error: ' + error.message;
-                mapDebug.style.background = 'rgba(255,0,0,0.9)';
-            }
         }
     }
 
@@ -375,8 +390,6 @@
         try {
             const start = [@Model.StartLat, @Model.StartLng];
             const end = [@Model.EndLat, @Model.EndLng];
-
-            console.log('Drawing route from', start, 'to', end);
 
             const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`);
             const data = await response.json();
@@ -403,8 +416,6 @@
                 document.getElementById('routeDistance').textContent = distance + ' km';
                 document.getElementById('routeDuration').textContent = duration + ' min';
                 document.getElementById('price').textContent = (distance * 7 + duration * 1.5 + 7).toFixed(2) + 'pound';
-
-                console.log(`Route: ${distance} km, ${duration} min, ${price} pound`);
             }
         } catch (error) {
             console.error('Error drawing route:', error);
@@ -418,8 +429,6 @@
         try {
             const start = [startLat, startLng];
             const end = [endLat, endLng];
-
-            console.log('Drawing route with coordinates from', start, 'to', end);
 
             const response = await fetch(`https://router.project-osrm.org/route/v1/driving/${start[1]},${start[0]};${end[1]},${end[0]}?overview=full&geometries=geojson`);
             const data = await response.json();
@@ -447,8 +456,6 @@
                 document.getElementById('routeDistance').textContent = distance + ' km';
                 document.getElementById('routeDuration').textContent = duration + ' min';
                 document.getElementById('price').textContent = price + 'pound';
-
-                console.log(`Route: ${distance} km, ${duration} min, ${price} pound`);
             }
         } catch (error) {
             console.error('Error drawing route:', error);
@@ -456,6 +463,23 @@
             document.getElementById('routeDuration').textContent = 'Error';
             document.getElementById('price').textContent = 'Error';
 
+         }
+     }
+
+                  // Function to join driver group if user is a driver
+         async function joinDriverGroupIfNeeded() {
+             @if (isDriver)
+             {
+                 <text>
+                 const driverId = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+                 if (driverId && driverId !== '') {
+                     try {
+                         await connection.invoke("JoinDriverGroup", driverId);
+                     } catch (err) {
+                         console.error("Failed to join driver group:", err);
+                     }
+                 }
+                 </text>
         }
     }
 
@@ -472,13 +496,124 @@
 
             // Join the ride group for updates
             await connection.start();
+                 
+                 // Join the ride group
             await connection.invoke("JoinRideGroup", "ride-@Model.Id");
+ 
+                 // Join driver group if user is a driver
+                 await joinDriverGroupIfNeeded();
+                 
+                 isConnected = true;
+                 updateSignalRStatus("Connected", "#28a745");
+                 
+                 // Set up SignalR event listeners
+                 setupSignalRListeners();
+                 
+                 // Add connection state monitoring
+                 connection.onclose(async (error) => {
+                     isConnected = false;
+                     updateSignalRStatus("Disconnected", "#dc3545");
+                     
+                     // Try to reconnect after a delay
+                     setTimeout(async () => {
+                         await initializeConnection();
+                     }, 3000);
+                 });
+                 
+                 // Add periodic connection health check
+                 setInterval(async () => {
+                     if (connection && connection.state === signalR.HubConnectionState.Connected) {
+                         isConnected = true;
+                         updateSignalRStatus("Connected", "#28a745");
+                     } else if (connection && connection.state !== signalR.HubConnectionState.Connected) {
+                         isConnected = false;
+                         updateSignalRStatus("Reconnecting...", "#ffc107");
+                         try {
+                             await initializeConnection();
+                         } catch (error) {
+                             console.error("Health check reconnection failed:", error);
+                         }
+                     }
+                 }, 10000); // Check every 10 seconds
+                 
+                 connection.onreconnecting((error) => {
+                     isConnected = false;
+                     updateSignalRStatus("Reconnecting...", "#ffc107");
+                 });
+                 
+                 connection.onreconnected((connectionId) => {
             isConnected = true;
-            console.log("Connected to ride updates");
+                     updateSignalRStatus("Connected", "#28a745");
+                 });
 
         } catch (err) {
             console.error("SignalR Connection Error:", err);
-        }
+                 isConnected = false;
+                 updateSignalRStatus("Error", "#dc3545");
+             }
+         }
+    
+         // Function to update SignalR status display
+     function updateSignalRStatus(status, color) {
+         const statusElement = document.getElementById('signalRStatus');
+         if (statusElement) {
+             statusElement.textContent = status;
+             statusElement.style.backgroundColor = color;
+             statusElement.style.color = 'white';
+         }
+     }
+     
+              // Function to set up SignalR event listeners
+         function setupSignalRListeners() {
+             // Prevent duplicate event listeners
+             if (window.signalRListenersSet) {
+                 return;
+             }
+             
+             // Listen for real-time ride updates
+             connection.on("RideStarted", function (rideId) {
+                 if (rideId == @Model.Id) {
+                     // Update UI to show ride started
+                     document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #ffc107; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">In Progress</span>';
+                     document.querySelector('.ride-status-info h4').textContent = '🚀 Ride Started';
+                     document.querySelector('.ride-status-info p').textContent = 'Your ride is now in progress!';
+                     document.querySelector('.ride-status-info').style.backgroundColor = '#fff3cd';
+                     document.querySelector('.ride-status-info').style.borderLeftColor = '#ffc107';
+                 }
+             });
+ 
+             connection.on("RideCompleted", function (rideId) {
+                 if (rideId == @Model.Id) {
+                     // Update UI to show ride completed
+                     document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">Completed</span>';
+                     document.querySelector('.ride-status-info h4').textContent = '✅ Ride Completed';
+                     document.querySelector('.ride-status-info p').textContent = 'Your ride has been completed successfully!';
+                     document.querySelector('.ride-status-info').style.backgroundColor = '#e8f5e8';
+                     document.querySelector('.ride-status-info').style.borderLeftColor = '#28a745';
+                 }
+             });
+ 
+             connection.on("RideCancelled", function (rideId) {
+                 if (rideId == @Model.Id) {
+                     // Update UI to show ride cancelled
+                     updateRideStatusDisplay("Cancelled");
+                     
+                     // Hide the cancel button
+                     const cancelBtn = document.getElementById('cancelRideBtn');
+                     if (cancelBtn) {
+                         cancelBtn.style.display = 'none';
+                     }
+                     
+                     // Show the Back to Home button
+                     showBackToHomeButton();
+                     
+                     // Show cancellation message
+                     alert("Ride has been cancelled.");
+                 }
+             });
+             
+             // Mark listeners as set up
+             window.signalRListenersSet = true;
     }
 
     // Driver functions
@@ -489,8 +624,56 @@
     }
 
     function completeRide() {
-        if (confirm("Are you sure you want to complete the ride?")) {
+        if (confirm("Are you sure you complete the ride?")) {
             updateRideStatus("Completed", @Model.Id);
+        }
+    }
+
+        // Cancel ride function for both roles
+    async function cancelRide() {
+        if (confirm("Are you sure you want to cancel this ride?")) {
+            try {
+                                 // Ensure SignalR connection is ready
+                 if (!connection || !isConnected) {
+                     await initializeConnection();
+                     
+                     // Wait a bit for connection to stabilize
+                     await new Promise(resolve => setTimeout(resolve, 1000));
+                 }
+                 
+                 const response = await fetch('/Ride/CancelRide', {
+                     method: 'POST',
+                     headers: {
+                         'Content-Type': 'application/json',
+                     },
+                     body: JSON.stringify({ 
+                         id: @Model.Id, 
+                         rideGroup: 'ride-@Model.Id' 
+                     })
+                 });
+
+                 if (response.ok) {
+                     const data = await response.json();
+                     
+                     // Hide the cancel button immediately
+                     const cancelBtn = document.getElementById('cancelRideBtn');
+                     if (cancelBtn) {
+                         cancelBtn.style.display = 'none';
+                     }
+                     
+                     // Update ride status display immediately
+                     updateRideStatusDisplay("Cancelled");
+                     
+                     // Show success message
+                     alert(data.message);
+                 } else {
+                     const errorData = await response.json();
+                     alert("Error cancelling ride: " + (errorData.message || "Unknown error"));
+                 }
+            } catch (err) {
+                console.error("Error:", err);
+                alert("Error cancelling ride. Please try again.");
+            }
         }
     }
 
@@ -539,229 +722,185 @@
         }
     }
 
-    // Listen for real-time ride updates
-    connection.on("RideStarted", function (rideId) {
-        if (rideId == @Model.Id) {
-            // Update UI to show ride started
-            document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #ffc107; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">In Progress</span>';
-            document.querySelector('.ride-status-info h4').textContent = '🚀 Ride Started';
-            document.querySelector('.ride-status-info p').textContent = 'Your ride is now in progress!';
-            document.querySelector('.ride-status-info').style.backgroundColor = '#fff3cd';
-            document.querySelector('.ride-status-info').style.borderLeftColor = '#ffc107';
+    // Function to update ride status display
+    function updateRideStatusDisplay(status) {
+        const statusInfo = document.querySelector('.ride-status-info');
+        const statusBadge = document.getElementById('statusBadge');
+        
+        if (statusInfo) {
+            if (status === "Cancelled") {
+                // Update the status info section
+                statusInfo.innerHTML = `
+                    <h4 style="color: #dc3545; margin: 0;">❌ Ride Cancelled</h4>
+                    <p style="margin: 10px 0 0 0; color: #721c24;">This ride has been cancelled.</p>
+                `;
+                statusInfo.style.backgroundColor = '#f8d7da';
+                statusInfo.style.borderLeftColor = '#dc3545';
+            }
         }
-    });
+        
+        if (statusBadge) {
+            if (status === "Cancelled") {
+                statusBadge.textContent = "Cancelled";
+                statusBadge.style.backgroundColor = "#dc3545";
+            }
+        }
+        
+        // Show the Back to Home button when ride is cancelled
+        if (status === "Cancelled") {
+            showBackToHomeButton();
+        }
+    }
+    
+    // Function to show the Back to Home button
+    function showBackToHomeButton() {
+        // Create the Back to Home button if it doesn't exist
+        let backButton = document.querySelector('.back-to-home-btn');
+        if (!backButton) {
+            backButton = document.createElement('a');
+            backButton.href = '/Home';
+            backButton.className = 'back-to-home-btn';
+            backButton.style.cssText = 'display: inline-block; padding: 15px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 0 10px;';
+            backButton.innerHTML = '🏠 Back to Home';
+            
+            // Insert after the action buttons div
+            const actionButtonsDiv = document.querySelector('.action-buttons');
+            if (actionButtonsDiv) {
+                actionButtonsDiv.appendChild(backButton);
+            }
+        }
+    }
 
-    connection.on("RideCompleted", function (rideId) {
-        if (rideId == @Model.Id) {
-            // Update UI to show ride completed
-            document.querySelector('.ride-status-info').innerHTML = '<span style="padding: 5px 12px; background-color: #28a745; color: white; border-radius: 15px; font-size: 12px; font-weight: bold;">Completed</span>';
-            document.querySelector('.ride-status-info h4').textContent = '✅ Ride Completed';
-            document.querySelector('.ride-status-info p').textContent = 'Your ride has been completed successfully!';
-            document.querySelector('.ride-status-info').style.backgroundColor = '#e8f5e8';
-            document.querySelector('.ride-status-info').style.borderLeftColor = '#28a745';
-        }
-    });
+    // SignalR event listeners are now set up in setupSignalRListeners() function
+    // which is called after the connection is established
 
     // Initialize everything when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('=== DOM LOADED EVENT TRIGGERED ===');
-        console.log('DOM loaded, checking map container...');
-        
-        const mapContainer = document.getElementById('rideMap');
-        const mapDebug = document.getElementById('mapDebug');
-        
-        console.log('Map container element:', mapContainer);
-        console.log('Map debug element:', mapDebug);
-        console.log('Map container dimensions:', {
-            width: mapContainer?.offsetWidth,
-            height: mapContainer?.offsetHeight,
-            style: mapContainer?.style.cssText
-        });
-        
-        // Show debug indicator initially
-        if (mapDebug) {
-            mapDebug.style.display = 'block';
-            mapDebug.innerHTML = 'DOM Loaded - Starting Map Initialization...';
-        }
+     document.addEventListener('DOMContentLoaded', async function() {
+
+         
+         // Check if ride is already cancelled and update UI accordingly
+         const currentStatus = '@Model.Status.ToString()';
+         if (currentStatus === 'Cancelled') {
+             updateRideStatusDisplay("Cancelled");
+             
+             // Hide the cancel button if ride is already cancelled
+             const cancelBtn = document.getElementById('cancelRideBtn');
+             if (cancelBtn) {
+                 cancelBtn.style.display = 'none';
+             }
+             
+             // Show the Back to Home button if ride is already cancelled
+             showBackToHomeButton();
+         }
+         
+         // Initialize SignalR status
+         updateSignalRStatus("Initializing...", "#6c757d");
+         
+         // AUTO-CONNECT SIGNALR IMMEDIATELY
+         try {
+             await initializeConnection();
+         } catch (error) {
+             console.error('SignalR auto-connection failed:', error);
+             // Retry after a delay
+             setTimeout(async () => {
+                 try {
+                     await initializeConnection();
+                 } catch (retryError) {
+                     console.error('SignalR retry failed:', retryError);
+                 }
+             }, 2000);
+         }
+         
+                            const mapContainer = document.getElementById('rideMap');
         
         // Check if container has proper dimensions
         if (mapContainer && (mapContainer.offsetWidth === 0 || mapContainer.offsetHeight === 0)) {
             console.warn('Map container has zero dimensions, this might cause the map not to appear');
-            if (mapDebug) {
-                mapDebug.innerHTML = 'Map container has zero dimensions! Check CSS.';
-            }
         }
         
         // Try immediate initialization first
-        console.log('Attempting immediate map initialization...');
-        if (typeof L !== 'undefined' && mapContainer && mapContainer.offsetWidth > 0 && mapContainer.offsetHeight > 0) {
+         if (typeof L !== 'undefined' && mapContainer && mapContainer.offsetWidth > 0 && mapContainer.offsetHeight > 0 && !window.mapInitialized) {
             try {
-                console.log('Immediate initialization possible, proceeding...');
-                if (mapDebug) {
-                    mapDebug.innerHTML = 'Attempting immediate initialization...';
-                }
                 initializeMap();
-                initializeConnection();
-                console.log('Immediate initialization successful!');
                 return;
             } catch (error) {
-                console.log('Immediate initialization failed, falling back to retry logic:', error);
-                if (mapDebug) {
-                    mapDebug.innerHTML = 'Immediate init failed: ' + error.message;
-                }
-            }
-        }
-        
-        // Start automatic map initialization with retry logic
-        console.log('Starting retry-based initialization...');
-        if (mapDebug) {
-            mapDebug.innerHTML = 'Starting retry-based initialization...';
-        }
-        autoInitializeMap();
+                     // Fall back to retry logic
+                 }
+         }
+         
+         // Start automatic map initialization with retry logic (only if not already initialized)
+         if (!window.mapInitialized) {
+             autoInitializeMap();
+         }
     });
     
     // Also try to initialize when window is fully loaded (backup)
-    window.addEventListener('load', function() {
-        console.log('Window loaded, checking if map needs initialization...');
-        
-        // Only initialize if map hasn't been initialized yet
-        if (!map) {
-            console.log('Map not initialized yet, trying to initialize...');
+         window.addEventListener('load', async function() {
+             // Ensure SignalR is connected
+             if (!connection || !isConnected) {
+                 try {
+                     await initializeConnection();
+                 } catch (error) {
+                     console.error('Failed to connect SignalR on window load:', error);
+                 }
+             }
+             
+             // Only initialize map if it hasn't been initialized yet
+             if (!map && !window.mapInitialized) {
             autoInitializeMap();
         }
     });
     
     // Automatic map initialization with retry logic
-    function autoInitializeMap() {
-        console.log('=== AUTO INITIALIZE MAP CALLED ===');
-        console.log('Starting automatic map initialization...');
+         async function autoInitializeMap() {
+             // Prevent multiple auto-initialization calls
+             if (window.autoInitInProgress) {
+                 return;
+             }
+             
+             // Prevent if map is already initialized
+             if (window.mapInitialized) {
+                 return;
+             }
+             
+             window.autoInitInProgress = true;
         
         // Check if Leaflet is loaded
         if (typeof L === 'undefined') {
-            console.log('Leaflet not loaded yet, waiting...');
-            const mapDebug = document.getElementById('mapDebug');
-            if (mapDebug) {
-                mapDebug.innerHTML = 'Waiting for Leaflet to load... (Retry in 200ms)';
-            }
-            
             // Retry after a short delay
-            setTimeout(autoInitializeMap, 200);
+                 setTimeout(() => {
+                     window.autoInitInProgress = false;
+                     autoInitializeMap();
+                 }, 200);
             return;
         }
-        
-        console.log('Leaflet is loaded, initializing map...');
         
         // Check if map container is ready
         const mapContainer = document.getElementById('rideMap');
         if (!mapContainer || mapContainer.offsetWidth === 0 || mapContainer.offsetHeight === 0) {
-            console.log('Map container not ready yet, waiting...');
-            const mapDebug = document.getElementById('mapDebug');
-            if (mapDebug) {
-                mapDebug.innerHTML = 'Waiting for map container to be ready... (Retry in 200ms)';
-            }
-            
             // Retry after a short delay
-            setTimeout(autoInitializeMap, 200);
+                 setTimeout(() => {
+                     window.autoInitInProgress = false;
+                     autoInitializeMap();
+                 }, 200);
             return;
         }
-        
-        console.log('Map container is ready, proceeding with initialization...');
         
         try {
             // Initialize the map
-            console.log('Calling initializeMap() function...');
             initializeMap();
-            
-            // Initialize SignalR connection
-            console.log('Calling initializeConnection() function...');
-            initializeConnection();
-            
-            console.log('Automatic initialization completed successfully');
-            
         } catch (error) {
-            console.error('Error during automatic initialization:', error);
-            const mapDebug = document.getElementById('mapDebug');
-            if (mapDebug) {
-                mapDebug.innerHTML = 'Initialization error: ' + error.message;
-                mapDebug.style.background = 'rgba(255,0,0,0.9)';
-            }
+                 console.error('Error during automatic map initialization:', error);
             
             // Retry after a longer delay
-            setTimeout(autoInitializeMap, 1000);
-        }
-    }
+                 setTimeout(() => {
+                     window.autoInitInProgress = false;
+                     autoInitializeMap();
+                 }, 1000);
+             } finally {
+                 window.autoInitInProgress = false;
+             }
+         }
 
-    // Function to hide debug indicator when map is successfully loaded
-    function hideMapDebug() {
-        const mapDebug = document.getElementById('mapDebug');
-        if (mapDebug) {
-            mapDebug.style.display = 'none';
-        }
-    }
-
-    // Test map container rendering
-    function testMapContainer() {
-        console.log('Testing map container rendering...');
-        console.log('Map container element:', document.getElementById('rideMap'));
-        console.log('Map container dimensions:', {
-            width: document.getElementById('rideMap')?.offsetWidth,
-            height: document.getElementById('rideMap')?.offsetHeight,
-            style: document.getElementById('rideMap')?.style.cssText
-        });
-        alert('Map container rendering test complete. Check console for details.');
-    }
-
-    // Force map initialization (useful for debugging)
-    function forceMapInit() {
-        console.log('Forcing map initialization...');
-        initializeMap(); // This will re-initialize the map with current coordinates
-        console.log('Map re-initialized.');
-    }
-
-    // Check if Leaflet is loaded
-    function checkLeaflet() {
-        console.log('Checking Leaflet status...');
-        if (typeof L !== 'undefined') {
-            console.log('Leaflet is loaded.');
-            alert('Leaflet is loaded.');
-        } else {
-            console.error('Leaflet is NOT loaded!');
-            alert('Leaflet is NOT loaded!');
-        }
-    }
     
-    // Create a simple test map to verify basic functionality
-    function createTestMap() {
-        console.log('Creating test map...');
-        
-        if (typeof L === 'undefined') {
-            alert('Leaflet not loaded!');
-            return;
-        }
-        
-        try {
-            // Clear existing map if any
-            if (map) {
-                map.remove();
-            }
-            
-            // Create a simple map centered on a known location
-            map = L.map('rideMap').setView([40.7128, -74.0060], 10);
-            
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-            
-            // Add a simple marker
-            L.marker([40.7128, -74.0060]).addTo(map).bindPopup("Test Marker").openPopup();
-            
-            hideMapDebug();
-            alert('Test map created successfully!');
-            
-        } catch (error) {
-            console.error('Error creating test map:', error);
-            alert('Error creating test map: ' + error.message);
-        }
-    }
 </script>

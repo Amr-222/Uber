@@ -95,15 +95,18 @@
 
 <div class="page-title">Drivers Management</div>
 
-<table>
-    <thead>
+
+<table id="Drivers" class="display">
+    <thead class="thead-dark">
         <tr>
-            <th>ID</th>
+@*             <th>ID</th>*@
             <th>Image</th>
             <th>Name</th>
             <th>Email</th>
             <th>Phone Number</th>
             <th>Date of Birth</th>
+            <th>Deleted</th>
+            <th>Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -111,11 +114,11 @@
         @foreach (var driver in Model)
         {
             <tr data-id="@driver.Id">
-                <td>@driver.Id</td>
-                <td>
+@*                 <td>@driver.Id</td>
+ *@                <td>
                     @if (!string.IsNullOrEmpty(driver.ImagePath))
                     {
-                        <img src="@driver.ImagePath" alt="Driver Image" width="60" height="60" style="border-radius:50%;" />
+                        <img src="~/Files/@driver.ImagePath" alt="Driver Image" width="60" height="60" style="border-radius:50%;" />
                     }
                     else
                     {
@@ -126,6 +129,26 @@
                 <td>@driver.Email</td>
                 <td>@driver.PhoneNumber</td>
                 <td>@driver.DateOfBirth</td>
+                <td>
+                    @if (driver.IsDeleted == true)
+                    {
+                        <span class="badge bg-danger">Deleted</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                </td>
+                <td >
+                    @if (driver.IsActive == false)
+                    {
+                        <span class="badge bg-danger">InActive</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                </td>
                 <td>
                     <a asp-action="EditDriver" asp-route-id="@driver.Id" class="btn btn-warning">Edit</a>
                     <button type="button" class="btn btn-danger" onclick="deleteDriver(@driver.Id)">Delete</button>

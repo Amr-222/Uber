@@ -32,6 +32,9 @@ namespace Uber.DAL.Entities
         public double? Duration { get; set; }
         public double? Distance { get; set; }
         public double? Price { get; set; }
+        
+        // Payment
+        public PaymentMethod PaymentMethod { get; set; } = PaymentMethod.Wallet;
         public (bool, string?) Cancel()
         {
             try

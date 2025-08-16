@@ -93,6 +93,25 @@ namespace Uber.PLL.Controllers
             return View(result.Item3);
         }
 
+        [Authorize(Roles = "User")]
+        [HttpGet]
+        public async Task<IActionResult> GetBalance()
+        {
+            try
+            {
+                var result = await service.GetProfileInfo();
+                if (result.Item3 != null)
+                {
+                    return Json(new { balance = result.Item3.Balance });
+                }
+                return Json(new { balance = 0 });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { balance = 0, error = ex.Message });
+            }
+        }
+
 
 
         //[HttpPost]

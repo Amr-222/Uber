@@ -228,6 +228,21 @@
             background: #1CB5A3;
         }
 
+        /* Payment Method Selection Styles */
+        input[type="radio"]:checked + span {
+            color: #1CB5A3;
+            font-weight: 600;
+        }
+
+        input[type="radio"]:checked {
+            accent-color: #1CB5A3;
+        }
+
+        label:has(input[type="radio"]:checked) {
+            border-color: #1CB5A3;
+            background-color: #f0f9ff;
+        }
+
         keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -262,6 +277,27 @@
 
             <input type="text" id="dropoff" placeholder="Dropoff location" autocomplete="off" required>
             <div id="dropoff-suggestions" class="suggestions"></div>
+            
+            <!-- Payment Method Selection -->
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">Payment Method:</label>
+                <div style="display: flex; gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; flex: 1; transition: all 0.3s ease;">
+                        <input type="radio" name="paymentMethod" value="Wallet" checked style="margin: 0;">
+                        <span>💳 Wallet</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; flex: 1; transition: all 0.3s ease;">
+                        <input type="radio" name="paymentMethod" value="Cash" style="margin: 0;">
+                        <span>💵 Cash</span>
+                    </label>
+                </div>
+                <div id="walletBalance" style="margin-top: 8px; padding: 8px; background-color: #e8f5e8; border-radius: 6px; border-left: 3px solid #28a745; display: none;">
+                    <small style="color: #155724;">
+                        <strong>Wallet Balance:</strong> £<span id="balanceAmount">0.00</span>
+                    </small>
+                </div>
+            </div>
+            
             <button type="submit">See prices</button>
         </form>
         <div id="quote" class="quote-card">
@@ -272,6 +308,12 @@
                     <span>Time: <strong id="durationText">-</strong> min</span>
                 </div>
                 <div class="quote-price"><span id="priceText">-</span> EGP</div>
+            </div>
+            <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 6px; border-left: 3px solid #1CB5A3;">
+                <small style="color: #6c757d;">
+                    <strong>Payment Method:</strong> <span id="selectedPaymentMethod">Wallet</span><br>
+                    <span id="paymentInfo">💳 Payment will be deducted from your wallet balance</span>
+                </small>
             </div>
             <button id="requestNowBtn" class="request-btn" disabled>Request now</button>
             <div id="requestStatus" style="display: none; margin-top: 10px; text-align: center;">
@@ -525,6 +567,16 @@
                 return;
             }
 
+            // Check if user has sufficient balance for wallet payment
+            const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            if (selectedPaymentMethod === 'Wallet') {
+                const userBalance = await getUserBalance();
+                if (userBalance < storedPrice) {
+                    alert(`Insufficient wallet balance. You have £${userBalance.toFixed(2)} but the ride costs £${storedPrice.toFixed(2)}. Please add funds to your wallet or select cash payment.`);
+                    return;
+                }
+            }
+
             // Check if we have valid coordinates and route
             if (!lastStart || !lastEnd || !storedDistance || !storedDuration || !storedPrice) {
                 alert('Please select valid pickup and dropoff locations first');
@@ -562,6 +614,9 @@
                     }
                 }, 2000);
 
+                // Get selected payment method
+                const selectedPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+                
                 // Create the ride request
                 const response = await fetch('/Ride/RequestRide', {
                     method: 'POST',
@@ -569,13 +624,14 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        StartLat: lastStart[0],
-                        StartLng: lastStart[1],
-                        EndLat: lastEnd[0],
-                        EndLng: lastEnd[1],
-                        Distance: storedDistance,
-                        Duration: storedDuration,
-                        Price: storedPrice
+                        startLat: lastStart[0],
+                        startLng: lastStart[1],
+                        endLat: lastEnd[0],
+                        endLng: lastEnd[1],
+                        distance: storedDistance,
+                        duration: storedDuration,
+                        price: storedPrice,
+                        paymentMethod: selectedPaymentMethod
                     })
                 });
 
@@ -632,7 +688,7 @@
             try {
                 // Try to make a request to a protected endpoint to check authentication
                 const response = await fetch('/Ride/RequestRide', {
-                    method: 'HEAD', // Just check if we can access it
+                    method: 'Get', 
                     credentials: 'same-origin'
                 });
                 
@@ -646,6 +702,91 @@
             } catch (error) {
                 console.error('Error checking authentication:', error);
                 return false;
+            }
+        }
+
+        // Add event listeners for payment method selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentMethodInputs = document.querySelectorAll('input[name="paymentMethod"]');
+            
+            paymentMethodInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    // Remove active class from all labels
+                    document.querySelectorAll('label:has(input[name="paymentMethod"])').forEach(label => {
+                        label.style.borderColor = '#e0e0e0';
+                        label.style.backgroundColor = 'transparent';
+                    });
+                    
+                    // Add active class to selected label
+                    if (this.checked) {
+                        const selectedLabel = this.closest('label');
+                        selectedLabel.style.borderColor = '#1CB5A3';
+                        selectedLabel.style.backgroundColor = '#f0f9ff';
+                    }
+                    
+                    // Update payment method display
+                    updatePaymentMethodDisplay(this.value);
+                });
+            });
+
+            // Initialize payment method display for default selection (Wallet)
+            const defaultPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
+            updatePaymentMethodDisplay(defaultPaymentMethod);
+        });
+
+        // Function to update payment method display
+        function updatePaymentMethodDisplay(paymentMethod) {
+            const selectedPaymentMethod = document.getElementById('selectedPaymentMethod');
+            const paymentInfo = document.getElementById('paymentInfo');
+            const walletBalance = document.getElementById('walletBalance');
+            
+            if (selectedPaymentMethod && paymentInfo) {
+                selectedPaymentMethod.textContent = paymentMethod;
+                
+                if (paymentMethod === 'Wallet') {
+                    paymentInfo.innerHTML = '💳 Payment will be deducted from your wallet balance';
+                    // Show wallet balance
+                    if (walletBalance) {
+                        walletBalance.style.display = 'block';
+                        loadWalletBalance();
+                    }
+                } else if (paymentMethod === 'Cash') {
+                    paymentInfo.innerHTML = '💵 Payment will be collected in cash after the ride';
+                    // Hide wallet balance
+                    if (walletBalance) {
+                        walletBalance.style.display = 'none';
+                    }
+                }
+            }
+        }
+
+        // Function to load and display wallet balance
+        async function loadWalletBalance() {
+            try {
+                const balance = await getUserBalance();
+                const balanceAmount = document.getElementById('balanceAmount');
+                if (balanceAmount) {
+                    balanceAmount.textContent = balance.toFixed(2);
+                }
+            } catch (error) {
+                console.error('Error loading wallet balance:', error);
+            }
+        }
+
+        // Function to get user's wallet balance
+        async function getUserBalance() {
+            try {
+                const response = await fetch('/User/GetBalance');
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.balance || 0;
+                } else {
+                    console.error('Failed to get user balance:', response.status);
+                    return 0;
+                }
+            } catch (error) {
+                console.error('Error getting user balance:', error);
+                return 0;
             }
         }
 </script>

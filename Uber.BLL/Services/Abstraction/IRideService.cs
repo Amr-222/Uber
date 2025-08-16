@@ -16,7 +16,7 @@ namespace Uber.BLL.Services.Abstraction
         public List<RideVM> GetAll();
         (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId, double startLat, double startLng,
-        double endLat, double endLng, double Distance, double Duration, double Price);
+        double endLat, double endLng, double Distance, double Duration, double Price, string paymentMethod);
 
         (bool, string?) MarkAccepted(int id);
         (bool, string?) MarkRejected(int id);
@@ -26,6 +26,7 @@ namespace Uber.BLL.Services.Abstraction
         (bool, string?) MarkCompleted(int id);
         (bool, string?) AddUserRating(int rideId, int rating);  // New method for rating user
         (bool, string?) AddDriverRating(int rideId, int rating);  // New method for rating driver
+        (bool, string?) ProcessPayment(int rideId);  // New method for processing payment when ride ends
        
     }
 }

@@ -9,7 +9,6 @@ using System;
 
 namespace Uber.PLL.Controllers
 {
-    // Model for ride request from Home page
     public class RideRequestModel
     {
         public double StartLat { get; set; }
@@ -19,6 +18,7 @@ namespace Uber.PLL.Controllers
         public double Distance { get; set; }
         public double Duration { get; set; }
         public double Price { get; set; }
+        public string PaymentMethod { get; set; } = "Wallet";
     }
 
     // Model for rating requests
@@ -57,7 +57,7 @@ namespace Uber.PLL.Controllers
                     return View("NoDrivers");
                 }
 
-                var chosenDriverId = nearest.Item3.FirstOrDefault(); // IdentityUser.Id (string)
+                var chosenDriverId = nearest.Item3.FirstOrDefault();
                 if (string.IsNullOrEmpty(chosenDriverId))
                 {
                     return View("NoDrivers");
@@ -70,7 +70,7 @@ namespace Uber.PLL.Controllers
                     return Unauthorized("User not authenticated");
                 }
 
-                var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, StartLat, StartLng, EndLat, EndLng, Distance, Duration, Price);
+                var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, StartLat, StartLng, EndLat, EndLng, Distance, Duration, Price, "Wallet");
                 if (!ok || ride == null)
                 {
                     return BadRequest(err ?? "Failed to create ride");
@@ -149,7 +149,7 @@ namespace Uber.PLL.Controllers
                     return Unauthorized(new { message = "User not authenticated" });
                 }
 
-                var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, request.StartLat, request.StartLng, request.EndLat, request.EndLng, request.Distance, request.Duration, request.Price);
+                var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, request.StartLat, request.StartLng, request.EndLat, request.EndLng, request.Distance, request.Duration, request.Price, request.PaymentMethod);
                 if (!ok || ride == null)
                 {
                     return BadRequest(new { message = err ?? "Failed to create ride" });
@@ -231,6 +231,9 @@ namespace Uber.PLL.Controllers
 
                 Console.WriteLine($"Notification sent successfully to group: {request.rideGroup}");
 
+                var result = _rideService.GetByID(request.id);
+                var rdriver = _driverService.AddBalance(result.Item2.DriverId, (result.Item2.PaymentMethod == 0) ? (double)result.Item2.Price * 0.8 : (double)result.Item2.Price * -0.2);
+                var rUser = _userService.AddBalance(result.Item2.UserId, (result.Item2.PaymentMethod == 0) ? (double)result.Item2.Price * -1 : 0);
                 return Ok(new { success = true, message = "Ride accepted successfully" });
             }
             catch (Exception ex)
@@ -409,75 +412,18 @@ namespace Uber.PLL.Controllers
         {
             try
             {
-                Console.WriteLine($"CompleteRide called with ride ID: {request.id}");
-                
-                // Get the ride details first
-                var (rideErr, ride) = _rideService.GetByID(request.id);
-                if (rideErr != null || ride == null)
-                {
-                    Console.WriteLine($"Ride not found: {rideErr}");
-                    return BadRequest("Ride not found");
-                }
-
-                Console.WriteLine($"Ride found: Price={ride.Price}, UserId={ride.UserId}, DriverId={ride.DriverId}");
-
-                // Mark the ride as completed
                 var (ok, err) = _rideService.MarkCompleted(request.id);
                 if (!ok)
                 {
-                    Console.WriteLine($"Failed to mark ride as completed: {err}");
                     return BadRequest(err ?? "Failed to complete ride");
-                }
-
-                // Process payment and update balances
-                if (ride.Price.HasValue && ride.Price > 0)
-                {
-                    try
-                    {
-                        // Deduct from user's balance
-                        var (userBalanceOk, userBalanceErr) = _userService.AddBalance(ride.UserId, -ride.Price.Value);
-                        if (!userBalanceOk)
-                        {
-                            Console.WriteLine($"Warning: Failed to deduct from user balance: {userBalanceErr}");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Successfully deducted {ride.Price.Value} from user {ride.UserId}");
-                        }
-
-                        // Add to driver's balance (driver gets the full fare)
-                        var (driverBalanceOk, driverBalanceErr) = _driverService.AddBalance(ride.DriverId, ride.Price.Value);
-                        if (!driverBalanceOk)
-                        {
-                            Console.WriteLine($"Warning: Failed to add to driver balance: {driverBalanceErr}");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Successfully added {ride.Price.Value} to driver {ride.DriverId}");
-                        }
-                    }
-                    catch (Exception paymentEx)
-                    {
-                        Console.WriteLine($"Payment processing error: {paymentEx.Message}");
-                        // Don't fail the ride completion if payment processing fails
-                        // The ride is already marked as completed
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Ride has no price, skipping payment processing");
                 }
 
                 // Notify both user and driver that ride has completed
                 await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideCompleted", request.id);
-                
-                Console.WriteLine($"Ride {request.id} completed successfully with payment processing");
                 return Ok(new { success = true, message = "Ride completed successfully" });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception in CompleteRide: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }

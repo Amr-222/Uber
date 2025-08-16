@@ -235,7 +235,7 @@ namespace Uber.PLL.Controllers
         {
             try
             {
-                if (ModelState.IsValid)
+                if (model!=null)
                 {
                     // Get current user ID
                     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;

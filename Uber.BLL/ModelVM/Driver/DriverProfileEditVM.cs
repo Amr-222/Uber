@@ -12,21 +12,21 @@ namespace Uber.BLL.ModelVM.Driver
 {
      public class DriverProfileEditVM
     {
-        public DriverProfileVM Profile { get; set; }   
-        public EditDriver Edit { get; set; }
-        public double Balance => Profile?.Balance ?? 0;
-        public string Name => Profile?.Name ?? "";
-        public List<Uber.DAL.Entities.Ride> Rides => Profile?.Rides ?? new List<Uber.DAL.Entities.Ride>();
-        public string? ImagePath => Profile?.ImagePath;
-        public IFormFile? File => Profile?.file;
-        public string Email => Edit?.Email ?? "";
-        public string Phone => Edit?.PhoneNumber ?? "";
-        public DateTime Dateofbirth => Edit?.DateOfBirth ?? DateTime.Now;
-        public Gender Gender => Edit?.Gender ?? Uber.DAL.Enums.Gender.Male;
-        public Vehicle? Vehicle => Edit?.Vehicle;
+        public DriverProfileVM Profile { get; set; } = new DriverProfileVM();
+        public Vehicle? Vehicle { get; set; }
+
+        DriverProfileEditVM(){}
+        public DriverProfileEditVM(string name, string id, double balance, DateTime DateOfBirth, string Email, string PhoneNumber, bool isdeleted)
+        {
+            //Profile.Name = name;
+            //Profile.Id = id;
+            //Profile.Balance = balance;
+            //this.DateOfBirth = DateOfBirth;
+            //this.Email = Email;
+            //this.PhoneNumber = PhoneNumber;
+            //this.IsDeleted = isdeleted;
 
 
-
-
+        }
     }
 }

@@ -84,7 +84,19 @@ namespace Uber.DAL.Repo.Implementation
 
 
 
-
+        public Vehicle? GetVehicleById(int id)
+        {
+            try
+            {
+                var vehicle = db.Vehicles.Where(a => a.Id == id).FirstOrDefault();
+               
+                return vehicle;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
 
 

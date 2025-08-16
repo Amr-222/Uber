@@ -156,5 +156,49 @@ namespace Uber.DAL.Repo.Implementation
                 return (false, ex.Message);
             }
         }
+
+        public (bool, string?) UpdateUserBalance(int rideId, User user)
+        {
+            try
+            {
+                var ride = db.Rides.Find(rideId);
+                if (ride == null) return (false, "Ride not found");
+                
+                // Update the user's balance in the database
+                var existingUser = db.Users.Find(user.Id);
+                if (existingUser == null) return (false, "User not found");
+                
+                existingUser.Balance = user.Balance;
+                
+                db.SaveChanges();
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
+        public (bool, string?) UpdateDriverBalance(int rideId, Driver driver)
+        {
+            try
+            {
+                var ride = db.Rides.Find(rideId);
+                if (ride == null) return (false, "Ride not found");
+                
+                // Update the driver's balance in the database
+                var existingDriver = db.Drivers.Find(driver.Id);
+                if (existingDriver == null) return (false, "Driver not found");
+                
+                existingDriver.Balance = driver.Balance;
+                
+                db.SaveChanges();
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
     }
 }

@@ -98,8 +98,6 @@ namespace Uber.PLL
                 app.UseHsts();
             }
             //SignalR
-            app.MapHub<RideHub>("/rideHub");
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -108,22 +106,10 @@ namespace Uber.PLL
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHub<RideHub>("/rideHub");
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-            using (var scope = app.Services.CreateScope())
-            {
-                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                string[] roles = { "Admin", "Driver", "User" };
-
-                foreach (var role in roles)
-                {
-                    if (!await roleManager.RoleExistsAsync(role))
-                    {
-                        await roleManager.CreateAsync(new IdentityRole(role));
-                    }
-                }
-            }
 
             app.Run();
         }

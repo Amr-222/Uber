@@ -251,10 +251,10 @@ namespace Uber.PLL.Controllers
 
                     MailSender.Mail("Password Reset", emailBody, model.Email);
 
-                    return RedirectToAction("ConfirmForgotPassword");
+                    return RedirectToAction("ForgotPasswordConfirmation");
                 }
 
-                return RedirectToAction("ConfirmForgotPassword");
+                return RedirectToAction("ForgotPasswordConfirmation");
             }
 
             return View(model);

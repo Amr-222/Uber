@@ -19,5 +19,7 @@ namespace Uber.DAL.Repo.Abstraction
         public (bool, string?) AssignNewDriver(int rideId, string newDriverId);
         public (bool, string?) UpdateUserRating(int rideId, User user);
         public (bool, string?) UpdateDriverRating(int rideId, Driver driver);
+        public (bool, string?) UpdateUserBalance(int rideId, User user);
+        public (bool, string?) UpdateDriverBalance(int rideId, Driver driver);
     }
 }

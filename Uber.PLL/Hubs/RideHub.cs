@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
 
-[Authorize] // both user & driver should be authenticated
 public class RideHub : Hub
 {
     // Client calls this right after page loads to join a ride group

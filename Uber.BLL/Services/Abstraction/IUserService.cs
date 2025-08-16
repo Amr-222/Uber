@@ -13,5 +13,6 @@ namespace Uber.BLL.Services.Abstraction
 
         public Task<(bool, string?, UserProfileVM?)> GetProfileInfo();
         public (string?, EditUser?) GetByIDToEdit(string id);
+        public (bool, string?) AddBalance(string id, double amount);
     }
 }

@@ -8,5 +8,6 @@ namespace Uber.DAL.Repo.Abstraction
         List<User> GetAll();
         (bool, string?) Delete(string id);
         (bool, string?) Edit(User user);
+        (bool, string?) AddBalance(User user, double amount);
     }
 }

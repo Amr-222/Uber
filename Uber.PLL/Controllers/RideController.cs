@@ -409,18 +409,75 @@ namespace Uber.PLL.Controllers
         {
             try
             {
+                Console.WriteLine($"CompleteRide called with ride ID: {request.id}");
+                
+                // Get the ride details first
+                var (rideErr, ride) = _rideService.GetByID(request.id);
+                if (rideErr != null || ride == null)
+                {
+                    Console.WriteLine($"Ride not found: {rideErr}");
+                    return BadRequest("Ride not found");
+                }
+
+                Console.WriteLine($"Ride found: Price={ride.Price}, UserId={ride.UserId}, DriverId={ride.DriverId}");
+
+                // Mark the ride as completed
                 var (ok, err) = _rideService.MarkCompleted(request.id);
                 if (!ok)
                 {
+                    Console.WriteLine($"Failed to mark ride as completed: {err}");
                     return BadRequest(err ?? "Failed to complete ride");
+                }
+
+                // Process payment and update balances
+                if (ride.Price.HasValue && ride.Price > 0)
+                {
+                    try
+                    {
+                        // Deduct from user's balance
+                        var (userBalanceOk, userBalanceErr) = _userService.AddBalance(ride.UserId, -ride.Price.Value);
+                        if (!userBalanceOk)
+                        {
+                            Console.WriteLine($"Warning: Failed to deduct from user balance: {userBalanceErr}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Successfully deducted {ride.Price.Value} from user {ride.UserId}");
+                        }
+
+                        // Add to driver's balance (driver gets the full fare)
+                        var (driverBalanceOk, driverBalanceErr) = _driverService.AddBalance(ride.DriverId, ride.Price.Value);
+                        if (!driverBalanceOk)
+                        {
+                            Console.WriteLine($"Warning: Failed to add to driver balance: {driverBalanceErr}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Successfully added {ride.Price.Value} to driver {ride.DriverId}");
+                        }
+                    }
+                    catch (Exception paymentEx)
+                    {
+                        Console.WriteLine($"Payment processing error: {paymentEx.Message}");
+                        // Don't fail the ride completion if payment processing fails
+                        // The ride is already marked as completed
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Ride has no price, skipping payment processing");
                 }
 
                 // Notify both user and driver that ride has completed
                 await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideCompleted", request.id);
+                
+                Console.WriteLine($"Ride {request.id} completed successfully with payment processing");
                 return Ok(new { success = true, message = "Ride completed successfully" });
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Exception in CompleteRide: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }

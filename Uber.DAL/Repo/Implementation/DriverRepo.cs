@@ -146,5 +146,15 @@ namespace Uber.DAL.Repo.Implementation
                 return (false, ex.Message);
             }
         }
+        public (bool, string?) AddBalance(Driver driver, double amount)
+        {
+            try
+            {
+                var result = driver.AddBalance(amount);
+                db.SaveChanges();
+                return result;
+            }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
     }
 }

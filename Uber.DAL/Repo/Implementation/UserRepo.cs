@@ -87,5 +87,16 @@ namespace Uber.DAL.Repo.Impelementation
                 return (false, ex.Message);
             }
         }
+
+        public (bool, string?) AddBalance(User user, double amount)
+        {
+            try
+            {
+                var result = user.AddBalance(amount);
+                db.SaveChanges();
+                return result;
+            }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
     }
 }

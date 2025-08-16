@@ -16,7 +16,8 @@ namespace Uber.DAL.Entities
 
         public int TotalRatingPoints { get; set; } 
         public int TotalRatings { get; set; } 
-        public double Rating() => TotalRatings != 0 ? (double)TotalRatingPoints / TotalRatings : 5; 
+        public double Rating() => TotalRatings != 0 ? (double)TotalRatingPoints / TotalRatings : 5;
+        public string? StripeId { get; set; }
 
         public (bool, string?) AddRating(int rating)
         {
@@ -109,6 +110,14 @@ namespace Uber.DAL.Entities
             }
         }
 
-
+        public (bool, string?) AddBalance(double amount)
+        {
+            try
+            {
+                Balance += amount;
+                return (true, null);
+            }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
     }
 }

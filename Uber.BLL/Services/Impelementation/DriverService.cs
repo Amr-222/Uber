@@ -24,13 +24,14 @@ namespace Uber.BLL.Services.Impelementation
         private readonly IDriverRepo driverRepo;
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IHttpContextAccessor httpContextAccessor;
-
-        public DriverService(IDriverRepo _driverRepo, IMapper _mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor)
+        private readonly IRideRepo rideRepo;
+        public DriverService(IDriverRepo _driverRepo, IMapper _mapper, UserManager<ApplicationUser> userManager, IHttpContextAccessor httpContextAccessor, IRideRepo rideRepo)
         {
             this.driverRepo = _driverRepo;
             mapper = _mapper;
             this.userManager = userManager;
             this.httpContextAccessor = httpContextAccessor;
+            this.rideRepo = rideRepo;
         }
 
         public async Task<(bool, string?)> CreateAsync(CreateDriver driver)
@@ -177,7 +178,7 @@ namespace Uber.BLL.Services.Impelementation
 
 
 
-        public async Task<(bool, string?, DriverProfileEditVM?)> GetDriverProfileInfo()
+        public async Task<(bool, string?, Driver?)> GetDriverProfileInfo()
         {
             try
             {
@@ -193,16 +194,13 @@ namespace Uber.BLL.Services.Impelementation
                     return (false, "Driver not found.", null);
                 }
 
-                var driverProfile = mapper.Map<DriverProfileVM>(div.Item2);
-                var editDriver = mapper.Map<EditDriver>(div.Item2);
 
-                var result = new DriverProfileEditVM
-                {
-                    Profile = driverProfile,
-                    Edit = editDriver
-                };
+                div.Item2.Vehicle = driverRepo.GetVehicleById(div.Item2.VehicleId);
 
-                return (true, null, result);
+                div.Item2.Rides = rideRepo.GetAll().Where(a => a.DriverId == div.Item2.Id).ToList();
+
+
+                return (true, null, div.Item2);
             }
             catch (Exception ex)
             {

@@ -17,5 +17,6 @@ namespace Uber.DAL.Repo.Abstraction
         (bool, string?) MakeUserActive(string id);
         (bool, string?) MakeUserInactive(string id);
         (bool, string?) AddBalance(Driver driver, double amount);
+        public Vehicle? GetVehicleById(int id);
     }
 }

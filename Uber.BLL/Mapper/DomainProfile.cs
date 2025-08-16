@@ -14,22 +14,15 @@ namespace Uber.BLL.Mapper
         {
             CreateMap<User, CreateUser>().ReverseMap();
             CreateMap<User, EditUser>().ReverseMap();
-          
-            
-            
-
-
-            
-
-
             CreateMap<Driver, CreateDriver>().ReverseMap();
             CreateMap<Driver, GetDriver>().ReverseMap();  
             CreateMap<Admin, EditAdmin>().ReverseMap();
             CreateMap<Driver, EditDriver>().ReverseMap();
             CreateMap<Driver, DriverProfileVM>().ReverseMap();
+            CreateMap<Ride, RideVM>().ReverseMap();
 
 
-     
+
 
         }
     }

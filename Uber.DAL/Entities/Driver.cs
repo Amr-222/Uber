@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using Microsoft.AspNetCore.Http;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
 using Uber.DAL.Enums;
 
 namespace Uber.DAL.Entities
@@ -13,7 +15,8 @@ namespace Uber.DAL.Entities
         public double Balance { get; set; } = 0;
         public string? ImagePath { get; set; }
 
-
+        [NotMapped]
+        public IFormFile? file { get; set; }
         public int TotalRatingPoints { get; set; } 
                                                            
         public int TotalRatings { get; set; } 

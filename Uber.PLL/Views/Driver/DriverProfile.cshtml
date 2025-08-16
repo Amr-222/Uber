@@ -1,4 +1,4 @@
-﻿@model Uber.BLL.ModelVM.Driver.DriverProfileEditVM
+﻿@model Uber.DAL.Entities.Driver
 @{
     ViewData["Title"] = "Driver Profile";
 }
@@ -42,23 +42,78 @@
     <main class="content">
         <section id="rides" class="tab-content active">
             <h2>Completed Rides</h2>
-             @if (Model.Rides != null && Model.Rides.Any())
-            {
-                foreach (var ride in Model.Rides)
-                {
-                    <div class="ride-card">
-                        <p><strong>From:</strong> @ride.StartLat,@ride.StartLng</p>
-                        <p><strong>To:</strong> @ride.EndLat,@ride.EndLng</p>
-                        <p><strong>Date & Time:</strong> @ride.CreatedAt.ToString("dd MMM yyyy - HH:mm")</p>
-                        <p><strong>Price:</strong> @ride.Price EGP</p>
-                        <p><strong>Passenger:</strong> @ride.User.Name</p>
-                    </div>
-                } 
-            }
-            else
-            {
-                <p class="empty-msg">No rides yet.</p>
-            }
+
+
+
+            <table id="rideUserprofile" class="display">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Driver</th>
+                        <th>Price</th>
+                        <th>Ride Time</th>
+                        <th>Duration</th>
+                        <th>Distance</th>
+                        <th>Status</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (Model.Rides != null && Model.Rides.Any())
+                    {
+                        @foreach (var ride in Model.Rides)
+                        {
+                            <tr>
+                                <td>@ride.Id</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(ride.Driver.ImagePath))
+                                    {
+                                        <img src="~/Files/@ride.Driver.ImagePath" alt="Driver Image" width="60" height="60" style="border-radius:50%;" />
+                                    }
+                                    else
+                                    {
+                                        <span>No Image</span>
+                                    }
+                                </td>
+                                <td>@ride.Driver.Name</td>
+                                <td>@('$' + ride.Price?.ToString("F2"))</td>
+                                <td>@ride.CreatedAt.ToString()</td>
+                                <td>@(ride.Duration + " Min")</td>
+                                <td>@(ride.Distance + "Km")</td>
+                                <td>
+                                    @if (ride.Status == Uber.DAL.Enums.RideStatus.Rejected || ride.Status == Uber.DAL.Enums.RideStatus.Cancelled)
+                                    {
+                                        <span class="badge bg-danger">@ride.Status</span>
+                                    }
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.InProgress || ride.Status == Uber.DAL.Enums.RideStatus.Pending)
+                                    {
+                                        <span class="badge bg-warning">@ride.Status</span>
+                                    }
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.Completed || ride.Status == Uber.DAL.Enums.RideStatus.Accepted)
+                                    {
+                                        <span class="badge bg-success">@ride.Status</span>
+                                    }
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.DriverWaiting)
+                                    {
+                                        <span class="badge bg-info">@ride.Status</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                    else
+                    {
+                        <p class="empty-msg">No rides yet.</p>
+                    }
+                </tbody>
+            </table>
+
+
+
+
         </section>
 
         <section id="payment" class="tab-content wallet-page">
@@ -68,7 +123,7 @@
                     <span class="wallet-balance-label">Cash balance</span>
                 </div>
                 <div class="wallet-balance">
-                    $@Model.Profile.Balance
+                    $@Model.Balance
                 </div>
                 <div class="wallet-actions">
                     <button class="wallet-btn add">Add Cash</button>
@@ -95,28 +150,31 @@
             <form asp-controller="Driver" asp-action="EditDriver" method="post" enctype="multipart/form-data" class="edit-driver-form" id="driverForm">
                 <div class="form-group">
                     <label>Name</label>
-                    <input asp-for="Name" type="text" class="form-control" required readonly />
+                    <input asp-for="Name" type="text" class="form-control" required  />
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input asp-for="Email" type="email" class="form-control" required readonly />
+                    <input asp-for="Email" type="email" class="form-control"  readonly />
                 </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input asp-for="Phone" type="tel" class="form-control" required pattern="^0(10|11|12|15)\d{8}$" placeholder="01012345678" maxlength="11" readonly />
+                <div class="phone-container">
+                    <div class="phone-prefix">
+                        <img src="https://flagcdn.com/w20/eg.png" alt="Egypt Flag">
+                        +20
+                    </div>
+                    <input asp-for="PhoneNumber" id="phone" class="phone-input" type="tel"
+                           inputmode="numeric"
+                           pattern="^(10|11|12|15)\d{8}$"
+                           placeholder="1012345678" maxlength="10" required>
                 </div>
                 <div class="form-group">
                     <label>Gender</label>
-                    <input type="text" class="form-control" value="@Model.Edit.Gender" readonly />
+                    <input type="text" class="form-control" value="@Model.Gender" readonly />
                 </div>
                 <div class="form-group">
                     <label>Date of Birth</label>
-                    <input asp-for="Dateofbirth" type="date" min="1925-01-01" max="2007-12-31" required readonly />
+                    <input asp-for="DateOfBirth" type="date" min="1925-01-01" max="2007-12-31" required readonly />
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" class="form-control" value="" readonly />
-                </div>
+              
 
                 <h3 style="margin-top: 20px;">Vehicle Info</h3>
 
@@ -168,7 +226,7 @@
                 </div>
                 <div class="form-group">
                     <label>Upload Image</label>
-                    <input asp-for="File" type="file" class="form-control" disabled />
+                    <input asp-for="file" type="file" class="form-control" disabled />
                 </div>
                 <button type="submit" class="btn-save" disabled>Save</button>
             </form>
@@ -625,3 +683,12 @@
             color: #17a38a;
         }
 </style>
+
+            <script>
+    const phoneInput = document.getElementById('phone');
+
+    // Prevent non-digit input
+    phoneInput.addEventListener('input', () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, '');
+    });
+</script>

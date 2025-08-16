@@ -111,18 +111,38 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var ride in Model)
-        {
-            <tr>
+                @foreach (var ride in Model)
+            {
+                <tr>
                 <td>@ride.ID</td>
                 <td>@ride.DriverName</td>
                 <td>@ride.RiderName</td>
-                <td>@ride.Price.ToString("F2")</td>
+
+                <td>@('$' + ride.Price.ToString("F2"))</td>
                 <td>@ride.CreatedAt.ToString()</td>
-                <td>@ride.Duration</td>
-                <td>@ride.Distance</td>
-                <td>@ride.Status</td>
-            </tr>
-        }
+                <td>@(ride.Duration + " Min")</td>
+                <td>@(ride.Distance + "Km")</td>
+                <td>
+                        @if (ride.Status == Uber.DAL.Enums.RideStatus.Rejected || ride.Status == Uber.DAL.Enums.RideStatus.Cancelled)
+                        {
+                            <span class="badge bg-danger">@ride.Status</span>
+                        }
+                        else if (ride.Status == Uber.DAL.Enums.RideStatus.InProgress || ride.Status == Uber.DAL.Enums.RideStatus.Pending)
+                        {
+                            <span class="badge bg-warning">@ride.Status</span>
+                        }
+                        else if (ride.Status == Uber.DAL.Enums.RideStatus.Completed || ride.Status == Uber.DAL.Enums.RideStatus.Accepted)
+                        {
+                            <span class="badge bg-success">@ride.Status</span>
+                        }
+                        else if (ride.Status == Uber.DAL.Enums.RideStatus.DriverWaiting)
+                        {
+                            <span class="badge bg-info">@ride.Status</span>
+                        }
+                    </td>
+                </tr>
+            }
+
+        
     </tbody>
 </table>

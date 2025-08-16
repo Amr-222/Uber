@@ -21,10 +21,14 @@ namespace Uber.BLL.Services.Impelementation
     {
         private readonly IRideRepo rideRepo;
         private readonly IMapper mapper;
-        public RideService(IRideRepo rideRepo, IMapper mapper)
+        private readonly IUserRepo userRepo;
+        private readonly IDriverRepo driverRepo;
+        public RideService(IRideRepo rideRepo, IMapper mapper, IUserRepo userRepo, IDriverRepo driverRepo)
         {
             this.rideRepo = rideRepo;
             this.mapper = mapper;
+            this.userRepo = userRepo;
+            this.driverRepo = driverRepo;
         }
         public (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId,
@@ -89,19 +93,38 @@ namespace Uber.BLL.Services.Impelementation
             return rideRepo.GetByID(id);
         }
 
-      
+
         public List<RideVM> GetAll()
         {
             var result = rideRepo.GetAll();
             var list = new List<RideVM>();
-            foreach (var user in result)
+            string tempDrivName, tempRiderName;
+
+            foreach (var ride in result)
             {
-                list.Add(mapper.Map<RideVM>(user));
+                tempDrivName = driverRepo.GetByID(ride.DriverId).Item2.Name;
+                tempRiderName = userRepo.GetByID(ride.UserId).Item2.Name;
+
+
+
+                list.Add(new RideVM
+                {
+
+                    CreatedAt = ride.CreatedAt,
+                    ID = ride.Id,
+                    DriverName = tempDrivName ?? "No Driver Assigned",
+                    RiderName = tempRiderName ?? "No User Assigned",
+                    Status = ride.Status,
+                    Price = ride.Price ?? 0,
+                    Duration = ride.Duration,
+                    Distance = ride.Distance
+
+                });
             }
             return list;
         }
 
-      
+
 
         public (bool, string?) AssignNewDriver(int rideId, string newDriverId)
         {

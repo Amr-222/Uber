@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Uber.BLL.ModelVM.Ride;
@@ -26,6 +26,13 @@ namespace Uber.PLL.Controllers
     {
         public int RideId { get; set; }
         public int Rating { get; set; }
+    }
+
+    // Model for accept/reject requests
+    public class AcceptRejectRequest
+    {
+        public int id { get; set; }
+        public string rideGroup { get; set; } = string.Empty;
     }
 
     public class RideController : Controller
@@ -80,8 +87,6 @@ namespace Uber.PLL.Controllers
 
                 // 3) Notify the target driver - use a driver-specific group instead of user ID
                 var driverGroup = $"driver-{chosenDriverId}";
-                Console.WriteLine($"Sending ride request to driver group: {driverGroup}");
-                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = StartLat, startLng = StartLng, endLat = EndLat, endLng = EndLng, userId, distance = Distance, duration = Duration, price = Price })}");
 
                 // Get user information for rating display
                 var (userErr, user) = _userService.GetByID(userId);
@@ -110,8 +115,6 @@ namespace Uber.PLL.Controllers
                     price = Price,
                     userRating = Math.Round(userRating, 1)
                 });
-
-                Console.WriteLine($"Ride request sent successfully to driver {chosenDriverId}");
 
                 // 4) Show waiting view (client will connect to hub & join group)
                 return View("WaitingForDriver", ride.Id.ToString());
@@ -159,8 +162,6 @@ namespace Uber.PLL.Controllers
 
                 // 3) Notify the target driver
                 var driverGroup = $"driver-{chosenDriverId}";
-                Console.WriteLine($"Sending ride request to driver group: {driverGroup}");
-                Console.WriteLine($"Ride data: {System.Text.Json.JsonSerializer.Serialize(new { rideId = ride.Id, rideGroup, startLat = request.StartLat, startLng = request.StartLng, endLat = request.EndLat, endLng = request.EndLng, userId, distance = request.Distance, duration = request.Duration, price = request.Price })}");
 
                 // Get user information for rating display
                 var (userErr, user) = _userService.GetByID(userId);
@@ -190,8 +191,6 @@ namespace Uber.PLL.Controllers
                     userRating = Math.Round(userRating, 1)
                 });
 
-                Console.WriteLine($"Ride request sent successfully to driver {chosenDriverId}");
-
                 // 4) Return JSON response with ride ID for the Home page
                 return Ok(new
                 {
@@ -203,7 +202,6 @@ namespace Uber.PLL.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in RequestRide POST: {ex.Message}");
                 return BadRequest(new { message = $"An error occurred: {ex.Message}" });
             }
         }
@@ -215,21 +213,14 @@ namespace Uber.PLL.Controllers
         {
             try
             {
-                Console.WriteLine($"DriverAccept called with: id={request.id}, rideGroup={request.rideGroup}");
-
                 var (ok, err) = _rideService.MarkAccepted(request.id);
                 if (!ok)
                 {
-                    Console.WriteLine($"Failed to mark ride as accepted: {err}");
                     return BadRequest(err ?? "Failed to accept ride");
                 }
 
-                Console.WriteLine($"Ride marked as accepted successfully. Sending notification to group: {request.rideGroup}");
-
                 // Send notification to the ride group
                 await _hub.Clients.Group(request.rideGroup).SendAsync("RideAccepted", request.id);
-
-                Console.WriteLine($"Notification sent successfully to group: {request.rideGroup}");
 
                 var result = _rideService.GetByID(request.id);
                 var rdriver = _driverService.AddBalance(result.Item2.DriverId, (result.Item2.PaymentMethod == 0) ? (double)result.Item2.Price * 0.8 : (double)result.Item2.Price * -0.2);
@@ -238,7 +229,6 @@ namespace Uber.PLL.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in DriverAccept: {ex.Message}");
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }
@@ -434,16 +424,11 @@ namespace Uber.PLL.Controllers
         {
             try
             {
-                Console.WriteLine($"DriverArrived called with ride ID: {request.id}");
-                
                 var (ok, err) = _rideService.MarkDriverWaiting(request.id);
                 if (!ok)
                 {
-                    Console.WriteLine($"Failed to mark driver as arrived: {err}");
                     return BadRequest(err ?? "Failed to mark driver as arrived");
                 }
-
-                Console.WriteLine($"Driver marked as arrived successfully for ride {request.id}");
 
                 // Notify both user and driver that driver has arrived
                 await _hub.Clients.Group($"ride-{request.id}").SendAsync("DriverArrived", request.id);
@@ -451,7 +436,6 @@ namespace Uber.PLL.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception in DriverArrived: {ex.Message}");
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }
@@ -530,26 +514,6 @@ namespace Uber.PLL.Controllers
             }
         }
 
-        // Test method to verify SignalR is working
-        [HttpPost]
-        public async Task<IActionResult> TestSignalR([FromBody] AcceptRejectRequest request)
-        {
-            try
-            {
-                Console.WriteLine($"Testing SignalR for ride {request.id}");
-
-                // Send a test message to the ride group
-                await _hub.Clients.Group($"ride-{request.id}").SendAsync("TestMessage", $"Test message for ride {request.id}");
-
-                Console.WriteLine($"Test message sent successfully");
-                return Ok(new { success = true, message = "Test message sent successfully" });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in TestSignalR: {ex.Message}");
-                return BadRequest($"An error occurred: {ex.Message}");
-            }
-        }
 
         [Authorize]
         public IActionResult WaitingForDriver(int? id = null)

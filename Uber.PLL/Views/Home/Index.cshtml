@@ -307,7 +307,7 @@
                     <span>Distance: <strong id="distanceText">-</strong> km</span>
                     <span>Time: <strong id="durationText">-</strong> min</span>
                 </div>
-                <div class="quote-price"><span id="priceText">-</span> EGP</div>
+                <div class="quote-price"><span id="priceText">-</span> £</div>
             </div>
             <div style="margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 6px; border-left: 3px solid #1CB5A3;">
                 <small style="color: #6c757d;">
@@ -688,7 +688,7 @@
             try {
                 // Try to make a request to a protected endpoint to check authentication
                 const response = await fetch('/Ride/RequestRide', {
-                    method: 'Get', 
+                    method: 'GET', 
                     credentials: 'same-origin'
                 });
                 
@@ -730,8 +730,10 @@
             });
 
             // Initialize payment method display for default selection (Wallet)
-            const defaultPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
-            updatePaymentMethodDisplay(defaultPaymentMethod);
+            const defaultPaymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+            if (defaultPaymentMethod) {
+                updatePaymentMethodDisplay(defaultPaymentMethod.value);
+            }
         });
 
         // Function to update payment method display

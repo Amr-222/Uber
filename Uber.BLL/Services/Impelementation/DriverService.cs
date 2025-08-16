@@ -126,6 +126,30 @@ namespace Uber.BLL.Services.Impelementation
             return driverRepo.GetByID(id);
         }
 
+
+
+        public (bool, string?) EditProfile(ProfileVM driver)
+        {
+            try
+            {
+                var result = driverRepo.GetByID(driver.Id);
+                var existingDriver = result.Item2;
+                if (existingDriver == null)
+                {
+                    return (false, "Driver not found");
+                }
+                mapper.Map(driver, existingDriver);
+
+                driverRepo.Edit(existingDriver);
+
+                return (true, null);
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
+
         public (bool, string?) Edit(EditDriver driver)
         {
             try

@@ -21,7 +21,7 @@ namespace Uber.BLL.Services.Abstraction
         //object SendRequest(GetDriver getDriver, string id);
         public (string?, EditDriver?) GetByIDToEdit(string id);
         public List<EditDriver> GetAll();
-
+        public (bool, string?) EditProfile(ProfileVM driver);
         public (bool, string?) Edit(EditDriver driv);
 
         public Task<(bool, string?, Driver?)> GetDriverProfileInfo();

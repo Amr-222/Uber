@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Uber.DAL.Entities;
+using Uber.DAL.Enums;
 
 namespace Uber.BLL.ModelVM.Driver
 {
@@ -15,6 +16,7 @@ namespace Uber.BLL.ModelVM.Driver
         public DateTime DateOfBirth { get; set; }
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
+        public Gender Gender { get; set; }
 
         public IFormFile? File { get; set; }
         public string? ImagePath { get;  set; }

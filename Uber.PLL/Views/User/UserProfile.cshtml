@@ -1,4 +1,4 @@
-﻿@model Uber.BLL.ModelVM.User.UserProfileVM
+﻿@model Uber.BLL.ModelVM.User.UserProfileEditVM
 @{
     ViewData["Title"] = "User Profile";
 }
@@ -9,7 +9,7 @@
             <div class="icon-placeholder">
                 <img src="~/Files/UserIcon.jpg" alt="User Icon" class="user-icon" />
             </div>
-            <h3>@Model.Name</h3>
+            <h3>@Model.Profile.Name</h3>
         </div>
 
         <ul>
@@ -29,7 +29,7 @@
         <section id="rides" class="tab-content active">
             <div class="page-title">Rides Management</div>
 
-			<h2>Your Rides</h2>
+            <h2>Your Rides</h2>
 
             <table id="rideUserprofile" class="display">
                 <thead class="thead-dark">
@@ -47,29 +47,29 @@
                 </thead>
                 <tbody>
 
-                    @if (Model.Rides != null && Model.Rides.Any())
+                    @if (Model.Profile.Rides != null && Model.Profile.Rides.Any())
                     {
-                    @foreach (var ride in Model.Rides)
-                    {
-                        <tr>
-                            <td>@ride.Id</td>
-                            <td>
-                                @if (!string.IsNullOrEmpty(ride.Driver.ImagePath))
-                                {
+                        @foreach (var ride in Model.Profile.Rides)
+                        {
+                            <tr>
+                                <td>@ride.Id</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(ride.Driver.ImagePath))
+                                    {
                                         <img src="~/Files/@ride.Driver.ImagePath" alt="Driver Image" width="60" height="60" style="border-radius:50%;" />
-                                }
-                                else
-                                {
-                                    <span>No Image</span>
-                                }
+                                    }
+                                    else
+                                    {
+                                        <span>No Image</span>
+                                    }
                                 </td>
-                            <td>@ride.Driver.Name</td>
-                            <td>@('$'+ride.Price?.ToString("F2"))</td>
-                            <td>@ride.CreatedAt.ToString()</td>
-                            <td>@(ride.Duration+" Min")</td>
+                                <td>@ride.Driver.Name</td>
+                                <td>@('$' + ride.Price?.ToString("F2"))</td>
+                                <td>@ride.CreatedAt.ToString()</td>
+                                <td>@(ride.Duration + " Min")</td>
                                 <td>@(ride.Distance + "Km")</td>
-                            <td>
-                                    @if (ride.Status == Uber.DAL.Enums.RideStatus.Rejected || ride.Status == Uber.DAL.Enums.RideStatus.Cancelled )
+                                <td>
+                                    @if (ride.Status == Uber.DAL.Enums.RideStatus.Rejected || ride.Status == Uber.DAL.Enums.RideStatus.Cancelled)
                                     {
                                         <span class="badge bg-danger">@ride.Status</span>
                                     }
@@ -86,17 +86,17 @@
                                         <span class="badge bg-info">@ride.Status</span>
                                     }
                                 </td>
-                        </tr>
-                    }
+                            </tr>
+                        }
 
                     }
                     else
                     {
-                    <p class="empty-msg">No rides yet.</p>
+                        <p class="empty-msg">No rides yet.</p>
                     }
                 </tbody>
-            </table>             
-               
+            </table>
+
         </section>
 
 
@@ -108,7 +108,7 @@
                     <span class="wallet-balance-label">Cash balance</span>
                 </div>
                 <div class="wallet-balance">
-                    $@Model.Balance
+                    $@Model.Profile.Balance
                 </div>
                 <div class="wallet-actions">
                     <button class="wallet-btn add">Add Cash</button>
@@ -120,7 +120,7 @@
         <section id="help" class="tab-content">
             <div class="help-container">
                 <header class="help-header">
-                    <h1>🚖 Help & Support</h1>
+                    <h1> Help & Support</h1>
                     <p>Quick tips to help you get started and use our app effectively.</p>
                 </header>
 
@@ -155,16 +155,40 @@
 
                 <section class="help-section contact-section">
                     <h2>Need More Help?</h2>
-                    <p>Contact our support team anytime.</p>
-                    <a href="mailto:support@uberclone.com" class="btn-contact">Contact Support</a>
+                    <p>Contact our support team anytime:</p>
+                    <p class="contact-text">
+                        <a href="mailto:amrahmed24555@gmail.com">amrahmed24555@gmail.com</a>
+                    </p>
                 </section>
             </div>
         </section>
 
-        <!-- Settings Tab -->
+
         <section id="settings" class="tab-content">
             <h2>Settings</h2>
-            <a href="#" class="btn-update">Update Profile</a>
+            <form asp-controller="User" asp-action="EditUser" method="post" class="settings-form">
+                <label>Name</label>
+                <input asp-for="Profile.Name" type="text" />
+
+                <label>Email</label>
+                <input asp-for="Email" type="email" readonly />
+
+                <div class="phone-container">
+                    <div class="phone-prefix">
+                        <img src="https://flagcdn.com/w20/eg.png" alt="Egypt Flag">
+                        +20
+                    </div>
+                    <input asp-for="PhoneNumber" id="phone" class="phone-input" type="tel"
+                           inputmode="numeric"
+                           pattern="^(10|11|12|15)\d{8}$"
+                           placeholder="1012345678" maxlength="10" required>
+                </div>
+
+                <label>Date of Birth</label>
+                <input asp-for="DateOfBirth" type="date" min="1925-01-01" max="2007-12-31" />
+
+                <button type="submit" class="btn-update">Update Profile</button>
+            </form>
         </section>
     </main>
 </div>
@@ -429,6 +453,27 @@
                 margin-bottom: 8px;
             }
 
+    .contact-section p.contact-text {
+        font-size: 16px;
+        color: #1CB5A3;
+        text-align: center;
+        margin-top: 15px;
+    }
+
+        .contact-section p.contact-text a {
+            text-decoration: none;
+            color: #1CB5A3;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+            .contact-section p.contact-text a:hover {
+                color: #17a38a;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+
+
     .contact-section .btn-contact {
         display: inline-block;
         padding: 10px 20px;
@@ -442,4 +487,55 @@
         .contact-section .btn-contact:hover {
             background: #17a38a;
         }
+
+    .settings-form {
+        display: flex;
+        flex-direction: column;
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 30px;
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+
+        .settings-form label {
+            margin-top: 15px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .settings-form input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        .settings-form .btn-update {
+            margin-top: 25px;
+            padding: 15px;
+            font-size: 16px;
+            background-color: #1CB5A3;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+            .settings-form .btn-update:hover {
+                background-color: #17a38a;
+            }
 </style>
+
+
+
+<script>
+    const phoneInput = document.getElementById('phone');
+
+    // Prevent non-digit input
+    phoneInput.addEventListener('input', () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, '');
+    });
+</script>

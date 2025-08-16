@@ -127,7 +127,6 @@ namespace Uber.BLL.Services.Impelementation
                 }
                 var us = userRepo.GetByID(user.Id);
 
-                // Manual mapping instead of AutoMapper
                 var userProfile = new UserProfileVM
                 {
                     Name = us.Item2.Name,

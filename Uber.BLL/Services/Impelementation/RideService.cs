@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,14 @@ namespace Uber.BLL.Services.Impelementation
     {
         private readonly IRideRepo rideRepo;
         private readonly IMapper mapper;
-        public RideService(IRideRepo rideRepo, IMapper mapper)
+        private readonly IUserRepo userRepo;
+        private readonly IDriverRepo driverRepo;
+        public RideService(IRideRepo rideRepo, IMapper mapper, IUserRepo userRepo, IDriverRepo driverRepo)
         {
             this.rideRepo = rideRepo;
             this.mapper = mapper;
+            this.userRepo = userRepo;
+            this.driverRepo = driverRepo;
         }
         public (bool, string?, Ride?) CreatePendingRide(
         string userId, string driverId,
@@ -43,9 +48,9 @@ namespace Uber.BLL.Services.Impelementation
                     EndLat = endLat,
                     EndLng = endLng,
                     Status = RideStatus.Pending,
-                    Duration = Duration,  // Will be calculated later
-                    Distance = Distance,  // Will be calculated later
-                    Price = Price      // Will be calculated later
+                    Duration = Duration,
+                    Distance = Distance,
+                    Price = Price       
                 };
                 var (ok, err) = rideRepo.Create(ride);
                 return (ok, err, ok ? ride : null);
@@ -93,9 +98,28 @@ namespace Uber.BLL.Services.Impelementation
         {
             var result = rideRepo.GetAll();
             var list = new List<RideVM>();
-            foreach (var user in result)
+            string tempDrivName,tempRiderName;
+
+            foreach (var ride in result)
             {
-                list.Add(mapper.Map<RideVM>(user));
+                tempDrivName=driverRepo.GetByID(ride.DriverId).Item2.Name;
+                tempRiderName=userRepo.GetByID(ride.UserId).Item2.Name;
+
+
+
+                list.Add(new RideVM
+                {
+
+                    CreatedAt=ride.CreatedAt,
+                    ID = ride.Id,
+                    DriverName = tempDrivName ?? "No Driver Assigned",
+                    RiderName = tempRiderName ?? "No User Assigned",
+                    Status = ride.Status,
+                    Price = ride.Price ?? 0,
+                    Duration = ride.Duration,
+                    Distance = ride.Distance
+
+                });
             }
             return list;
         }

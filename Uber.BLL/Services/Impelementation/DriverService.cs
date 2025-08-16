@@ -135,7 +135,8 @@ namespace Uber.BLL.Services.Impelementation
                 {
                     return (false, "Driver not found");
                 }
-              
+                mapper.Map(driver, existingDriver);
+
                 driverRepo.Edit(existingDriver);
 
                 return (true, null);
@@ -176,7 +177,7 @@ namespace Uber.BLL.Services.Impelementation
 
 
 
-        public async Task<(bool, string?, DriverProfileVM?)> GetDriverProfileInfo()
+        public async Task<(bool, string?, DriverProfileEditVM?)> GetDriverProfileInfo()
         {
             try
             {
@@ -185,13 +186,23 @@ namespace Uber.BLL.Services.Impelementation
                 {
                     return (false, "Driver not found or not logged in.", null);
                 }
-                var div=driverRepo.GetByID(driver.Id);
+                var div = driverRepo.GetByID(driver.Id);
 
+                if (div.Item1 != null || div.Item2 == null)
+                {
+                    return (false, "Driver not found.", null);
+                }
 
                 var driverProfile = mapper.Map<DriverProfileVM>(div.Item2);
+                var editDriver = mapper.Map<EditDriver>(div.Item2);
 
+                var result = new DriverProfileEditVM
+                {
+                    Profile = driverProfile,
+                    Edit = editDriver
+                };
 
-                return (true, null, driverProfile);
+                return (true, null, result);
             }
             catch (Exception ex)
             {

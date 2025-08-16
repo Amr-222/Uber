@@ -229,6 +229,43 @@ namespace Uber.PLL.Controllers
             return View(result.Item3);
         }
 
+        [Authorize(Roles = "Driver")]
+        [HttpPost]
+        public async Task<IActionResult> EditDriver(EditDriver model)
+        {
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    // Get current user ID
+                    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userId))
+                    {
+                        return Unauthorized("User not authenticated");
+                    }
 
+                    model.Id = userId;
+
+                    var result = service.Edit(model);
+                    if (result.Item1)
+                    {
+                        TempData["SuccessMessage"] = "Profile updated successfully!";
+                        return RedirectToAction("DriverProfile");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", result.Item2 ?? "An error occurred while updating the profile");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+            }
+
+            // If we get here, there was an error, so reload the profile
+            var profileResult = await service.GetDriverProfileInfo();
+            return View("DriverProfile", profileResult.Item3);
+        }
     }
 }

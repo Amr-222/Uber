@@ -80,11 +80,14 @@ namespace Uber.PLL.Controllers
 
         }
 
+
         [HttpGet]
         public IActionResult RequestRide()
         {
             return View();
         }
+
+
         [Authorize(Roles = "User")]
         [HttpGet]
         public async Task<IActionResult> UserProfile()
@@ -114,6 +117,58 @@ namespace Uber.PLL.Controllers
 
 
 
+
+
+
+
+        [Authorize(Roles = "User")]
+        [HttpPost]
+        public async Task<IActionResult> EditUser(UserProfileEditVM model)
+        {
+            try
+            {
+                if (model!=null)
+                {
+                    // Get current user ID
+                    var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userId))
+                    {
+                        return Unauthorized("User not authenticated");
+                    }
+
+                    EditUser us = new EditUser
+                    {
+                        Name = model.Profile.Name,
+                        DateOfBirth = model.DateOfBirth,
+                        Email=model.Email,
+                        PhoneNumber = model.PhoneNumber
+                    };
+                    us.Id = userId;
+
+                    var result = service.Edit(us);
+                    if (result.Item1)
+                    {
+                        TempData["SuccessMessage"] = "Profile updated successfully!";
+                        return RedirectToAction("UserProfile");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", result.Item2 ?? "An error occurred while updating the profile");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+            }
+
+            // If we get here, there was an error, so reload the profile
+            var profileResult = await service.GetProfileInfo();
+            return View("UserProfile", profileResult.Item3);
+        }
+
+
+
         //[HttpPost]
         /*public IActionResult RequestRide(double StartLat, double StartLng, double EndLat, double EndLng, string Id)
         {
@@ -126,5 +181,7 @@ namespace Uber.PLL.Controllers
                 var res = driverService.SendRequest(result.Item3[index++], Id);
             }
         }*/
+
+
     }
 }

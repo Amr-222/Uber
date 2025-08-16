@@ -105,7 +105,7 @@ namespace Uber.PLL.Controllers
                 var result = await service.GetProfileInfo();
                 if (result.Item3 != null)
                 {
-                    return Json(new { balance = result.Item3.Balance });
+                    return Json(new { balance = result.Item3.Profile.Balance });
                 }
                 return Json(new { balance = 0 });
             }

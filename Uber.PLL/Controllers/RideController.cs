@@ -50,14 +50,13 @@ namespace Uber.PLL.Controllers
             _userService = userService;
         }
 
-        [Authorize] // user must be logged in
+        [Authorize] 
         [HttpGet]
         public async Task<IActionResult> RequestRide(double StartLat, double StartLng, double EndLat, double EndLng,
             double Distance, double Duration, double Price)
         {
             try
             {
-                // 1) find nearest driver (you already have GetNearestDriver)
                 var nearest = _driverService.GetNearestDriver(StartLat, StartLng);
                 if (!nearest.Item1 || nearest.Item3 == null || !nearest.Item3.Any())
                 {
@@ -70,7 +69,6 @@ namespace Uber.PLL.Controllers
                     return View("NoDrivers");
                 }
 
-                // 2) create pending ride in DB
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -126,7 +124,7 @@ namespace Uber.PLL.Controllers
             }
         }
 
-        [Authorize] // user must be logged in
+        [Authorize] 
         [HttpPost]
         public async Task<IActionResult> RequestRide([FromBody] RideRequestModel request)
         {

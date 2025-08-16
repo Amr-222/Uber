@@ -25,7 +25,7 @@ namespace Uber.BLL.Services.Impelementation
                     {
                         PriceData = new SessionLineItemPriceDataOptions
                         {
-                            Currency = "usd",
+                            Currency = "egp",
                             UnitAmount = amount,
                             ProductData = new SessionLineItemPriceDataProductDataOptions
                             {

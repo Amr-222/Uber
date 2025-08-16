@@ -156,7 +156,12 @@ namespace Uber.PLL.Controllers
 
             if (result.Succeeded)
             {
-                if (User.IsInRole("User"))
+                if(_userManager.Users.FirstOrDefault().IsDeleted == true)
+                {
+                    ViewBag.LoginError = "Account was deleted";
+                    return View(model);
+                }
+                else if (User.IsInRole("User"))
                     return RedirectToAction("Index", "Home");
                 else if (User.IsInRole("Driver"))
                     return RedirectToAction("Dashboard", "Driver");

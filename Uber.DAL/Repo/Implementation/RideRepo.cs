@@ -20,12 +20,13 @@ namespace Uber.DAL.Repo.Implementation
             this.db = db;
         }
 
-        public (bool, string?) Create(Ride ride)
+        public (bool, string?) Create(Ride ride, bool create = true)
         {
             try
             {
                 db.Rides.Add(ride);
-                db.SaveChanges();
+                if (create)
+                    db.SaveChanges();
                 return (true, null);
             }
             catch (Exception ex)

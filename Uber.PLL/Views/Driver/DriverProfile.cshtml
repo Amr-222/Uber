@@ -116,6 +116,7 @@
 
         </section>
 
+
         <section id="payment" class="tab-content wallet-page">
             <h1 class="wallet-title">💳 Wallet</h1>
             <div class="wallet-card big">
@@ -126,8 +127,7 @@
                     $@Model.Balance
                 </div>
                 <div class="wallet-actions">
-                    <button class="wallet-btn add">Add Cash</button>
-                    <button class="wallet-btn cashout">Cash Out</button>
+                    <a asp-controller="Payment" asp-action="Index" class="wallet-btn add">Add Cash</a>
                 </div>
             </div>
         </section>

@@ -47,9 +47,9 @@ namespace Uber.BLL.Services.Impelementation
                     EndLat = endLat,
                     EndLng = endLng,
                     Status = RideStatus.Pending,
-                    Duration = Duration,  // Will be calculated later
-                    Distance = Distance,  // Will be calculated later
-                    Price = Price,      // Will be calculated later
+                    Duration = Duration,
+                    Distance = Distance,
+                    Price = Price,      
                     PaymentMethod = Enum.Parse<PaymentMethod>(paymentMethod)
                 };
                 var (ok, err) = rideRepo.Create(ride);

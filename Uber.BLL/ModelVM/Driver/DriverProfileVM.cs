@@ -17,7 +17,7 @@ namespace Uber.BLL.ModelVM.Driver
         public string? ImagePath { get; set; }
         public IFormFile file { get; set; }
         public string PaymentMethod { get; set; }
-        
+        public EditDriver Edit { get; set; }
 
     }
 }

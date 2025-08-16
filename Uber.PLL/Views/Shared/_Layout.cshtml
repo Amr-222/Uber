@@ -42,7 +42,14 @@
             $('#Rides').DataTable();
         } );
     </script>
+    <script>
+            $(document).ready( function () {
+            $('#rideUserprofile').DataTable();
+        } );
+    </script>
 
+
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

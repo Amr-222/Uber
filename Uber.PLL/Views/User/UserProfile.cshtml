@@ -27,22 +27,76 @@
 
     <main class="content">
         <section id="rides" class="tab-content active">
-            <h2>Your Rides</h2>
-            @if (Model.Rides != null && Model.Rides.Any())
-            {
-                foreach (var ride in Model.Rides)
-                {
-                    <div class="ride-card">
-                        <p><strong>From:</strong> @ride.StartLat @ride.StartLng</p>
-                        <p><strong>To:</strong> @ride.EndLat @ride.EndLng</p>
-                    </div>
-                }
-            }
-            else
-            {
-                <p class="empty-msg">No rides yet.</p>
-            }
+            <div class="page-title">Rides Management</div>
+
+			<h2>Your Rides</h2>
+
+            <table id="rideUserprofile" class="display">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>Driver</th>
+                        <th>Price</th>
+                        <th>Ride Time</th>
+                        <th>Duration</th>
+                        <th>Distance</th>
+                        <th>Status</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @if (Model.Rides != null && Model.Rides.Any())
+                    {
+                    @foreach (var ride in Model.Rides)
+                    {
+                        <tr>
+                            <td>@ride.Id</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(ride.Driver.ImagePath))
+                                {
+                                        <img src="~/Files/@ride.Driver.ImagePath" alt="Driver Image" width="60" height="60" style="border-radius:50%;" />
+                                }
+                                else
+                                {
+                                    <span>No Image</span>
+                                }
+                                </td>
+                            <td>@ride.Driver.Name</td>
+                            <td>@('$'+ride.Price?.ToString("F2"))</td>
+                            <td>@ride.CreatedAt.ToString()</td>
+                            <td>@ride.Duration</td>
+                                <td>@(ride.Distance + "Km")</td>
+                            <td>
+                                @if(ride.Status==Uber.DAL.Enums.RideStatus.Rejected)
+                                    {
+                                        <span class="badge bg-danger">ride.Status</span>
+                                    }
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.InProgress)
+                                    {
+                                        <span class="badge bg-warning">ride.Status</span>
+                                    }
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.)
+                                    {
+                                        <span class="badge bg-warning">ride.Status</span>
+                                    }
+
+                                    @ride.Status</td>
+                        </tr>
+                    }
+
+                    }
+                    else
+                    {
+                    <p class="empty-msg">No rides yet.</p>
+                    }
+                </tbody>
+            </table>             
+               
         </section>
+
+
 
         <section id="payment" class="tab-content wallet-page">
             <h1 class="wallet-title">💳 Wallet</h1>

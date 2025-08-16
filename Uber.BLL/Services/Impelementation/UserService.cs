@@ -17,14 +17,16 @@ namespace Uber.BLL.Services.Impelementation
         private readonly UserManager<ApplicationUser> userManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IRideRepo rideRepo;
+        private readonly IDriverRepo driverRepo;
 
-        public UserService(IUserRepo _userRepo, IMapper _mapper, UserManager<ApplicationUser> _userManager, IHttpContextAccessor _httpContextAccessor, IRideRepo rideRepo)
+        public UserService(IUserRepo _userRepo, IMapper _mapper, UserManager<ApplicationUser> _userManager, IHttpContextAccessor _httpContextAccessor, IRideRepo rideRepo,IDriverRepo driverRepo)
         {
             userRepo = _userRepo;
             mapper = _mapper;
             userManager = _userManager;
             httpContextAccessor = _httpContextAccessor;
             this.rideRepo = rideRepo;
+            this.driverRepo = driverRepo;
         }
 
         public async Task<(bool, string?)> CreateAsync(CreateUser user)
@@ -87,8 +89,6 @@ namespace Uber.BLL.Services.Impelementation
                 if (existingUser == null)
                     return (false, "User not found");
 
-                //existingUser.Edit(user.Name, user.DateOfBirth,user.Email,user.PhoneNumber);
-
                 userRepo.Edit(existingUser);
 
                 return (true, null);
@@ -139,7 +139,11 @@ namespace Uber.BLL.Services.Impelementation
 
                 userProfile.Rides = rideRepo.GetAll().Where(a => a.UserId != null && a.UserId == userProfile.Id).ToList();
 
+                foreach(var ride in userProfile.Rides)
+                {
+                    ride.Driver = driverRepo.GetByID(ride.DriverId).Item2;
 
+                }
 
         
 

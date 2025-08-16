@@ -28,7 +28,7 @@ namespace Uber.BLL.Mapper
             CreateMap<Driver, EditDriver>().ReverseMap();
             CreateMap<Driver, DriverProfileVM>().ReverseMap();
 
-
+            CreateMap<Ride, RideVM>().ReverseMap();
      
 
         }

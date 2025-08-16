@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Uber.DAL.DataBase;
 
@@ -11,9 +12,11 @@ using Uber.DAL.DataBase;
 namespace Uber.DAL.Migrations
 {
     [DbContext(typeof(UberDBContext))]
-    partial class UberDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250815220559_StripeIdInApplicationUser")]
+    partial class StripeIdInApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,6 +221,9 @@ namespace Uber.DAL.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("StripeId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
@@ -367,9 +373,6 @@ namespace Uber.DAL.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("StripeId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("TotalRatingPoints")
                         .HasColumnType("int");
 
@@ -394,9 +397,6 @@ namespace Uber.DAL.Migrations
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("StripeId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("TotalRatingPoints")
                         .HasColumnType("int");
 
@@ -410,9 +410,6 @@ namespace Uber.DAL.Migrations
 
                             t.Property("ModifiedAt")
                                 .HasColumnName("User_ModifiedAt");
-
-                            t.Property("StripeId")
-                                .HasColumnName("User_StripeId");
 
                             t.Property("TotalRatingPoints")
                                 .HasColumnName("User_TotalRatingPoints");

@@ -319,12 +319,9 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
-
-       
-
-
-      
-
-
+        public string? GetRideById(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

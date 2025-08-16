@@ -10,9 +10,10 @@ namespace Uber.BLL.ModelVM.Driver
 {
      public class DriverProfileVM
     {
-        public double Balance { get; set; }
         public string Name { get; set; }
         public List<Uber.DAL.Entities.Ride> Rides { get; set; }
+        public double Balance { get; set; }
+        public string Id { get; set; }
         public string? ImagePath { get; set; }
         public IFormFile file { get; set; }
         public string PaymentMethod { get; set; }

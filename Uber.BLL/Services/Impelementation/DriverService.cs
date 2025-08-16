@@ -210,6 +210,21 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
+        public (bool, string?) AddBalance(string id, double amount)
+        {
+            try
+            {
+                var result = driverRepo.GetByID(id);
+                var user = result.Item2;
+                if (user == null)
+                {
+                    return (false, "User Not Found");
+                }
+                return driverRepo.AddBalance(user, amount);
+            }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
+
         //public Task<(bool, string?, DriverProfileVM?)> GetProfileInfo()
         //{
         //    throw new NotImplementedException();

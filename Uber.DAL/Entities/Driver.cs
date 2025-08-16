@@ -67,6 +67,7 @@ namespace Uber.DAL.Entities
         public List<Ride> Rides { get; set; }
         public int VehicleId { get; set; }
         public Vehicle Vehicle { get; set; }
+        public string? StripeId { get; set; }
         public (bool, string?) Delete()
         {
             try
@@ -138,6 +139,14 @@ namespace Uber.DAL.Entities
 
         }
 
-
+        public (bool, string?) AddBalance(double amount)
+        {
+            try
+            {
+                Balance += amount;
+                return (true, null);
+            }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
     }
 }

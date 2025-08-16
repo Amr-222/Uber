@@ -3,6 +3,13 @@
     ViewData["Title"] = "Driver Profile";
 }
 
+@if (TempData["PaymentMessage"] != null)
+{
+    <script>
+        alert('@TempData["PaymentMessage"]');
+    </script>
+}
+
 <div class="profile-container">
     <aside class="sidebar">
         <div class="user-info">
@@ -32,7 +39,7 @@
     <main class="content">
         <section id="rides" class="tab-content active">
             <h2>Completed Rides</h2>
-            @if (Model.Rides != null && Model.Rides.Any())
+             @if (Model.Rides != null && Model.Rides.Any())
             {
                 foreach (var ride in Model.Rides)
                 {
@@ -43,7 +50,7 @@
                         <p><strong>Price:</strong> @ride.Price EGP</p>
                         <p><strong>Passenger:</strong> @ride.User.Name</p>
                     </div>
-                }
+                } 
             }
             else
             {

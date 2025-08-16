@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Stripe.Tax;
 using System.Linq;
 using Uber.BLL.Helper;
 using Uber.BLL.ModelVM.User;
@@ -171,6 +172,19 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
-
+        public (bool, string?) AddBalance(string id, double amount)
+        {
+            try
+            {
+                var result = userRepo.GetByID(id);
+                var user = result.Item2;
+                if (user == null)
+                {
+                    return (false, "User Not Found");
+                }
+                return userRepo.AddBalance(user, amount);
+            }
+            catch (Exception ex) { return (false, ex.Message); }
+        }
     }
 }

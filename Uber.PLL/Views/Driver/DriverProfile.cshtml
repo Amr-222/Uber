@@ -28,12 +28,12 @@
 
         <ul>
             <li data-tab="rides" class="active">Completed Rides</li>
-            <li data-tab="payment">💳 Earnings</li>
-            <li data-tab="help">❓ Help</li>
-            <li data-tab="settings">⚙ Settings</li>
+            <li data-tab="payment"> Earnings</li>
+            <li data-tab="help"> Help</li>
+            <li data-tab="settings"> Settings</li>
             <li class="logout">
                 <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
-                    <button type="submit" class="sidebar-btn">🚪 Logout</button>
+                    <button type="submit" class="sidebar-btn"> Logout</button>
                 </form>
             </li>
         </ul>
@@ -43,41 +43,24 @@
         <section id="rides" class="tab-content active">
             <h2>Completed Rides</h2>
 
-
-
             <table id="rideUserprofile" class="display">
                 <thead class="thead-dark">
                     <tr>
                         <th>ID</th>
-                        <th>Image</th>
-                        <th>Driver</th>
                         <th>Price</th>
                         <th>Ride Time</th>
                         <th>Duration</th>
                         <th>Distance</th>
                         <th>Status</th>
-
                     </tr>
                 </thead>
                 <tbody>
-
                     @if (Model.Rides != null && Model.Rides.Any())
                     {
                         @foreach (var ride in Model.Rides)
                         {
                             <tr>
-                                <td>@ride.Id</td>
-                                <td>
-                                    @if (!string.IsNullOrEmpty(ride.Driver.ImagePath))
-                                    {
-                                        <img src="~/Files/@ride.Driver.ImagePath" alt="Driver Image" width="60" height="60" style="border-radius:50%;" />
-                                    }
-                                    else
-                                    {
-                                        <span>No Image</span>
-                                    }
-                                </td>
-                                <td>@ride.Driver.Name</td>
+                                <td>@ride.Id</td>                              
                                 <td>@('$' + ride.Price?.ToString("F2"))</td>
                                 <td>@ride.CreatedAt.ToString()</td>
                                 <td>@(ride.Duration + " Min")</td>
@@ -102,7 +85,6 @@
                                 </td>
                             </tr>
                         }
-
                     }
                     else
                     {
@@ -110,15 +92,10 @@
                     }
                 </tbody>
             </table>
-
-
-
-
         </section>
 
-
         <section id="payment" class="tab-content wallet-page">
-            <h1 class="wallet-title">💳 Wallet</h1>
+            <h1 class="wallet-title"> Wallet</h1>
             <div class="wallet-card big">
                 <div class="wallet-header">
                     <span class="wallet-balance-label">Cash balance</span>
@@ -142,19 +119,14 @@
                 </div>
             }
 
-            <div class="edit-controls">
-                <button type="button" id="editBtn" class="btn-edit">Edit Profile</button>
-                <button type="button" id="cancelBtn" class="btn-cancel" style="display: none;">Cancel</button>
-            </div>
-
             <form asp-controller="Driver" asp-action="EditDriver" method="post" enctype="multipart/form-data" class="edit-driver-form" id="driverForm">
                 <div class="form-group">
                     <label>Name</label>
-                    <input asp-for="Name" type="text" class="form-control" required  />
+                    <input asp-for="Name" type="text" class="form-control" required />
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input asp-for="Email" type="email" class="form-control"  readonly />
+                    <input asp-for="Email" type="email" class="form-control" readonly />
                 </div>
                 <div class="phone-container">
                     <div class="phone-prefix">
@@ -174,33 +146,32 @@
                     <label>Date of Birth</label>
                     <input asp-for="DateOfBirth" type="date" min="1925-01-01" max="2007-12-31" required readonly />
                 </div>
-              
 
                 <h3 style="margin-top: 20px;">Vehicle Info</h3>
 
                 <div class="form-group">
                     <label>Brand</label>
-                    <input asp-for="Vehicle.Brand" type="text" class="form-control" required readonly />
+                    <input asp-for="Vehicle.Brand" type="text" class="form-control" required />
                 </div>
                 <div class="form-group">
                     <label>Model</label>
-                    <input asp-for="Vehicle.Model" type="text" class="form-control" required readonly />
+                    <input asp-for="Vehicle.Model" type="text" class="form-control" required />
                 </div>
                 <div class="form-group">
                     <label>Year</label>
-                    <input asp-for="Vehicle.YearMade" type="number" min="2008" max="2025" class="form-control" required readonly />
+                    <input asp-for="Vehicle.YearMade" type="number" min="2008" max="2025" class="form-control" required />
                 </div>
                 <div class="form-group">
                     <label>Plate</label>
-                    <input asp-for="Vehicle.Plate" type="text" class="form-control" required readonly />
+                    <input asp-for="Vehicle.Plate" type="text" class="form-control" required />
                 </div>
                 <div class="form-group">
                     <label>Color</label>
-                    <input asp-for="Vehicle.Color" type="text" class="form-control" required readonly />
+                    <input asp-for="Vehicle.Color" type="text" class="form-control" required />
                 </div>
                 <div class="form-group">
                     <label>Seating Capacity</label>
-                    <input asp-for="Vehicle.SeatingCapacity" type="number" min="1" max="14" class="form-control" required readonly />
+                    <input asp-for="Vehicle.SeatingCapacity" type="number" min="1" max="14" class="form-control" required />
                 </div>
                 <div class="form-group">
                     <label>Vehicle Type</label>
@@ -224,15 +195,15 @@
                         <label><input asp-for="Vehicle.VehicleEngine" type="radio" value="Electric" /> Electric</label>
                     </div>
                 </div>
-              
-                <button type="submit" class="btn-save" disabled>Save</button>
+
+                <button type="submit" class="btn-save">Save</button>
             </form>
         </section>
 
         <section id="help" class="tab-content">
             <div class="help-container">
                 <header class="help-header">
-                    <h1>🚖 Help & Support</h1>
+                    <h1> Help & Support</h1>
                     <p>Quick tips to help you get started and use our app effectively.</p>
                 </header>
 
@@ -290,46 +261,9 @@
             document.getElementById(tabId).classList.add("active");
         });
     });
-
-    let isEditMode = false;
-    let originalValues = {};
-    const editBtn = document.getElementById('editBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const form = document.getElementById('driverForm');
-
-    editBtn.addEventListener('click', function() {
-        if (!isEditMode) {
-            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"]');
-            inputs.forEach(input => originalValues[input.name] = input.value);
-            if (confirm('Are you sure you want to edit your profile?')) {
-                inputs.forEach(input => input.readOnly = false);
-                document.querySelector('input[type="file"]').disabled = false;
-                document.querySelector('.btn-save').disabled = false;
-                editBtn.style.display = 'none';
-                cancelBtn.style.display = 'inline-block';
-                isEditMode = true;
-            }
-        }
-    });
-    cancelBtn.addEventListener('click', function() {
-        if (isEditMode) {
-            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"]');
-            inputs.forEach(input => {
-                input.value = originalValues[input.name];
-                input.readOnly = true;
-            });
-            document.querySelector('input[type="file"]').disabled = true;
-            document.querySelector('.btn-save').disabled = true;
-            editBtn.style.display = 'inline-block';
-            cancelBtn.style.display = 'none';
-            isEditMode = false;
-        }
-    });
-
-    form.addEventListener('submit', function(e) {
-        if (isEditMode && !confirm('Are you sure you want to save these changes?')) {
-            e.preventDefault();
-        }
+    const phoneInput = document.getElementById('phone');
+    phoneInput.addEventListener('input', () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, '');
     });
 </script>
 
@@ -411,8 +345,7 @@
             text-align: left;
         }
 
-            .sidebar ul li:hover,
-            .sidebar ul li.active {
+            .sidebar ul li:hover, .sidebar ul li.active {
                 background: #1CB5A3;
             }
 
@@ -520,7 +453,6 @@
             background: rgba(255,255,255,0.3);
         }
 
-
     .edit-driver-form .form-group {
         margin-bottom: 15px;
     }
@@ -531,12 +463,7 @@
         font-weight: 600;
     }
 
-    .edit-driver-form input[type="text"],
-    .edit-driver-form input[type="email"],
-    .edit-driver-form input[type="password"],
-    .edit-driver-form input[type="number"],
-    .edit-driver-form input[type="date"],
-    .edit-driver-form input[type="file"] {
+    .edit-driver-form input[type="text"], .edit-driver-form input[type="email"], .edit-driver-form input[type="password"], .edit-driver-form input[type="number"], .edit-driver-form input[type="date"], .edit-driver-form input[type="file"] {
         width: 100%;
         padding: 10px;
         border-radius: 8px;
@@ -564,45 +491,6 @@
         .btn-save:hover {
             background: #17a38a;
         }
-
-    .edit-controls {
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .btn-edit, .btn-cancel {
-        padding: 10px 20px;
-        margin: 0 10px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: 0.3s;
-    }
-
-    .btn-edit {
-        background: #1CB5A3;
-        color: #fff;
-    }
-
-        .btn-edit:hover {
-            background: #17a38a;
-        }
-
-    .btn-cancel {
-        background: #dc3545;
-        color: #fff;
-    }
-
-        .btn-cancel:hover {
-            background: #c82333;
-        }
-
-    .edit-driver-form input[readonly],
-    .edit-driver-form input[disabled] {
-        background-color: #f8f9fa;
-        cursor: not-allowed;
-    }
 
     .help-container {
         max-width: 800px;
@@ -646,7 +534,6 @@
         text-align: left;
     }
 
-
     .help-section {
         margin-bottom: 25px;
     }
@@ -657,13 +544,11 @@
             margin-bottom: 10px;
         }
 
-        .help-section p,
-        .help-section ul {
+        .help-section p, .help-section ul {
             font-size: 16px;
             color: #333;
             line-height: 1.6;
         }
-
 
             .help-section ul li {
                 margin-bottom: 8px;
@@ -680,12 +565,3 @@
             color: #17a38a;
         }
 </style>
-
-            <script>
-    const phoneInput = document.getElementById('phone');
-
-    // Prevent non-digit input
-    phoneInput.addEventListener('input', () => {
-        phoneInput.value = phoneInput.value.replace(/\D/g, '');
-    });
-</script>

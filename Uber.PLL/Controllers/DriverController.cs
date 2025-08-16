@@ -231,7 +231,7 @@ namespace Uber.PLL.Controllers
 
         [Authorize(Roles = "Driver")]
         [HttpPost]
-        public async Task<IActionResult> EditDriver(EditDriver model)
+        public async Task<IActionResult> EditDriver(ProfileVM model)
         {
             try
             {
@@ -246,7 +246,7 @@ namespace Uber.PLL.Controllers
 
                     model.Id = userId;
 
-                    var result = service.Edit(model);
+                    var result = service.EditProfile(model);
                     if (result.Item1)
                     {
                         TempData["SuccessMessage"] = "Profile updated successfully!";

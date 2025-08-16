@@ -364,7 +364,7 @@
 
 <div class="header">
     <div class="header-content">
-        <h1>🚗 Uber Admin Dashboard</h1>
+        <h1> Uber Admin Dashboard</h1>
         <div class="header-nav">
             <a asp-controller="Admin" asp-action="AdminDashBoard">Dashboard</a>
             <a asp-controller="Admin" asp-action="Admin_Drivers">Drivers</a>
@@ -377,7 +377,7 @@
 
 <div class="details-container">
     <div class="details-header">
-        <h2>🚗 Ride Details</h2>
+        <h2> Ride Details</h2>
         <p>Comprehensive information about ride #@Model.Id</p>
     </div>
 
@@ -385,20 +385,20 @@
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success">
-                ✅ @TempData["SuccessMessage"]
+                 @TempData["SuccessMessage"]
             </div>
         }
 
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="alert alert-danger">
-                ❌ @TempData["ErrorMessage"]
+                 @TempData["ErrorMessage"]
             </div>
         }
 
         <div class="details-grid">
             <div class="detail-section">
-                <h3>📊 Ride Information</h3>
+                <h3> Ride Information</h3>
                 <div class="detail-item">
                     <span class="detail-label">Ride ID:</span>
                     <span class="detail-value">#@Model.Id</span>
@@ -445,16 +445,7 @@
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Rating:</span>
-                    <span class="detail-value">
-                        @* @if (Model.Rate.HasValue)
-                        {
-                            <span style="color: #f39c12; font-weight: 600;">@Model.Rate/5 ⭐</span>
-                        }
-                        else
-                        {
-                            <span style="color: #6c757d; font-style: italic;">No rating</span>
-                        } *@
-                    </span>
+                    <span class="detail-value"></span>
                 </div>
             </div>
 
@@ -483,15 +474,15 @@
             </div>
 
             <div class="detail-section">
-                <h3>📍 Locations</h3>
+                <h3> Locations</h3>
                 <div class="location-card location pickup">
-                    <div class="location-icon">📍</div>
+                    <div class="location-icon"></div>
                     <div class="location-label">Pickup Location</div>
                     <div class="location-coords">@Model.StartLat.ToString("F6"), @Model.StartLng.ToString("F6")</div>
                     <div style="color: #6c757d; font-size: 12px;">Start coordinates</div>
                 </div>
                 <div class="location-card location dropoff">
-                    <div class="location-icon">🎯</div>
+                    <div class="location-icon"></div>
                     <div class="location-label">Drop-off Location</div>
                     <div class="location-coords">@Model.EndLat.ToString("F6"), @Model.EndLng.ToString("F6")</div>
                     <div style="color: #6c757d; font-size: 12px;">End coordinates</div>
@@ -501,14 +492,14 @@
 
         <div class="actions">
             <a asp-controller="Admin" asp-action="Admin_Rides" class="btn btn-secondary">
-                ↩️ Back to Rides
+                 Back to Rides
             </a>
             @if (Model.Status == Uber.DAL.Enums.RideStatus.Pending || Model.Status == Uber.DAL.Enums.RideStatus.Accepted)
             {
                 <form method="post" action="@Url.Action("CancelRide", "Admin")" style="display: inline;">
                     <input type="hidden" name="id" value="@Model.Id" />
                     <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this ride?')">
-                        ❌ Cancel Ride
+                         Cancel Ride
                     </button>
                 </form>
             }
@@ -519,9 +510,7 @@
 @functions {
     private double CalculateFare(double startLat, double startLng, double endLat, double endLng)
     {
-        // Simple distance calculation using Haversine formula
-        const double R = 6371; // Earth's radius in kilometers
-        
+        const double R = 6371;
         var lat1 = startLat * Math.PI / 180;
         var lat2 = endLat * Math.PI / 180;
         var deltaLat = (endLat - startLat) * Math.PI / 180;
@@ -533,8 +522,6 @@
         
         var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
         var distance = R * c;
-        
-        // Base fare: $2.50 + $1.50 per km
         return 2.50 + (distance * 1.50);
     }
 }

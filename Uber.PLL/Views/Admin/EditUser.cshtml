@@ -342,7 +342,7 @@
 
 <div class="header">
     <div class="header-content">
-        <h1>🚗 Uber Admin Dashboard</h1>
+        <h1> Uber Admin Dashboard</h1>
         <div class="header-nav">
             <a asp-controller="Admin" asp-action="AdminDashBoard">Dashboard</a>
             <a asp-controller="Admin" asp-action="Admin_Drivers">Drivers</a>
@@ -355,7 +355,7 @@
 
 <div class="edit-container">
     <div class="edit-header">
-        <h2>✏️ Edit Rider</h2>
+        <h2> Edit Rider</h2>
         <p>Update information for @Model.Name</p>
     </div>
 
@@ -363,14 +363,14 @@
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success">
-                ✅ @TempData["SuccessMessage"]
+                 @TempData["SuccessMessage"]
             </div>
         }
 
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="alert alert-danger">
-                ❌ @TempData["ErrorMessage"]
+                 @TempData["ErrorMessage"]
             </div>
         }
 
@@ -422,7 +422,7 @@
             </div>
 
             <div class="form-section">
-                <h3>📊 Account Information</h3>
+                <h3> Account Information</h3>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -450,7 +450,7 @@
             </div>
 
             <div class="form-section">
-                <h3>🔄 Account Status</h3>
+                <h3> Account Status</h3>
                 
                 <div class="status-toggle">
                     <div class="toggle-switch @(Model.IsDeleted ? "" : "active")" onclick="toggleStatus()">
@@ -463,34 +463,33 @@
 
             <div class="actions">
                 <a asp-controller="Admin" asp-action="Admin_Riders" class="btn btn-secondary">
-                    ↩️ Back to Riders
+                     Back to Riders
                 </a>
                 
                 <button type="submit" class="btn btn-primary">
-                    💾 Save Changes
+                     Save Changes
                 </button>
                 
                 <button type="button" class="btn btn-danger" onclick="deleteUser('@Model.Id', '@Model.Name')">
-                    🗑️ Delete Rider
+                     Delete Rider
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
     <div style="background-color: white; margin: 15% auto; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3);">
-        <h3 style="color: #dc3545; margin-bottom: 20px;">⚠️ Confirm Deletion</h3>
+        <h3 style="color: #dc3545; margin-bottom: 20px;"> Confirm Deletion</h3>
         <p style="margin-bottom: 25px; color: #495057;">Are you sure you want to delete rider <strong id="riderNameToDelete"></strong>?</p>
         <p style="margin-bottom: 25px; color: #6c757d; font-size: 14px;">This action cannot be undone and will remove all associated data.</p>
         
         <form id="deleteForm" method="post" action="@Url.Action("DeleteUser", "Admin")" style="display: inline;">
             <input type="hidden" id="userIdToDelete" name="id" />
-            <button type="submit" class="btn btn-danger" style="margin-right: 10px;">🗑️ Delete Rider</button>
+            <button type="submit" class="btn btn-danger" style="margin-right: 10px;"> Delete Rider</button>
         </form>
         
-        <button onclick="closeModal('deleteModal')" class="btn" style="background: #6c757d; color: white;">❌ Cancel</button>
+        <button onclick="closeModal('deleteModal')" class="btn" style="background: #6c757d; color: white;"> Cancel</button>
     </div>
 </div>
 
@@ -521,15 +520,12 @@
         document.getElementById(modalId).style.display = 'none';
     }
 
-    // Close modal when clicking outside
     window.onclick = function(event) {
         const modal = document.getElementById('deleteModal');
         if (event.target === modal) {
             modal.style.display = 'none';
         }
     }
-
-    // Auto-hide alerts after 5 seconds
     setTimeout(function() {
         const alerts = document.querySelectorAll('.alert');
         alerts.forEach(alert => {

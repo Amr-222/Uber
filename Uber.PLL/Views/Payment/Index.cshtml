@@ -6,7 +6,7 @@
 
 <p>Use these buttons to test different payment actions.</p>
 
-<form asp-action="Checkout" method="post">
+<form asp-action="Checkout" method="post" class="payment-form">
     <label>Amount to Checkout ($): </label>
     <input type="number" name="amount" step="0.01" value="50.00" required />
     <button type="submit" class="btn btn-primary">Start Checkout</button>
@@ -14,3 +14,66 @@
 
 <hr />
 
+<style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f9f9f9;
+        color: #333;
+        padding: 30px;
+    }
+
+    h1 {
+        color: #0d6efd;
+        margin-bottom: 15px;
+    }
+
+    p {
+        font-size: 16px;
+        margin-bottom: 25px;
+    }
+
+    .payment-form {
+        background-color: #fff;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        max-width: 400px;
+    }
+
+    .payment-form label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .payment-form input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+
+    .payment-form button {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        background-color: #0d6efd;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .payment-form button:hover {
+        background-color: #0b5ed7;
+    }
+
+    hr {
+        margin: 40px 0;
+        border: 0;
+        border-top: 1px solid #ccc;
+    }
+</style>

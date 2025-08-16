@@ -57,7 +57,7 @@
 
 <h2>Driver Dashboard</h2>
 <div style="margin-bottom: 20px; padding: 15px; background-color: #e8f5e8; border-radius: 8px; border-left: 4px solid #28a745;">
-    <h4 style="color: #28a745; margin: 0 0 10px 0;">🚗 Driver Status</h4>
+    <h4 style="color: #28a745; margin: 0 0 10px 0;"> Driver Status</h4>
     <div style="display: flex; align-items: center; gap: 15px;">
         <div>
             <strong>Current Status:</strong>
@@ -166,11 +166,11 @@
         rideDiv.style.cssText = "border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 15px; background-color: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.1);";
 
         rideDiv.innerHTML = `
-            <h4 style="color: #007bff; margin-bottom: 15px;">🚗 New Ride Request</h4>
+            <h4 style="color: #007bff; margin-bottom: 15px;"> New Ride Request</h4>
             <div style="margin-bottom: 15px;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #007bff;">
-                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">📏 Distance</p>
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;"> Distance</p>
                         <p style="margin: 0; font-size: 18px; color: #007bff;">${(ride.distance && ride.distance > 0) ? ride.distance.toFixed(1) + ' km' : 'N/A'}</p>
                     </div>
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #28a745;">
@@ -180,7 +180,7 @@
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #ffc107;">
-                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">💰 Price</p>
+                        <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;"> Price</p>
                         <p style="margin: 0; font-size: 18px; color: #ffc107;">${(ride.price && ride.price > 0) ? '£' + ride.price.toFixed(2) : 'N/A'}</p>
                     </div>
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #6f42c1;">
@@ -193,11 +193,11 @@
             <div style="display: flex; gap: 10px;">
                 <button onclick="acceptRide('${ride.rideId}', '${ride.rideGroup}')"
                         style="background-color: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    ✅ Accept Ride
+                     Accept Ride
                 </button>
                 <button onclick="rejectRide('${ride.rideId}', '${ride.rideGroup}')"
                         style="background-color: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    ❌ Reject Ride
+                     Reject Ride
                 </button>
             </div>
         `;
@@ -216,7 +216,7 @@
                 })
             });
             if (response.ok) {
-                document.getElementById("rideRequests").innerHTML = "<div style='color: green; padding: 20px; text-align: center;'><h3>✅ Ride Accepted!</h3><p>Redirecting to ride details...</p></div>";
+                document.getElementById("rideRequests").innerHTML = "<div style='color: green; padding: 20px; text-align: center;'><h3>Ride Accepted!</h3><p>Redirecting to ride details...</p></div>";
                 setTimeout(() => {
                     window.location.href = `/Ride/RideDetails/${rideId}`;
                 }, 2000);
@@ -261,7 +261,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         initializeConnection();
         startHeartbeat();
-        // addLogEntry('📡 Fetching current driver status...');
         getCurrentDriverStatus();
     });
     async function setDriverActive() {
@@ -400,7 +399,6 @@
             }
         }, 30000);
     }
-
     function stopHeartbeat() {
         if (heartbeatInterval) {
             clearInterval(heartbeatInterval);

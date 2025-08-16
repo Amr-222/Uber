@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Uber.BLL.Services.Abstraction;
-using Uber.BLL.ModelVM.Driver;
-using Uber.DAL.Entities;
-using Uber.BLL.ModelVM.User;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Uber.BLL.ModelVM.Admin;
+using Uber.BLL.ModelVM.Driver;
+using Uber.BLL.ModelVM.User;
+using Uber.BLL.Services.Abstraction;
+using Uber.DAL.Entities;
 
 namespace Uber.PLL.Controllers
 {
@@ -20,16 +21,18 @@ namespace Uber.PLL.Controllers
             _userService = userService;
             _adminService = adminService;
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult AdminDashBoard()
         {
             return View();
         }
+        [Authorize(Roles = "Admin")]
         public IActionResult Admin_Drivers()
         {
             var drivers = _driverService.GetAll();
             return View(drivers);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult EditDriver(string id)
         {
@@ -40,6 +43,7 @@ namespace Uber.PLL.Controllers
             return View(driver.Item2);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult EditDriver(EditDriver driver)
         {
@@ -51,6 +55,7 @@ namespace Uber.PLL.Controllers
             return View(driver);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult DeleteDriver(string id)
         {
@@ -63,6 +68,7 @@ namespace Uber.PLL.Controllers
             return View(users);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult EditRider(string id)
         {
@@ -73,6 +79,7 @@ namespace Uber.PLL.Controllers
             return View("EditUser", user.Item2);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult EditRider(EditUser user)
         {
@@ -84,6 +91,7 @@ namespace Uber.PLL.Controllers
             return View(user);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult DeleteRider(string id)
         {
@@ -91,17 +99,14 @@ namespace Uber.PLL.Controllers
             return RedirectToAction("Admin_Riders");
         }
 
-
-
-
-
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Admin_Admins()
         {
             var admins = _adminService.GetAll();
             return View(admins);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult EditAdmin(string id)
         {
@@ -112,6 +117,7 @@ namespace Uber.PLL.Controllers
             return View("EditAdmin", admin.Item2); // Make The EditAdmin VIEW
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult EditAdmin(EditAdmin admin)
         {
@@ -123,6 +129,7 @@ namespace Uber.PLL.Controllers
             return View(admin);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public IActionResult DeleteAdmin(string id)
         {
@@ -130,20 +137,11 @@ namespace Uber.PLL.Controllers
             return RedirectToAction("Admin_Admins");
         }
 
-
-
-
-
+        [Authorize(Roles = "Admin")]
         public IActionResult Admin_Rides()
         {
             var rides = _rideService.GetAll();
             return View(rides);
         }
-
-    
-
-
-
-
     }
 }

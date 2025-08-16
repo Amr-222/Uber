@@ -66,23 +66,26 @@
                             <td>@ride.Driver.Name</td>
                             <td>@('$'+ride.Price?.ToString("F2"))</td>
                             <td>@ride.CreatedAt.ToString()</td>
-                            <td>@ride.Duration</td>
+                            <td>@(ride.Duration+" Min")</td>
                                 <td>@(ride.Distance + "Km")</td>
                             <td>
-                                @if(ride.Status==Uber.DAL.Enums.RideStatus.Rejected)
+                                    @if (ride.Status == Uber.DAL.Enums.RideStatus.Rejected || ride.Status == Uber.DAL.Enums.RideStatus.Cancelled )
                                     {
-                                        <span class="badge bg-danger">ride.Status</span>
+                                        <span class="badge bg-danger">@ride.Status</span>
                                     }
-                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.InProgress)
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.InProgress || ride.Status == Uber.DAL.Enums.RideStatus.Pending)
                                     {
-                                        <span class="badge bg-warning">ride.Status</span>
+                                        <span class="badge bg-warning">@ride.Status</span>
                                     }
-                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.)
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.Completed || ride.Status == Uber.DAL.Enums.RideStatus.Accepted)
                                     {
-                                        <span class="badge bg-warning">ride.Status</span>
+                                        <span class="badge bg-success">@ride.Status</span>
                                     }
-
-                                    @ride.Status</td>
+                                    else if (ride.Status == Uber.DAL.Enums.RideStatus.DriverWaiting)
+                                    {
+                                        <span class="badge bg-info">@ride.Status</span>
+                                    }
+                                </td>
                         </tr>
                     }
 

@@ -10,7 +10,7 @@ namespace Uber.DAL.Repo.Abstraction
 {
     public interface IRideRepo
     {
-        public (bool, string?) Create(Ride ride);
+        public (bool, string?) Create(Ride ride, bool create = true);
         public (bool, string?) Cancel(int id);
         public (string, Ride?) GetByID(int id);
         public List<Ride> GetAll();

@@ -34,7 +34,7 @@ namespace Uber.BLL.Services.Impelementation
         string userId, string driverId,
         double startLat, double startLng,
         double endLat, double endLng,
-        double Distance, double Duration, double Price, string paymentMethod)
+        double Distance, double Duration, double Price, string paymentMethod, bool create = true)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace Uber.BLL.Services.Impelementation
                     Price = Price,      
                     PaymentMethod = Enum.Parse<PaymentMethod>(paymentMethod)
                 };
-                var (ok, err) = rideRepo.Create(ride);
+                var (ok, err) = rideRepo.Create(ride, create);
                 return (ok, err, ok ? ride : null);
             }
             catch (Exception ex) { return (false, ex.Message, null); }
@@ -143,14 +143,12 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                // Get the ride first to check its current status
                 var (err, ride) = rideRepo.GetByID(id);
                 if (err != null || ride == null)
                 {
                     return (false, "Ride not found");
                 }
 
-                // Only allow status change if ride is currently DriverWaiting
                 if (ride.Status != RideStatus.DriverWaiting)
                 {
                     return (false, $"Cannot start ride. Ride is currently in {ride.Status} status. Expected: DriverWaiting");
@@ -169,14 +167,12 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                // Get the ride first to check its current status
                 var (err, ride) = rideRepo.GetByID(id);
                 if (err != null || ride == null)
                 {
                     return (false, "Ride not found");
                 }
 
-                // Only allow status change if ride is currently InProgress
                 if (ride.Status != RideStatus.InProgress)
                 {
                     return (false, $"Cannot complete ride. Ride is currently in {ride.Status} status. Expected: InProgress");
@@ -195,14 +191,12 @@ namespace Uber.BLL.Services.Impelementation
         {
             try
             {
-                // Get the ride first to check its current status
                 var (err, ride) = rideRepo.GetByID(id);
                 if (err != null || ride == null)
                 {
                     return (false, "Ride not found");
                 }
 
-                // Only allow status change if ride is currently Accepted
                 if (ride.Status != RideStatus.Accepted)
                 {
                     return (false, $"Cannot mark driver as arrived. Ride is currently in {ride.Status} status. Expected: Accepted");
@@ -249,7 +243,6 @@ namespace Uber.BLL.Services.Impelementation
 
                 Console.WriteLine($"Rating added to user successfully. New total: {ride.User.TotalRatingPoints}/{ride.User.TotalRatings}");
 
-                // Update the user in the database
                 var (updateOk, updateErr) = rideRepo.UpdateUserRating(rideId, ride.User);
                 if (!updateOk)
                 {
@@ -319,86 +312,86 @@ namespace Uber.BLL.Services.Impelementation
             }
         }
 
-        public (bool, string?) ProcessPayment(int rideId)
-        {
-            try
-            {
-                Console.WriteLine($"ProcessPayment called with rideId: {rideId}");
+        //public (bool, string?) ProcessPayment(int rideId)
+        //{
+        //    try
+        //    {
+        //        Console.WriteLine($"ProcessPayment called with rideId: {rideId}");
                 
-                var (err, ride) = GetByID(rideId);
-                if (err != null || ride == null)
-                {
-                    Console.WriteLine($"Ride not found: {err}");
-                    return (false, "Ride not found");
-                }
+        //        var (err, ride) = GetByID(rideId);
+        //        if (err != null || ride == null)
+        //        {
+        //            Console.WriteLine($"Ride not found: {err}");
+        //            return (false, "Ride not found");
+        //        }
 
-                if (ride.Price == null || ride.Price <= 0)
-                {
-                    Console.WriteLine($"Invalid ride price: {ride.Price}");
-                    return (false, "Invalid ride price");
-                }
+        //        if (ride.Price == null || ride.Price <= 0)
+        //        {
+        //            Console.WriteLine($"Invalid ride price: {ride.Price}");
+        //            return (false, "Invalid ride price");
+        //        }
 
-                var ridePrice = ride.Price.Value;
-                Console.WriteLine($"Processing payment for ride {rideId} with price {ridePrice} using {ride.PaymentMethod}");
+        //        var ridePrice = ride.Price.Value;
+        //        Console.WriteLine($"Processing payment for ride {rideId} with price {ridePrice} using {ride.PaymentMethod}");
 
-                if (ride.PaymentMethod == PaymentMethod.Cash)
-                {
-                    // Cash payment: deduct 0.2 × (ride price) from driver's balance
-                    var deductionAmount = 0.2 * ridePrice;
-                    var (deductOk, deductErr) = ride.Driver.AddBalance(-deductionAmount);
-                    if (!deductOk)
-                    {
-                        Console.WriteLine($"Failed to deduct from driver balance: {deductErr}");
-                        return (false, deductErr);
-                    }
-                    Console.WriteLine($"Deducted {deductionAmount} from driver balance. New balance: {ride.Driver.Balance}");
-                }
-                else if (ride.PaymentMethod == PaymentMethod.Wallet)
-                {
-                    // Wallet payment: subtract ride price from user's wallet, add 0.8 × ride price to driver
-                    var (deductOk, deductErr) = ride.User.AddBalance(-ridePrice);
-                    if (!deductOk)
-                    {
-                        Console.WriteLine($"Failed to deduct from user wallet: {deductErr}");
-                        return (false, deductErr);
-                    }
+        //        if (ride.PaymentMethod == PaymentMethod.Cash)
+        //        {
+        //            // Cash payment: deduct 0.2 × (ride price) from driver's balance
+        //            var deductionAmount = 0.2 * ridePrice;
+        //            var (deductOk, deductErr) = ride.Driver.AddBalance(-deductionAmount);
+        //            if (!deductOk)
+        //            {
+        //                Console.WriteLine($"Failed to deduct from driver balance: {deductErr}");
+        //                return (false, deductErr);
+        //            }
+        //            Console.WriteLine($"Deducted {deductionAmount} from driver balance. New balance: {ride.Driver.Balance}");
+        //        }
+        //        else if (ride.PaymentMethod == PaymentMethod.Wallet)
+        //        {
+        //            // Wallet payment: subtract ride price from user's wallet, add 0.8 × ride price to driver
+        //            var (deductOk, deductErr) = ride.User.AddBalance(-ridePrice);
+        //            if (!deductOk)
+        //            {
+        //                Console.WriteLine($"Failed to deduct from user wallet: {deductErr}");
+        //                return (false, deductErr);
+        //            }
 
-                    var driverEarning = 0.8 * ridePrice;
-                    var (addOk, addErr) = ride.Driver.AddBalance(driverEarning);
-                    if (!addOk)
-                    {
-                        Console.WriteLine($"Failed to add to driver balance: {addErr}");
-                        return (false, addErr);
-                    }
+        //            var driverEarning = 0.8 * ridePrice;
+        //            var (addOk, addErr) = ride.Driver.AddBalance(driverEarning);
+        //            if (!addOk)
+        //            {
+        //                Console.WriteLine($"Failed to add to driver balance: {addErr}");
+        //                return (false, addErr);
+        //            }
 
-                    Console.WriteLine($"Deducted {ridePrice} from user wallet. New user balance: {ride.User.Balance}");
-                    Console.WriteLine($"Added {driverEarning} to driver balance. New driver balance: {ride.Driver.Balance}");
-                }
+        //            Console.WriteLine($"Deducted {ridePrice} from user wallet. New user balance: {ride.User.Balance}");
+        //            Console.WriteLine($"Added {driverEarning} to driver balance. New driver balance: {ride.Driver.Balance}");
+        //        }
 
-                // Update both user and driver in the database
-                var (updateUserOk, updateUserErr) = rideRepo.UpdateUserBalance(rideId, ride.User);
-                if (!updateUserOk)
-                {
-                    Console.WriteLine($"Failed to update user balance in database: {updateUserErr}");
-                    return (false, updateUserErr);
-                }
+        //        // Update both user and driver in the database
+        //        var (updateUserOk, updateUserErr) = rideRepo.UpdateUserBalance(rideId, ride.User);
+        //        if (!updateUserOk)
+        //        {
+        //            Console.WriteLine($"Failed to update user balance in database: {updateUserErr}");
+        //            return (false, updateUserErr);
+        //        }
 
-                var (updateDriverOk, updateDriverErr) = rideRepo.UpdateDriverBalance(rideId, ride.Driver);
-                if (!updateDriverOk)
-                {
-                    Console.WriteLine($"Failed to update driver balance in database: {updateDriverErr}");
-                    return (false, updateDriverErr);
-                }
+        //        var (updateDriverOk, updateDriverErr) = rideRepo.UpdateDriverBalance(rideId, ride.Driver);
+        //        if (!updateDriverOk)
+        //        {
+        //            Console.WriteLine($"Failed to update driver balance in database: {updateDriverErr}");
+        //            return (false, updateDriverErr);
+        //        }
 
-                Console.WriteLine($"Payment processed successfully for ride {rideId}");
-                return (true, null);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception in ProcessPayment: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                return (false, ex.Message);
-            }
-        }
+        //        Console.WriteLine($"Payment processed successfully for ride {rideId}");
+        //        return (true, null);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Exception in ProcessPayment: {ex.Message}");
+        //        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        //        return (false, ex.Message);
+        //    }
+        //}
     }
 }

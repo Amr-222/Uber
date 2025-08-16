@@ -9,31 +9,6 @@ using System;
 
 namespace Uber.PLL.Controllers
 {
-    public class RideRequestModel
-    {
-        public double StartLat { get; set; }
-        public double StartLng { get; set; }
-        public double EndLat { get; set; }
-        public double EndLng { get; set; }
-        public double Distance { get; set; }
-        public double Duration { get; set; }
-        public double Price { get; set; }
-        public string PaymentMethod { get; set; } = "Wallet";
-    }
-
-    // Model for rating requests
-    public class RatingRequest
-    {
-        public int RideId { get; set; }
-        public int Rating { get; set; }
-    }
-
-    // Model for accept/reject requests
-    public class AcceptRejectRequest
-    {
-        public int id { get; set; }
-        public string rideGroup { get; set; } = string.Empty;
-    }
 
     public class RideController : Controller
     {
@@ -75,7 +50,7 @@ namespace Uber.PLL.Controllers
                     return Unauthorized("User not authenticated");
                 }
 
-                var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, StartLat, StartLng, EndLat, EndLng, Distance, Duration, Price, "Wallet");
+                var (ok, err, ride) = _rideService.CreatePendingRide(userId, chosenDriverId, StartLat, StartLng, EndLat, EndLng, Distance, Duration, Price, "Wallet", false);
                 if (!ok || ride == null)
                 {
                     return BadRequest(err ?? "Failed to create ride");
@@ -83,7 +58,7 @@ namespace Uber.PLL.Controllers
 
                 var rideGroup = $"ride-{ride.Id}";
 
-                // 3) Notify the target driver - use a driver-specific group instead of user ID
+                
                 var driverGroup = $"driver-{chosenDriverId}";
 
                 // Get user information for rating display

@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Payment Test";
+}
+
+<h1>Payment Test Page</h1>
+
+<p>Use these buttons to test different payment actions.</p>
+
+<form asp-action="Checkout" method="post">
+    <label>Amount to Checkout ($): </label>
+    <input type="number" name="amount" step="0.01" value="50.00" required />
+    <button type="submit" class="btn btn-primary">Start Checkout</button>
+</form>
+
+<hr />
+

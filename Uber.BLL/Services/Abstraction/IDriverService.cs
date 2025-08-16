@@ -25,5 +25,6 @@ namespace Uber.BLL.Services.Abstraction
         public (bool, string?) Edit(EditDriver driv);
 
         public Task<(bool, string?, DriverProfileEditVM?)> GetDriverProfileInfo();
+        public (bool, string?) AddBalance(string id, double amount);
     }
 }

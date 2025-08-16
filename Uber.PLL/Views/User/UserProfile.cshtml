@@ -3,6 +3,13 @@
     ViewData["Title"] = "User Profile";
 }
 
+@if (TempData["PaymentMessage"] != null)
+{
+    <script>
+        alert('@TempData["PaymentMessage"]');
+    </script>
+}
+
 <div class="profile-container">
     <aside class="sidebar">
         <div class="user-info">
@@ -111,7 +118,7 @@
                     $@Model.Profile.Balance
                 </div>
                 <div class="wallet-actions">
-                    <button class="wallet-btn add">Add Cash</button>
+                    <a asp-controller="Payment" asp-action="Index" class="wallet-btn add">Add Cash</a>
                     <button class="wallet-btn cashout">Cash Out</button>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-﻿@model Uber.BLL.ModelVM.Driver.DriverProfileVM
+﻿@model Uber.BLL.ModelVM.Driver.DriverProfileEditVM
 @{
     ViewData["Title"] = "Driver Profile";
 }
@@ -20,12 +20,15 @@
         </div>
 
         <ul>
-            <li data-tab="rides" class="active">🚗 Completed Rides</li>
+            <li data-tab="rides" class="active">Completed Rides</li>
             <li data-tab="payment">💳 Earnings</li>
-            <li>
-                <a href="/Home/Help" style="color: inherit; text-decoration: none;">❓ Help</a>
-            </li>
+            <li data-tab="help">❓ Help</li>
             <li data-tab="settings">⚙ Settings</li>
+            <li class="logout">
+                <form asp-controller="Account" asp-action="Logout" method="post" style="margin:0;">
+                    <button type="submit" class="sidebar-btn">🚪 Logout</button>
+                </form>
+            </li>
         </ul>
     </aside>
 
@@ -51,14 +54,163 @@
             }
         </section>
 
-        <section id="payment" class="tab-content">
-            <h2>Total Earnings</h2>
-            <p><strong>@Model.Balance</strong> EGP</p>
+        <section id="payment" class="tab-content wallet-page">
+            <h1 class="wallet-title">💳 Wallet</h1>
+            <div class="wallet-card big">
+                <div class="wallet-header">
+                    <span class="wallet-balance-label">Cash balance</span>
+                </div>
+                <div class="wallet-balance">
+                    $@Model.Profile.Balance
+                </div>
+                <div class="wallet-actions">
+                    <button class="wallet-btn add">Add Cash</button>
+                    <button class="wallet-btn cashout">Cash Out</button>
+                </div>
+            </div>
         </section>
 
         <section id="settings" class="tab-content">
-            <h2>Settings</h2>
-            <a href="#" class="btn-update">Update Profile</a>
+            <h2 style="text-align:center; margin-bottom: 20px;">Profile</h2>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" style="text-align: center; margin-bottom: 20px; padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 5px;">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <div class="edit-controls">
+                <button type="button" id="editBtn" class="btn-edit">Edit Profile</button>
+                <button type="button" id="cancelBtn" class="btn-cancel" style="display: none;">Cancel</button>
+            </div>
+
+            <form asp-controller="Driver" asp-action="EditDriver" method="post" enctype="multipart/form-data" class="edit-driver-form" id="driverForm">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input asp-for="Name" type="text" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input asp-for="Email" type="email" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input asp-for="Phone" type="tel" class="form-control" required pattern="^0(10|11|12|15)\d{8}$" placeholder="01012345678" maxlength="11" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <input type="text" class="form-control" value="@Model.Edit.Gender" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input asp-for="Dateofbirth" type="date" min="1925-01-01" max="2007-12-31" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" value="" readonly />
+                </div>
+
+                <h3 style="margin-top: 20px;">Vehicle Info</h3>
+
+                <div class="form-group">
+                    <label>Brand</label>
+                    <input asp-for="Vehicle.Brand" type="text" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Model</label>
+                    <input asp-for="Vehicle.Model" type="text" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Year</label>
+                    <input asp-for="Vehicle.YearMade" type="number" min="2008" max="2025" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Plate</label>
+                    <input asp-for="Vehicle.Plate" type="text" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Color</label>
+                    <input asp-for="Vehicle.Color" type="text" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Seating Capacity</label>
+                    <input asp-for="Vehicle.SeatingCapacity" type="number" min="1" max="14" class="form-control" required readonly />
+                </div>
+                <div class="form-group">
+                    <label>Vehicle Type</label>
+                    <div class="radio-group">
+                        <label><input asp-for="Vehicle.Type" type="radio" value="Car" /> Car</label>
+                        <label><input asp-for="Vehicle.Type" type="radio" value="Scooter" /> Scooter</label>
+                        <label><input asp-for="Vehicle.Type" type="radio" value="Shuttle" /> Shuttle</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Transmission</label>
+                    <div class="radio-group">
+                        <label><input asp-for="Vehicle.Transmission" type="radio" value="Manual" /> Manual</label>
+                        <label><input asp-for="Vehicle.Transmission" type="radio" value="Automatic" /> Automatic</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Engine</label>
+                    <div class="radio-group">
+                        <label><input asp-for="Vehicle.VehicleEngine" type="radio" value="Gasoline" /> Gas</label>
+                        <label><input asp-for="Vehicle.VehicleEngine" type="radio" value="Electric" /> Electric</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Upload Image</label>
+                    <input asp-for="File" type="file" class="form-control" disabled />
+                </div>
+                <button type="submit" class="btn-save" disabled>Save</button>
+            </form>
+        </section>
+
+        <section id="help" class="tab-content">
+            <div class="help-container">
+                <header class="help-header">
+                    <h1>🚖 Help & Support</h1>
+                    <p>Quick tips to help you get started and use our app effectively.</p>
+                </header>
+
+                <section class="help-section">
+                    <h2>Getting Started</h2>
+                    <p>Sign up or log in, then request a ride by entering your pickup and drop-off locations.</p>
+                </section>
+
+                <section class="help-section">
+                    <h2>Booking a Ride</h2>
+                    <p>
+                        1. Go to the home page.<br>
+                        2. Enter pickup & drop-off points.<br>
+                        3. Choose your ride type.<br>
+                        4. Confirm booking.
+                    </p>
+                </section>
+
+                <section class="help-section">
+                    <h2>Payment Methods</h2>
+                    <p>We support Cash and Card payments. Set your preference in the "Wallet" tab.</p>
+                </section>
+
+                <section class="help-section">
+                    <h2>Safety Tips</h2>
+                    <ul>
+                        <li>Verify the driver's details before starting.</li>
+                        <li>Share your trip with friends or family.</li>
+                        <li>Contact support if you face any issues.</li>
+                    </ul>
+                </section>
+
+                <section class="help-section contact-section">
+                    <h2>Need More Help?</h2>
+                    <p>Contact our support team anytime:</p>
+                    <p class="contact-email">
+                        <a href="mailto:amrahmed24555@gmail.com">amrahmed24555@gmail.com</a>
+                    </p>
+                </section>
+            </div>
         </section>
     </main>
 </div>
@@ -72,8 +224,50 @@
             document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
 
             item.classList.add("active");
-            document.getElementById(item.dataset.tab).classList.add("active");
+            const tabId = item.dataset.tab || "help";
+            document.getElementById(tabId).classList.add("active");
         });
+    });
+
+    let isEditMode = false;
+    let originalValues = {};
+    const editBtn = document.getElementById('editBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const form = document.getElementById('driverForm');
+
+    editBtn.addEventListener('click', function() {
+        if (!isEditMode) {
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"]');
+            inputs.forEach(input => originalValues[input.name] = input.value);
+            if (confirm('Are you sure you want to edit your profile?')) {
+                inputs.forEach(input => input.readOnly = false);
+                document.querySelector('input[type="file"]').disabled = false;
+                document.querySelector('.btn-save').disabled = false;
+                editBtn.style.display = 'none';
+                cancelBtn.style.display = 'inline-block';
+                isEditMode = true;
+            }
+        }
+    });
+    cancelBtn.addEventListener('click', function() {
+        if (isEditMode) {
+            const inputs = form.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="date"], input[type="number"]');
+            inputs.forEach(input => {
+                input.value = originalValues[input.name];
+                input.readOnly = true;
+            });
+            document.querySelector('input[type="file"]').disabled = true;
+            document.querySelector('.btn-save').disabled = true;
+            editBtn.style.display = 'inline-block';
+            cancelBtn.style.display = 'none';
+            isEditMode = false;
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        if (isEditMode && !confirm('Are you sure you want to save these changes?')) {
+            e.preventDefault();
+        }
     });
 </script>
 
@@ -130,8 +324,8 @@
     }
 
     .user-icon {
-        width: 60px;
-        height: 60px;
+        width: 100px;
+        height: 100px;
         border-radius: 50%;
         object-fit: cover;
     }
@@ -193,17 +387,234 @@
         font-style: italic;
     }
 
-    .btn-update {
-        display: inline-block;
-        padding: 10px 15px;
-        background: #1CB5A3;
-        color: #fff;
-        text-decoration: none;
-        border-radius: 6px;
+    .edit-driver-form {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
-        .btn-update:hover {
+    .wallet-page {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 60px);
+        background: none;
+    }
+
+        .wallet-page.active {
+            display: flex;
+        }
+
+    .wallet-title {
+        font-size: 40px;
+        font-weight: bold;
+        margin-bottom: 30px;
+        color: #333;
+    }
+
+    .wallet-card.big {
+        background: linear-gradient(135deg, #1CB5A3, #0e8b77);
+        color: #fff;
+        border-radius: 20px;
+        padding: 50px;
+        width: 500px;
+        text-align: center;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    .wallet-balance-label {
+        font-size: 18px;
+        color: rgba(255,255,255,0.8);
+    }
+
+    .wallet-balance {
+        font-size: 50px;
+        font-weight: bold;
+        margin: 20px 0 30px;
+    }
+
+    .wallet-actions {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .wallet-btn {
+        flex: 1;
+        padding: 15px;
+        margin: 0 8px;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        background: rgba(255,255,255,0.15);
+        color: #fff;
+    }
+
+        .wallet-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+
+    .edit-driver-form .form-group {
+        margin-bottom: 15px;
+    }
+
+    .edit-driver-form label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+    }
+
+    .edit-driver-form input[type="text"],
+    .edit-driver-form input[type="email"],
+    .edit-driver-form input[type="password"],
+    .edit-driver-form input[type="number"],
+    .edit-driver-form input[type="date"],
+    .edit-driver-form input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+    }
+
+    .edit-driver-form .radio-group label {
+        margin-right: 15px;
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .btn-save {
+        width: 100%;
+        padding: 12px;
+        background: #1CB5A3;
+        color: #fff;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .btn-save:hover {
             background: #17a38a;
         }
 
+    .edit-controls {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-edit, .btn-cancel {
+        padding: 10px 20px;
+        margin: 0 10px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: 0.3s;
+    }
+
+    .btn-edit {
+        background: #1CB5A3;
+        color: #fff;
+    }
+
+        .btn-edit:hover {
+            background: #17a38a;
+        }
+
+    .btn-cancel {
+        background: #dc3545;
+        color: #fff;
+    }
+
+        .btn-cancel:hover {
+            background: #c82333;
+        }
+
+    .edit-driver-form input[readonly],
+    .edit-driver-form input[disabled] {
+        background-color: #f8f9fa;
+        cursor: not-allowed;
+    }
+
+    .help-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 30px;
+        background: #f9f9f9;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .help-header h1 {
+        color: #1CB5A3;
+        font-size: 36px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+
+    .help-header p {
+        font-size: 16px;
+        text-align: center;
+        color: #555;
+        margin-bottom: 30px;
+    }
+
+    .sidebar ul li.logout {
+        color: #fff;
+    }
+
+        .sidebar ul li.logout:hover {
+            background: #e74c3c;
+        }
+
+    .sidebar-btn {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 14px;
+        padding: 0;
+        cursor: pointer;
+        width: 100%;
+        text-align: left;
+    }
+
+
+    .help-section {
+        margin-bottom: 25px;
+    }
+
+        .help-section h2 {
+            color: #1CB5A3;
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .help-section p,
+        .help-section ul {
+            font-size: 16px;
+            color: #333;
+            line-height: 1.6;
+        }
+
+
+            .help-section ul li {
+                margin-bottom: 8px;
+            }
+
+    .contact-email a {
+        color: #1CB5A3;
+        text-decoration: underline;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .contact-email a:hover {
+            color: #17a38a;
+        }
 </style>

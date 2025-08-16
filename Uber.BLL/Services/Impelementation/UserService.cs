@@ -80,7 +80,7 @@ namespace Uber.BLL.Services.Impelementation
                 return (false, ex.Message);
             }
         }
-        public (bool, string?) Edit(EditUser user)
+        public (bool, string?) Edit(EditUser user) 
         {
             try
             {
@@ -88,6 +88,8 @@ namespace Uber.BLL.Services.Impelementation
                 var existingUser = result.Item2;
                 if (existingUser == null)
                     return (false, "User not found");
+
+                mapper.Map(user, existingUser);
 
                 userRepo.Edit(existingUser);
 
@@ -115,7 +117,7 @@ namespace Uber.BLL.Services.Impelementation
             return list;
         }
 
-        public async Task<(bool, string?, UserProfileVM?)> GetProfileInfo()
+        public async Task<(bool, string?, UserProfileEditVM?)> GetProfileInfo()
         {
             try
             {
@@ -126,20 +128,14 @@ namespace Uber.BLL.Services.Impelementation
                 }
                 var us = userRepo.GetByID(user.Id);
 
-                var userProfile = new UserProfileVM
-                {
-                    Name = us.Item2.Name,
-                    Id = us.Item2.Id,
-                    Balance = us.Item2.Balance,
-                    Rides = new List<Uber.DAL.Entities.Ride>()
-                };
+                var userProfileEdit = new UserProfileEditVM(us.Item2.Name,us.Item2.Id,us.Item2.Balance,us.Item2.DateOfBirth,us.Item2.Email,us.Item2.PhoneNumber,us.Item2.IsDeleted);
 
 
 
 
-                userProfile.Rides = rideRepo.GetAll().Where(a => a.UserId != null && a.UserId == userProfile.Id).ToList();
+                userProfileEdit.Profile.Rides = rideRepo.GetAll().Where(a => a.UserId != null && a.UserId == userProfileEdit.Profile.Id).ToList();
 
-                foreach(var ride in userProfile.Rides)
+                foreach(var ride in userProfileEdit.Profile.Rides)
                 {
                     ride.Driver = driverRepo.GetByID(ride.DriverId).Item2;
 
@@ -149,7 +145,7 @@ namespace Uber.BLL.Services.Impelementation
 
 
               
-                return (true, null, userProfile);
+                return (true, null, userProfileEdit);
             }
             catch (Exception ex)
             {

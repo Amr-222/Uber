@@ -38,7 +38,7 @@ namespace Uber.PLL.Controllers
                     ModelState.AddModelError("", error ?? "An error occurred");
                     return View("~/Views/Driver/Register.cshtml", driver);
                 }
-                return RedirectToAction("Login", "Driver");
+                return RedirectToAction("Login", "Account");
             }
 
             return View("~/Views/Driver/Register.cshtml", driver);
@@ -211,8 +211,7 @@ namespace Uber.PLL.Controllers
         [HttpPost]
         public IActionResult AcceptRide(string rideId)
         {
-            // Logic to mark ride as accepted
-            // Notify user through SignalR if needed
+      
 
             return Json(new { success = true });
         }
@@ -237,7 +236,6 @@ namespace Uber.PLL.Controllers
             {
                 if (model!=null)
                 {
-                    // Get current user ID
                     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userId))
                     {
@@ -263,7 +261,6 @@ namespace Uber.PLL.Controllers
                 ModelState.AddModelError("", $"An error occurred: {ex.Message}");
             }
 
-            // If we get here, there was an error, so reload the profile
             var profileResult = await service.GetDriverProfileInfo();
             return View("DriverProfile", profileResult.Item3);
         }

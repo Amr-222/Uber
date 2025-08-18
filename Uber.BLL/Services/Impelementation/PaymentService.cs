@@ -35,7 +35,7 @@ namespace Uber.BLL.Services.Impelementation
                         Quantity = 1
                     }
                 },
-                SetupIntentData = new SessionSetupIntentDataOptions(), // Save card for future
+                SetupIntentData = new SessionSetupIntentDataOptions(), 
                 SuccessUrl = successUrl,
                 CancelUrl = cancelUrl
             };

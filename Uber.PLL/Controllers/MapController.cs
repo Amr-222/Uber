@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
+using Uber.BLL.ModelVM.Ride;
 
 namespace MVCDay3.Controllers
 {
@@ -30,7 +31,6 @@ namespace MVCDay3.Controllers
             if (coordsArray == null || summary == null)
                 return Json(new { error = "No route data" });
 
-            // Convert [lng, lat] to [lat, lng] for Leaflet
             var latLngCoords = coordsArray.Select(coord => new double[] { (double)coord[1], (double)coord[0] }).ToList();
 
             double distanceMeters = (double)summary["distance"];
@@ -44,12 +44,6 @@ namespace MVCDay3.Controllers
             });
         }
 
-        public class RouteRequest
-        {
-            public double StartLat { get; set; }
-            public double StartLng { get; set; }
-            public double EndLat { get; set; }
-            public double EndLng { get; set; }
-        }
+     
     }
 }

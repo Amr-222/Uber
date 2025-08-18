@@ -113,7 +113,6 @@
             <th>Phone Number</th>
             <th>Date of Birth</th>
             <th>Deleted</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <tbody id="ridersTable">
@@ -135,10 +134,7 @@
                         <span class="badge bg-success">Available</span>
                     }
                 </td>
-                <td>
-                    <a asp-action="EditRider" asp-route-id="@rider.Id" class="btn btn-warning">Edit</a>
-                    <button type="button" class="btn btn-danger" onclick="deleteRider(@rider.Id)">Delete</button>
-                </td>
+           
             </tr>
         }
     </tbody>

@@ -61,9 +61,8 @@ namespace Uber.PLL.Controllers
                 
                 var driverGroup = $"driver-{chosenDriverId}";
 
-                // Get user information for rating display
                 var (userErr, user) = _userService.GetByID(userId);
-                var userRating = 5.0; // Default to 5 if user not found
+                var userRating = 5.0; 
                 if (userErr != null)
                 {
                     Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
@@ -89,12 +88,12 @@ namespace Uber.PLL.Controllers
                     userRating = Math.Round(userRating, 1)
                 });
 
-                // 4) Show waiting view (client will connect to hub & join group)
+              
                 return View("WaitingForDriver", ride.Id.ToString());
             }
             catch (Exception ex)
             {
-                // Log the exception here
+               
                 return BadRequest($"An error occurred: {ex.Message}");
             }
         }
@@ -105,7 +104,7 @@ namespace Uber.PLL.Controllers
         {
             try
             {
-                // 1) find nearest driver
+              
                 var nearest = _driverService.GetNearestDriver(request.StartLat, request.StartLng);
                 if (!nearest.Item1 || nearest.Item3 == null || !nearest.Item3.Any())
                 {
@@ -118,7 +117,7 @@ namespace Uber.PLL.Controllers
                     return BadRequest(new { message = "No drivers available in your area" });
                 }
 
-                // 2) create pending ride in DB
+               
                 var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(userId))
                 {
@@ -133,12 +132,12 @@ namespace Uber.PLL.Controllers
 
                 var rideGroup = $"ride-{ride.Id}";
 
-                // 3) Notify the target driver
+              
                 var driverGroup = $"driver-{chosenDriverId}";
 
-                // Get user information for rating display
+              
                 var (userErr, user) = _userService.GetByID(userId);
-                var userRating = 5.0; // Default to 5 if user not found
+                var userRating = 5.0; 
                 if (userErr != null)
                 {
                     Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
@@ -164,7 +163,7 @@ namespace Uber.PLL.Controllers
                     userRating = Math.Round(userRating, 1)
                 });
 
-                // 4) Return JSON response with ride ID for the Home page
+                
                 return Ok(new
                 {
                     success = true,
@@ -179,7 +178,7 @@ namespace Uber.PLL.Controllers
             }
         }
 
-        // These can be called by Hub as well, but keeping REST fallbacks:
+      
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> DriverAccept([FromBody] AcceptRejectRequest request)
@@ -192,7 +191,7 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to accept ride");
                 }
 
-                // Send notification to the ride group
+              
                 await _hub.Clients.Group(request.rideGroup).SendAsync("RideAccepted", request.id);
 
                 var result = _rideService.GetByID(request.id);
@@ -218,29 +217,29 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to reject ride");
                 }
 
-                // Get the rejected ride to find next nearest driver
+                
                 var (rideErr, ride) = _rideService.GetByID(request.id);
                 if (rideErr != null || ride == null)
                 {
                     return BadRequest("Ride not found");
                 }
 
-                // Find next nearest driver
+              
                 var nextNearest = _driverService.GetNearestDriver(ride.StartLat, ride.StartLng);
                 if (nextNearest.Item1 && nextNearest.Item3 != null && nextNearest.Item3.Any())
                 {
-                    // Skip the driver who just rejected
+                   
                     var nextDriverId = nextNearest.Item3.FirstOrDefault(d => d != ride.DriverId);
 
                     if (!string.IsNullOrEmpty(nextDriverId))
                     {
-                        // Update ride with new driver
+                
                         var (updateOk, updateErr) = _rideService.AssignNewDriver(request.id, nextDriverId);
                         if (updateOk)
                         {
-                            // Get user information for rating display
+                          
                             var (userErr, user) = _userService.GetByID(ride.UserId);
-                            var userRating = 5.0; // Default to 5 if user not found
+                            var userRating = 5.0; 
                             if (userErr != null)
                             {
                                 Console.WriteLine($"Warning: Could not get user info for rating: {userErr}");
@@ -251,7 +250,7 @@ namespace Uber.PLL.Controllers
                                 Console.WriteLine($"User rating retrieved: {userRating}");
                             }
                             
-                            // Notify the new driver
+
                             await _hub.Clients.Group($"driver-{nextDriverId}").SendAsync("ReceiveRideRequest", new
                             {
                                 rideId = ride.Id,
@@ -267,14 +266,13 @@ namespace Uber.PLL.Controllers
                                 userRating = Math.Round(userRating, 1)
                             });
 
-                            // Notify user that request was sent to another driver
                             await _hub.Clients.Group(request.rideGroup).SendAsync("RideRejected", request.id);
                             return Ok(new { success = true, message = "Ride rejected, sent to next driver" });
                         }
                     }
                 }
 
-                // If no more drivers available, notify user
+               
                 await _hub.Clients.Group(request.rideGroup).SendAsync("RideRejected", request.id);
                 return Ok(new { success = true, message = "Ride rejected, no more drivers available" });
             }
@@ -326,14 +324,12 @@ namespace Uber.PLL.Controllers
                     return NotFound("Ride not found");
                 }
 
-                // Check if the current user is authorized to view this ride
                 var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrEmpty(currentUserId))
                 {
                     return Unauthorized("User not authenticated");
                 }
 
-                // User can view if they are the ride requester or the assigned driver
                 if (ride.UserId != currentUserId && ride.DriverId != currentUserId)
                 {
                     return Forbid("You are not authorized to view this ride");
@@ -359,7 +355,6 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to start ride");
                 }
 
-                // Notify both user and driver that ride has started
                 await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideStarted", request.id);
                 return Ok(new { success = true, message = "Ride started successfully" });
             }
@@ -381,7 +376,6 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to complete ride");
                 }
 
-                // Notify both user and driver that ride has completed
                 await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideCompleted", request.id);
                 return Ok(new { success = true, message = "Ride completed successfully" });
             }
@@ -403,7 +397,7 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to mark driver as arrived");
                 }
 
-                // Notify both user and driver that driver has arrived
+            
                 await _hub.Clients.Group($"ride-{request.id}").SendAsync("DriverArrived", request.id);
                 return Ok(new { success = true, message = "Driver arrived at pickup location" });
             }
@@ -425,7 +419,7 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to add user rating");
                 }
 
-                // Notify both user and driver that user rating was added
+            
                 await _hub.Clients.Group($"ride-{request.RideId}").SendAsync("UserRated", request.RideId, request.Rating);
                 return Ok(new { success = true, message = "User rating added successfully" });
             }
@@ -447,7 +441,7 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to add driver rating");
                 }
 
-                // Notify both user and driver that driver rating was added
+          
                 await _hub.Clients.Group($"ride-{request.RideId}").SendAsync("DriverRated", request.RideId, request.Rating);
                 return Ok(new { success = true, message = "Driver rating added successfully" });
             }
@@ -469,10 +463,10 @@ namespace Uber.PLL.Controllers
                     return BadRequest(err ?? "Failed to cancel ride");
                 }
 
-                // Notify both user and driver that ride has been cancelled
+               
                 await _hub.Clients.Group($"ride-{request.id}").SendAsync("RideCancelled", request.id);
                 
-                // Also notify the driver specifically if they exist
+    
                 var (rideErr, ride) = _rideService.GetByID(request.id);
                 if (rideErr == null && ride != null && !string.IsNullOrEmpty(ride.DriverId))
                 {
@@ -493,13 +487,13 @@ namespace Uber.PLL.Controllers
         {
             try
             {
-                // If an ID is provided, pass it to the view
+                
                 if (id.HasValue)
                 {
                     return View( model: id.ToString());
                 }
 
-                // Otherwise, just show the waiting page without specific ride ID
+            
                 return View();
             }
             catch (Exception ex)

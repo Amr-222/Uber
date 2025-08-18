@@ -42,7 +42,7 @@ namespace Uber.PLL.Controllers
                     return View("~/Views/User/Register.cshtml", user);
                 }
 
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Account");
             }
 
             return View("~/Views/User/Register.cshtml", user);
@@ -129,7 +129,6 @@ namespace Uber.PLL.Controllers
             {
                 if (model!=null)
                 {
-                    // Get current user ID
                     var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
                     if (string.IsNullOrEmpty(userId))
                     {
@@ -162,25 +161,14 @@ namespace Uber.PLL.Controllers
                 ModelState.AddModelError("", $"An error occurred: {ex.Message}");
             }
 
-            // If we get here, there was an error, so reload the profile
+        
             var profileResult = await service.GetProfileInfo();
             return View("UserProfile", profileResult.Item3);
         }
 
 
 
-        //[HttpPost]
-        /*public IActionResult RequestRide(double StartLat, double StartLng, double EndLat, double EndLng, string Id)
-        {
-            var result = driverService.GetNearstDriver(StartLat, StartLng);
-            if (!result.Item1) return View(result.Item2);
-            bool foundDriver = false;
-            int index = 0;
-            while (!foundDriver)
-            {
-                var res = driverService.SendRequest(result.Item3[index++], Id);
-            }
-        }*/
+
 
 
     }

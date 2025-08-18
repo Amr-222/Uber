@@ -114,7 +114,7 @@ namespace Uber.PLL.Controllers
             if (admin.Item2 == null)
                 return NotFound();
 
-            return View("EditAdmin", admin.Item2); // Make The EditAdmin VIEW
+            return View("EditAdmin", admin.Item2); 
         }
 
         [Authorize(Roles = "Admin")]

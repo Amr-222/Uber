@@ -7,15 +7,12 @@
     string backHref = User.IsInRole("Driver") ? "/Driver/Dashboard" : "/Home";
 }
 
-<!-- Map CSS and JS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<!-- Fallback CDN links in case the main ones fail -->
 <script>
-    // Check if Leaflet loaded from primary CDN
     if (typeof L === 'undefined') {
-        // Load from fallback CDN
+       
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';
@@ -303,11 +300,11 @@
         </div>
     }
 
-    <!-- Action Buttons -->
+
     <div class="action-buttons" style="text-align: center; margin-top: 30px;">
         @if (isDriver)
         {
-            <!-- All driver buttons are always present but controlled by JavaScript -->
+       
             <button id="arrivedAtPickupBtn" onclick="driverArrived()" style="padding: 15px 30px; background-color: #17a2b8; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px; display: none;">
                 🚗 Arrived at Pickup
             </button>
@@ -321,7 +318,7 @@
             </button>
         }
         
-        <!-- Cancel Ride Button - Visible for both roles unless ride is completed or cancelled -->
+       
         @if (Model.Status != Uber.DAL.Enums.RideStatus.Completed && Model.Status != Uber.DAL.Enums.RideStatus.Cancelled)
         {
             <button id="cancelRideBtn" onclick="cancelRide()" style="padding: 15px 30px; background-color: #dc3545; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px;">
@@ -329,7 +326,7 @@
             </button>
         }
         
-        <!-- Back to Home Button - Only visible when ride is completed or cancelled -->
+        
         @if (Model.Status == Uber.DAL.Enums.RideStatus.Completed || Model.Status == Uber.DAL.Enums.RideStatus.Cancelled)
         {
         <a href="/Home" style="display: inline-block; padding: 15px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 0 10px;">
@@ -338,7 +335,7 @@
         }
     </div>
 
-    <!-- Rating Modal -->
+  
     <div id="ratingModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px;">
             <div class="modal-header" style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px;">
@@ -395,29 +392,27 @@
     let ratingTarget = ''; // 'user' or 'driver'
     let currentRideId = @Model.Id;
 
-    // Initialize map
     function initializeMap() {
-             // Prevent multiple map initializations
              if (window.mapInitialized) {
                  return;
              }
         
-        // Check if Leaflet is loaded
+       
         if (typeof L === 'undefined') {
             console.error('Leaflet library not loaded!');
             return;
         }
         
-        // Validate coordinates
+      
         const startLat = @Model.StartLat;
         const startLng = @Model.StartLng;
         const endLat = @Model.EndLat;
         const endLng = @Model.EndLng;
         
-        // Check if coordinates are valid numbers
+      
         if (isNaN(startLat) || isNaN(startLng) || isNaN(endLat) || isNaN(endLng)) {
             console.error('Invalid coordinates detected, using fallback coordinates');
-            // Use fallback coordinates (New York City area)
+          
             const fallbackStartLat = 40.7128;
             const fallbackStartLng = -74.0060;
             const fallbackEndLat = 40.7589;
@@ -432,7 +427,7 @@
     
     function initializeMapWithCoordinates(startLat, startLng, endLat, endLng) {
         try {
-            // Create map centered between pickup and destination
+            
             const centerLat = (startLat + endLat) / 2;
             const centerLng = (startLng + endLng) / 2;
             
@@ -443,7 +438,7 @@
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            // Add pickup and dropoff markers
+            
             pickupMarker = L.marker([startLat, startLng], {
                 icon: L.icon({
                     iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
@@ -458,10 +453,10 @@
                 })
             }).addTo(map).bindPopup("🎯 Destination").openPopup();
 
-            // Draw route between points
+           
             drawRouteWithCoordinates(startLat, startLng, endLat, endLng);
              
-             // Mark map as initialized
+            
              window.mapInitialized = true;
         } catch (error) {
             console.error('Error initializing map:', error);
@@ -918,12 +913,11 @@
             }
         }
         
-        // Show the Back to Home button when ride is cancelled or completed
+        
         if (status === "Cancelled" || status === "Completed") {
             showBackToHomeButton();
         }
         
-        // Update button visibility based on status (only if not already updated for this status)
         const buttonVisibilityKey = `buttonVisibilityUpdated_${currentRideId}_${status}`;
         if (!window[buttonVisibilityKey]) {
             updateButtonVisibility(status);
@@ -933,21 +927,17 @@
             console.log(`Button visibility already updated for status: ${status}, skipping...`);
         }
         
-        // Show ride price prominently when completed
         if (status === "Completed") {
             showRidePrice();
         }
         
-        // Mark that this status has been displayed for this ride
         window[statusKey] = true;
         console.log(`Status ${status} displayed and marked as shown for this ride`);
     }
     
-    // Function to initialize buttons based on current ride status
     function initializeButtons(status) {
         console.log('initializeButtons called with status:', status);
         
-        // Check if user is driver by looking for driver buttons
         const arrivedBtn = document.getElementById('arrivedAtPickupBtn');
         const startBtn = document.getElementById('startRideBtn');
         const completeBtn = document.getElementById('completeRideBtn');
@@ -955,12 +945,10 @@
         if (arrivedBtn && startBtn && completeBtn) {
             console.log('User is driver, initializing buttons for status:', status);
             
-            // Hide all buttons first
             arrivedBtn.style.display = 'none';
             startBtn.style.display = 'none';
             completeBtn.style.display = 'none';
             
-            // Show appropriate button based on status
             switch (status) {
                 case "Accepted":
                     arrivedBtn.style.display = 'inline-block';
@@ -983,7 +971,6 @@
         }
     }
     
-    // Function to update button visibility based on ride status
     function updateButtonVisibility(status) {
         console.log('updateButtonVisibility called with status:', status);
         
@@ -999,12 +986,10 @@
             cancelBtn: !!cancelBtn 
         });
         
-        // Hide all driver buttons first
         if (arrivedBtn) arrivedBtn.style.display = 'none';
         if (startBtn) startBtn.style.display = 'none';
         if (completeBtn) completeBtn.style.display = 'none';
         
-        // Show buttons based on status (only for drivers)
         if (arrivedBtn && startBtn && completeBtn) { // Check if user is driver
             switch (status) {
                 case "Accepted":
@@ -1022,7 +1007,6 @@
             }
         }
         
-        // Cancel button is always visible unless ride is completed or cancelled
         if (cancelBtn && (status === "Completed" || status === "Cancelled")) {
             cancelBtn.style.display = 'none';
         }
@@ -1030,15 +1014,12 @@
         console.log('Button visibility updated for status:', status);
     }
     
-    // Function to show the Back to Home button
     function showBackToHomeButton() {
-        // Check if back to home button has already been shown for this ride
         if (window.backToHomeShown) {
             console.log('Back to home button already shown, skipping...');
             return;
         }
         
-        // Create the Back to Home button if it doesn't exist
         let backButton = document.querySelector('.back-to-home-btn');
         if (!backButton) {
 
@@ -1048,27 +1029,22 @@
             backButton.style.cssText = 'display: inline-block; padding: 15px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 0 10px;';
             backButton.innerHTML = '🏠 Back to Home';
             
-            // Insert after the action buttons div
             const actionButtonsDiv = document.querySelector('.action-buttons');
             if (actionButtonsDiv) {
                 actionButtonsDiv.appendChild(backButton);
             }
         }
         
-        // Mark that back to home button has been shown
         window.backToHomeShown = true;
         console.log('Back to home button displayed and marked as shown');
     }
     
-    // Function to show ride price prominently
     function showRidePrice() {
-        // Check if price has already been shown for this ride
         if (window.ridePriceShown) {
             console.log('Ride price already shown, skipping...');
             return;
         }
         
-        // Remove any existing price display to prevent duplicates
         const existingPrice = document.getElementById('completedRidePrice');
         if (existingPrice) {
             existingPrice.remove();
@@ -1080,20 +1056,16 @@
         priceDisplay.style.cssText = 'background-color: #28a745; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; font-size: 18px; font-weight: bold;';
         priceDisplay.innerHTML = `🎉 Ride Completed! Total Price: ${price}`;
         
-        // Insert before the action buttons
         const actionButtonsDiv = document.querySelector('.action-buttons');
         if (actionButtonsDiv) {
             actionButtonsDiv.parentNode.insertBefore(priceDisplay, actionButtonsDiv);
         }
         
-        // Mark that price has been shown
         window.ridePriceShown = true;
         console.log('Ride price displayed and marked as shown');
     }
 
-    // Rating system functions
     function showRatingModal(target, message) {
-        // Check if rating modal has already been shown for this target
         const ratingKey = `ratingModalShown_${currentRideId}_${target}`;
         if (window[ratingKey]) {
             console.log(`Rating modal already shown for ${target}, skipping...`);
@@ -1186,7 +1158,6 @@
                     errorMessage = errorData.message || "Unknown error";
                     console.error('Rating error response:', errorData);
                 } catch (parseError) {
-                    // If response is not JSON, try to get it as text
                     try {
                         const errorText = await response.text();
                         errorMessage = errorText || "Unknown error";
@@ -1203,7 +1174,6 @@
         }
     }
 
-    // Driver workflow functions
     async function driverArrived() {
         if (confirm("Are you sure you have arrived at the pickup location?")) {
             try {

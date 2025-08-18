@@ -114,7 +114,6 @@
             <th>Date of Birth</th>
             <th>Deleted</th>
             <th>Status</th>
-            <th>Actions</th>
         </tr>
     </thead>
     <tbody id="driversTable">
@@ -155,10 +154,6 @@
                     {
                         <span class="badge bg-success">Active</span>
                     }
-                </td>
-                <td>
-                    <a asp-action="EditDriver" asp-route-id="@driver.Id" class="btn btn-warning">Edit</a>
-                    <button type="button" class="btn btn-danger" onclick="deleteDriver(@driver.Id)">Delete</button>
                 </td>
             </tr>
         }

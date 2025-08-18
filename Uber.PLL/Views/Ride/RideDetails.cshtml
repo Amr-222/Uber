@@ -12,12 +12,12 @@
 
 <script>
     if (typeof L === 'undefined') {
-       
+
         const link = document.createElement('link');
         link.rel = 'stylesheet';
         link.href = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css';
         document.head.appendChild(link);
-        
+
         const script = document.createElement('script');
         script.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js';
         script.onload = function() {
@@ -41,7 +41,7 @@
         background-color: #f0f0f0; /* Add background color to make it visible */
         border: 2px solid #ddd; /* Add border to make it more visible */
     }
-    
+
     /* Ensure the map container is properly sized */
     .map-container {
         background-color: white;
@@ -51,41 +51,41 @@
         margin-bottom: 20px;
         position: relative;
     }
-    
-    /* Force the map to be visible */
-    .map-container #rideMap {
-        min-height: 400px;
-        display: block !important;
-        visibility: visible !important;
-    }
-    
+
+        /* Force the map to be visible */
+        .map-container #rideMap {
+            min-height: 400px;
+            display: block !important;
+            visibility: visible !important;
+        }
+
     .map-info {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 20px;
         margin-top: 15px;
     }
-    
+
     .map-info-item {
         background-color: #f8f9fa;
         padding: 15px;
         border-radius: 5px;
         text-align: center;
     }
-    
-    .map-info-item h5 {
-        margin: 0 0 10px 0;
-        color: #6c757d;
-        font-size: 14px;
-    }
-    
-    .map-info-item p {
-        margin: 0;
-        font-weight: bold;
-        color: #495057;
-        font-size: 18px;
-    }
-    
+
+        .map-info-item h5 {
+            margin: 0 0 10px 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .map-info-item p {
+            margin: 0;
+            font-weight: bold;
+            color: #495057;
+            font-size: 18px;
+        }
+
     /* Rating stars styles */
     .star {
         font-size: 40px !important;
@@ -94,14 +94,14 @@
         cursor: pointer;
     }
 
-    .star:hover {
-        color: #ffc107 !important;
-        transform: scale(1.1);
-    }
+        .star:hover {
+            color: #ffc107 !important;
+            transform: scale(1.1);
+        }
 
-    .star:hover ~ .star {
-        color: #ddd !important;
-    }
+            .star:hover ~ .star {
+                color: #ddd !important;
+            }
 
     /* Rating modal enhancements */
     .modal-content {
@@ -111,51 +111,141 @@
     .rating-stars {
         margin: 30px 0;
     }
-    
+
     #selectedRating {
         font-size: 20px;
         margin: 20px 0;
         min-height: 30px;
     }
-    
+
     .modal-actions button {
         font-size: 16px;
         padding: 12px 24px;
         margin: 0 10px;
     }
-    
+
     /* Driver workflow button enhancements */
     .action-buttons button {
         transition: all 0.3s ease;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
-    
-    .action-buttons button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    
-    .action-buttons button:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
+
+        .action-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .action-buttons button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
     /* Ride price display */
     #completedRidePrice {
         animation: fadeInUp 0.5s ease-out;
     }
+
     keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(20px);
     }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Toast notification styles */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+    }
+
+    /* Toast styles */
+    .toast {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        margin-bottom: 10px;
+        padding: 16px 20px;
+        transform: translateX(400px);
+        opacity: 0;
+        transition: all 0.3s ease;
+        border-left: 4px solid #007bff;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left-color: #28a745;
+        }
+
+        .toast.error {
+            border-left-color: #dc3545;
+        }
+
+        .toast.warning {
+            border-left-color: #ffc107;
+        }
+
+        .toast.info {
+            border-left-color: #17a2b8;
+        }
+
+    .toast-icon {
+        font-size: 20px;
+        min-width: 20px;
+    }
+
+    .toast-content {
+        flex: 1;
+    }
+
+    .toast-title {
+        font-weight: bold;
+        margin-bottom: 4px;
+        color: #333;
+    }
+
+    .toast-message {
+        color: #666;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        cursor: pointer;
+        color: #999;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+    }
+
+        .toast-close:hover {
+            color: #333;
+        }
 </style>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
 
 <div style="max-width: 1000px; margin: 0 auto; padding: 20px;">
     <div style="text-align: center; margin-bottom: 30px;">
@@ -226,19 +316,19 @@
         <h4 style="color: #495057; margin-bottom: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">🗺️ Ride Route</h4>
         <div id="rideMap">
         </div>
-        
-        
-        
+
+
+
         <!-- SignalR Status Indicator -->
         <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; text-align: center;">
-            <strong>SignalR Status:</strong> 
+            <strong>SignalR Status:</strong>
             <span id="signalRStatus" style="padding: 5px 10px; border-radius: 3px; font-weight: bold; margin-left: 10px;">
                 Connecting...
             </span>
         </div>
-        
-        
-        
+
+
+
         <div class="map-info">
             <div class="map-info-item">
                 <h5>🚀 Price</h5>
@@ -267,12 +357,12 @@
     {
         <div style="background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
             <h4 style="color: #495057; margin-bottom: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">👨‍💼 Driver Information</h4>
-            
+
             <div style="display: flex; align-items: center; gap: 20px;">
                 <div style="width: 60px; height: 60px; background-color: #007bff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
                     @(Model.Driver.UserName?.Substring(0, 1).ToUpper() ?? "D")
                 </div>
-                
+
                 <div>
                     <h5 style="margin: 0; color: #495057;">@Model.Driver.UserName</h5>
                     <p style="margin: 5px 0 0 0; color: #6c757d;">Your assigned driver</p>
@@ -286,12 +376,12 @@
     {
         <div style="background-color: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px;">
             <h4 style="color: #495057; margin-bottom: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 10px;">👤 Passenger Information</h4>
-            
+
             <div style="display: flex; align-items: center; gap: 20px;">
                 <div style="width: 60px; height: 60px; background-color: #6c757d; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">
                     @(Model.User.UserName?.Substring(0, 1).ToUpper() ?? "U")
                 </div>
-                
+
                 <div>
                     <h5 style="margin: 0; color: #495057;">@Model.User.UserName</h5>
                     <p style="margin: 5px 0 0 0; color: #6c757d;">Your passenger</p>
@@ -304,48 +394,48 @@
     <div class="action-buttons" style="text-align: center; margin-top: 30px;">
         @if (isDriver)
         {
-       
+
             <button id="arrivedAtPickupBtn" onclick="driverArrived()" style="padding: 15px 30px; background-color: #17a2b8; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px; display: none;">
                 🚗 Arrived at Pickup
             </button>
-            
+
             <button id="startRideBtn" onclick="startRide()" style="padding: 15px 30px; background-color: #007bff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px; display: none;">
                 🚀 Start Ride
             </button>
-            
+
             <button id="completeRideBtn" onclick="completeRide()" style="padding: 15px 30px; background-color: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px; display: none;">
                 ✅ Complete Ride
             </button>
         }
-        
-       
+
+
         @if (Model.Status != Uber.DAL.Enums.RideStatus.Completed && Model.Status != Uber.DAL.Enums.RideStatus.Cancelled)
         {
             <button id="cancelRideBtn" onclick="cancelRide()" style="padding: 15px 30px; background-color: #dc3545; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; margin: 0 10px;">
                 ❌ Cancel Ride
             </button>
         }
-        
-        
+
+
         @if (Model.Status == Uber.DAL.Enums.RideStatus.Completed || Model.Status == Uber.DAL.Enums.RideStatus.Cancelled)
         {
-        <a href="/Home" style="display: inline-block; padding: 15px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 0 10px;">
-            🏠 Back to Home
-        </a>
+            <a href="/Home" style="display: inline-block; padding: 15px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 0 10px;">
+                🏠 Back to Home
+            </a>
         }
     </div>
 
-  
+
     <div id="ratingModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
         <div class="modal-content" style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px;">
             <div class="modal-header" style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 20px;">
                 <h3 id="ratingModalTitle" style="margin: 0; color: #495057;">Rate Your Experience</h3>
                 <span class="close" onclick="closeRatingModal()" style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
             </div>
-            
+
             <div class="modal-body">
                 <p id="ratingModalMessage" style="margin-bottom: 20px; color: #6c757d;">Please rate your experience with this ride.</p>
-                
+
                 <div class="rating-stars" style="text-align: center;">
                     <span class="star" data-rating="1">★</span>
                     <span class="star" data-rating="2">★</span>
@@ -353,11 +443,11 @@
                     <span class="star" data-rating="4">★</span>
                     <span class="star" data-rating="5">★</span>
                 </div>
-                
+
                 <div id="selectedRating" style="text-align: center; margin-bottom: 20px;">
                     <span style="font-size: 18px; color: #6c757d;">Select a rating</span>
                 </div>
-                
+
                 <div class="modal-actions" style="text-align: center;">
                     <button id="submitRatingBtn" onclick="submitRating()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; margin-right: 10px;" disabled>
                         Submit Rating
@@ -392,45 +482,114 @@
     let ratingTarget = ''; // 'user' or 'driver'
     let currentRideId = @Model.Id;
 
+    // Toast notification system
+    function showToast(type = 'info', title = '', message = '', duration = 5000) {
+        const container = document.getElementById('toastContainer');
+
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+
+        // Choose icon based on type
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+
+        toast.innerHTML = `
+            <div class="toast-icon">${icons[type] || icons.info}</div>
+            <div class="toast-content">
+                ${title ? `<div class="toast-title">${title}</div>` : ''}
+                <div class="toast-message">${message}</div>
+            </div>
+            <button class="toast-close" onclick="closeToast(this.parentElement)">×</button>
+        `;
+
+        // Add to container
+        container.appendChild(toast);
+
+        // Trigger animation
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        // Auto-remove after duration
+        if (duration > 0) {
+            setTimeout(() => {
+                closeToast(toast);
+            }, duration);
+        }
+
+        return toast;
+    }
+
+    function closeToast(toast) {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentElement) {
+                toast.parentElement.removeChild(toast);
+            }
+        }, 300);
+    }
+
+    // Enhanced versions for specific ride events
+    function showRideSuccessToast(title, message) {
+        return showToast('success', title, message, 4000);
+    }
+
+    function showRideErrorToast(title, message) {
+        return showToast('error', title, message, 6000);
+    }
+
+    function showRideInfoToast(title, message) {
+        return showToast('info', title, message, 5000);
+    }
+
+    function showRideWarningToast(title, message) {
+        return showToast('warning', title, message, 5000);
+    }
+
     function initializeMap() {
              if (window.mapInitialized) {
                  return;
              }
-        
-       
+
+
         if (typeof L === 'undefined') {
             console.error('Leaflet library not loaded!');
             return;
         }
-        
-      
+
+
         const startLat = @Model.StartLat;
         const startLng = @Model.StartLng;
         const endLat = @Model.EndLat;
         const endLng = @Model.EndLng;
-        
-      
+
+
         if (isNaN(startLat) || isNaN(startLng) || isNaN(endLat) || isNaN(endLng)) {
             console.error('Invalid coordinates detected, using fallback coordinates');
-          
+
             const fallbackStartLat = 40.7128;
             const fallbackStartLng = -74.0060;
             const fallbackEndLat = 40.7589;
             const fallbackEndLng = -73.9851;
-            
+
             initializeMapWithCoordinates(fallbackStartLat, fallbackStartLng, fallbackEndLat, fallbackEndLng);
             return;
         }
-        
+
         initializeMapWithCoordinates(startLat, startLng, endLat, endLng);
     }
-    
+
     function initializeMapWithCoordinates(startLat, startLng, endLat, endLng) {
         try {
-            
+
             const centerLat = (startLat + endLat) / 2;
             const centerLng = (startLng + endLng) / 2;
-            
+
             map = L.map('rideMap').setView([centerLat, centerLng], 13);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -438,7 +597,7 @@
                 attribution: '© OpenStreetMap contributors'
             }).addTo(map);
 
-            
+
             pickupMarker = L.marker([startLat, startLng], {
                 icon: L.icon({
                     iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
@@ -453,17 +612,17 @@
                 })
             }).addTo(map).bindPopup("🎯 Destination").openPopup();
 
-           
+
             drawRouteWithCoordinates(startLat, startLng, endLat, endLng);
-             
-            
+
+
              window.mapInitialized = true;
         } catch (error) {
             console.error('Error initializing map:', error);
         }
     }
 
-    
+
     async function drawRouteWithCoordinates(startLat, startLng, endLat, endLng) {
         try {
             const start = [startLat, startLng];
@@ -509,16 +668,16 @@
          async function joinDriverGroupIfNeeded() {
              @if (isDriver)
              {
-                 <text>
-                 const driverId = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
-                 if (driverId && driverId !== '') {
-                     try {
-                         await connection.invoke("JoinDriverGroup", driverId);
-                     } catch (err) {
-                         console.error("Failed to join driver group:", err);
-                     }
-                 }
-                 </text>
+                         <text>
+                         const driverId = '@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value';
+                         if (driverId && driverId !== '') {
+                             try {
+                                 await connection.invoke("JoinDriverGroup", driverId);
+                             } catch (err) {
+                                 console.error("Failed to join driver group:", err);
+                             }
+                         }
+                         </text>
         }
     }
 
@@ -526,7 +685,7 @@
     async function initializeConnection() {
         try {
             connection = new signalR.HubConnectionBuilder()
-                .withUrl("/rideHub", { 
+                .withUrl("/rideHub", {
                     skipNegotiation: true,
                     transport: signalR.HttpTransportType.WebSockets
                 })
@@ -535,30 +694,30 @@
 
             // Join the ride group for updates
             await connection.start();
-                 
+
                  // Join the ride group
             await connection.invoke("JoinRideGroup", "ride-@Model.Id");
- 
+
                  // Join driver group if user is a driver
                  await joinDriverGroupIfNeeded();
-                 
+
                  isConnected = true;
                  updateSignalRStatus("Connected", "#28a745");
-                 
+
                  // Set up SignalR event listeners
                  setupSignalRListeners();
-                 
+
                  // Add connection state monitoring
                  connection.onclose(async (error) => {
                      isConnected = false;
                      updateSignalRStatus("Disconnected", "#dc3545");
-                     
+
                      // Try to reconnect after a delay
                      setTimeout(async () => {
                          await initializeConnection();
                      }, 3000);
                  });
-                 
+
                  // Add periodic connection health check
                  setInterval(async () => {
                      if (connection && connection.state === signalR.HubConnectionState.Connected) {
@@ -574,12 +733,12 @@
                          }
                      }
                  }, 10000); // Check every 10 seconds
-                 
+
                  connection.onreconnecting((error) => {
                      isConnected = false;
                      updateSignalRStatus("Reconnecting...", "#ffc107");
                  });
-                 
+
                  connection.onreconnected((connectionId) => {
             isConnected = true;
                      updateSignalRStatus("Connected", "#28a745");
@@ -591,7 +750,7 @@
                  updateSignalRStatus("Error", "#dc3545");
              }
          }
-    
+
          // Function to update SignalR status display
      function updateSignalRStatus(status, color) {
          const statusElement = document.getElementById('signalRStatus');
@@ -601,14 +760,14 @@
              statusElement.style.color = 'white';
          }
      }
-     
+
               // Function to set up SignalR event listeners
          function setupSignalRListeners() {
              // Prevent duplicate event listeners
              if (window.signalRListenersSet) {
                  return;
              }
-             
+
              // Listen for real-time ride updates
 
               // Event listener for driver workflow
@@ -617,9 +776,9 @@
                       // Update UI to show driver arrived
                       updateRideStatusDisplay("DriverWaiting");
                       updateButtonVisibility("DriverWaiting");
-                      
+
                       // Show success message
-                      alert("Driver has arrived at pickup location!");
+                      showRideInfoToast('Driver Arrived', 'Driver has arrived at pickup location!');
                   }
               });
 
@@ -629,9 +788,9 @@
                       // Update UI to show ride started
                       updateRideStatusDisplay("InProgress");
                       updateButtonVisibility("InProgress");
-                      
+
                       // Show success message
-                      alert("Ride has started!");
+                      showRideSuccessToast('Ride Started', 'Your ride is now in progress!');
                   }
               });
 
@@ -639,10 +798,10 @@
               connection.on("RideCompleted", function (rideId) {
                   if (rideId == @Model.Id) {
                       console.log('RideCompleted SignalR event received for ride:', rideId);
-                      
+
                       // Update UI to show ride completed
                       updateRideStatusDisplay("Completed");
-                      
+
                       // Show rating modal only for drivers to rate users
                       if (@isDriver.ToString().ToLower()) {
                           showRatingModal('user', 'Please rate your passenger for this ride.');
@@ -656,12 +815,12 @@
                       // Update ride status display immediately
                       updateRideStatusDisplay("Cancelled");
                       updateButtonVisibility("Cancelled");
-                      
+
                       // Show the Back to Home button
                       showBackToHomeButton();
-                      
+
                       // Show cancellation message
-                      alert("Ride has been cancelled.");
+                      showRideWarningToast('Ride Cancelled', 'This ride has been cancelled.');
                   }
               });
 
@@ -669,8 +828,8 @@
              connection.on("UserRated", function (rideId, rating) {
                  if (rideId == @Model.Id) {
                      // Show success message for user rating
-                     alert(`User has been rated ${rating} star${rating > 1 ? 's' : ''}!`);
-                     
+                     showRideSuccessToast('Rating Submitted', `User has been rated ${rating} star${rating > 1 ? 's' : ''}!`);
+
                      // Show rating modal for user to rate driver (only if user hasn't rated yet)
                      if (!@isDriver.ToString().ToLower()) {
                          showRatingModal('driver', 'Please rate your driver for this ride.');
@@ -681,8 +840,8 @@
              connection.on("DriverRated", function (rideId, rating) {
                  if (rideId == @Model.Id) {
                      // Show success message for driver rating
-                     alert(`Driver has been rated ${rating} star${rating > 1 ? 's' : ''}!`);
-                     
+                     showRideSuccessToast('Rating Submitted', `Driver has been rated ${rating} star${rating > 1 ? 's' : ''}!`);
+
                      // Check if both parties have rated (only if user hasn't rated yet)
                      if (!@isDriver.ToString().ToLower()) {
                          checkBothRated();
@@ -699,7 +858,7 @@
         if (confirm("Are you sure you want to start the ride?")) {
             try {
                 console.log('Start ride called for ride:', currentRideId);
-                
+
                 const response = await fetch('/Ride/StartRide', {
                     method: 'POST',
                     headers: {
@@ -713,20 +872,21 @@
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Start ride success:', data);
-                    
+
                     // Update ride status display immediately
                     updateRideStatusDisplay("InProgress");
-                    
+
                     // Show success message
-                    alert(data.message);
+                    showRideSuccessToast('Ride Started', data.message);
+                    closeRatingModal();
                 } else {
                     const errorData = await response.json();
                     console.error('Start ride error:', errorData);
-                    alert("Error starting ride: " + (errorData.message || "Unknown error"));
+                    showRideErrorToast('Start Ride Failed', errorData.message || 'Unknown error');
                 }
             } catch (err) {
                 console.error("Start ride error:", err);
-                alert("Error starting ride. Please try again.");
+                showRideErrorToast('Connection Error', 'Error starting ride. Please try again.');
             }
         }
     }
@@ -735,7 +895,7 @@
         if (confirm("Are you sure you want to complete the ride?")) {
             try {
                 console.log('Complete ride called for ride:', currentRideId);
-                
+
                 const response = await fetch('/Ride/CompleteRide', {
                     method: 'POST',
                     headers: {
@@ -749,10 +909,10 @@
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Complete ride success:', data);
-                    
+
                     // Update ride status display immediately
                     updateRideStatusDisplay("Completed");
-                    
+
                     // Show rating modal for driver to rate user
                     if (@isDriver.ToString().ToLower()) {
                         showRatingModal('user', 'Please rate your passenger for this ride.');
@@ -760,11 +920,11 @@
                 } else {
                     const errorData = await response.json();
                     console.error('Complete ride error:', errorData);
-                    alert("Error completing ride: " + (errorData.message || "Unknown error"));
+                    showRideErrorToast('Complete Ride Failed', errorData.message || 'Unknown error');
                 }
             } catch (err) {
                 console.error("Complete ride error:", err);
-                alert("Error completing ride. Please try again.");
+                showRideErrorToast('Connection Error', 'Error completing ride. Please try again.');
             }
         }
     }
@@ -778,43 +938,43 @@
                                  // Ensure SignalR connection is ready
                  if (!connection || !isConnected) {
                      await initializeConnection();
-                     
+
                      // Wait a bit for connection to stabilize
                      await new Promise(resolve => setTimeout(resolve, 1000));
                  }
-                 
+
                  const response = await fetch('/Ride/CancelRide', {
                      method: 'POST',
                      headers: {
                          'Content-Type': 'application/json',
                      },
-                     body: JSON.stringify({ 
-                         id: @Model.Id, 
-                         rideGroup: 'ride-@Model.Id' 
+                     body: JSON.stringify({
+                         id: @Model.Id,
+                         rideGroup: 'ride-@Model.Id'
                      })
                  });
 
                  if (response.ok) {
                      const data = await response.json();
-                     
+
                      // Hide the cancel button immediately
                      const cancelBtn = document.getElementById('cancelRideBtn');
                      if (cancelBtn) {
                          cancelBtn.style.display = 'none';
                      }
-                     
+
                      // Update ride status display immediately
                      updateRideStatusDisplay("Cancelled");
-                     
+
                      // Show success message
-                     alert(data.message);
+                     showRideSuccessToast('Ride Cancelled', data.message);
                  } else {
                      const errorData = await response.json();
-                     alert("Error cancelling ride: " + (errorData.message || "Unknown error"));
+                     showRideErrorToast('Cancel Failed', errorData.message || 'Unknown error');
                  }
             } catch (err) {
                 console.error("Error:", err);
-                alert("Error cancelling ride. Please try again.");
+                showRideErrorToast('Connection Error', 'Error cancelling ride. Please try again.');
             }
         }
     }
@@ -823,17 +983,17 @@
     // Function to update ride status display
     function updateRideStatusDisplay(status) {
         console.log('updateRideStatusDisplay called with status:', status);
-        
+
         // Check if this status has already been displayed for this ride
         const statusKey = `statusDisplayed_${currentRideId}_${status}`;
         if (window[statusKey]) {
             console.log(`Status ${status} already displayed for this ride, skipping...`);
             return;
         }
-        
+
         const statusInfo = document.querySelector('.ride-status-info');
         const statusBadge = document.getElementById('statusBadge');
-        
+
         if (statusInfo) {
             if (status === "Cancelled") {
                 // Update the status info section
@@ -887,7 +1047,7 @@
                 statusInfo.style.borderLeftColor = '#dc3545';
             }
         }
-        
+
         if (statusBadge) {
             if (status === "Cancelled") {
                 statusBadge.textContent = "Cancelled";
@@ -912,12 +1072,12 @@
                 statusBadge.style.backgroundColor = "#dc3545";
             }
         }
-        
-        
+
+
         if (status === "Cancelled" || status === "Completed") {
             showBackToHomeButton();
         }
-        
+
         const buttonVisibilityKey = `buttonVisibilityUpdated_${currentRideId}_${status}`;
         if (!window[buttonVisibilityKey]) {
             updateButtonVisibility(status);
@@ -926,29 +1086,29 @@
         } else {
             console.log(`Button visibility already updated for status: ${status}, skipping...`);
         }
-        
+
         if (status === "Completed") {
             showRidePrice();
         }
-        
+
         window[statusKey] = true;
         console.log(`Status ${status} displayed and marked as shown for this ride`);
     }
-    
+
     function initializeButtons(status) {
         console.log('initializeButtons called with status:', status);
-        
+
         const arrivedBtn = document.getElementById('arrivedAtPickupBtn');
         const startBtn = document.getElementById('startRideBtn');
         const completeBtn = document.getElementById('completeRideBtn');
-        
+
         if (arrivedBtn && startBtn && completeBtn) {
             console.log('User is driver, initializing buttons for status:', status);
-            
+
             arrivedBtn.style.display = 'none';
             startBtn.style.display = 'none';
             completeBtn.style.display = 'none';
-            
+
             switch (status) {
                 case "Accepted":
                     arrivedBtn.style.display = 'inline-block';
@@ -970,26 +1130,26 @@
             console.log('User is not driver or buttons not found');
         }
     }
-    
+
     function updateButtonVisibility(status) {
         console.log('updateButtonVisibility called with status:', status);
-        
+
         const arrivedBtn = document.getElementById('arrivedAtPickupBtn');
         const startBtn = document.getElementById('startRideBtn');
         const completeBtn = document.getElementById('completeRideBtn');
         const cancelBtn = document.getElementById('cancelRideBtn');
-        
-        console.log('Button elements found:', { 
-            arrivedBtn: !!arrivedBtn, 
-            startBtn: !!startBtn, 
-            completeBtn: !!completeBtn, 
-            cancelBtn: !!cancelBtn 
+
+        console.log('Button elements found:', {
+            arrivedBtn: !!arrivedBtn,
+            startBtn: !!startBtn,
+            completeBtn: !!completeBtn,
+            cancelBtn: !!cancelBtn
         });
-        
+
         if (arrivedBtn) arrivedBtn.style.display = 'none';
         if (startBtn) startBtn.style.display = 'none';
         if (completeBtn) completeBtn.style.display = 'none';
-        
+
         if (arrivedBtn && startBtn && completeBtn) { // Check if user is driver
             switch (status) {
                 case "Accepted":
@@ -1006,20 +1166,20 @@
                     break;
             }
         }
-        
+
         if (cancelBtn && (status === "Completed" || status === "Cancelled")) {
             cancelBtn.style.display = 'none';
         }
-        
+
         console.log('Button visibility updated for status:', status);
     }
-    
+
     function showBackToHomeButton() {
         if (window.backToHomeShown) {
             console.log('Back to home button already shown, skipping...');
             return;
         }
-        
+
         let backButton = document.querySelector('.back-to-home-btn');
         if (!backButton) {
 
@@ -1028,39 +1188,39 @@
             backButton.className = 'back-to-home-btn';
             backButton.style.cssText = 'display: inline-block; padding: 15px 30px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 8px; font-size: 16px; margin: 0 10px;';
             backButton.innerHTML = '🏠 Back to Home';
-            
+
             const actionButtonsDiv = document.querySelector('.action-buttons');
             if (actionButtonsDiv) {
                 actionButtonsDiv.appendChild(backButton);
             }
         }
-        
+
         window.backToHomeShown = true;
         console.log('Back to home button displayed and marked as shown');
     }
-    
+
     function showRidePrice() {
         if (window.ridePriceShown) {
             console.log('Ride price already shown, skipping...');
             return;
         }
-        
+
         const existingPrice = document.getElementById('completedRidePrice');
         if (existingPrice) {
             existingPrice.remove();
         }
-        
+
         const price = document.getElementById('price').textContent;
         const priceDisplay = document.createElement('div');
         priceDisplay.id = 'completedRidePrice';
         priceDisplay.style.cssText = 'background-color: #28a745; color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0; font-size: 18px; font-weight: bold;';
         priceDisplay.innerHTML = `🎉 Ride Completed! Total Price: ${price}`;
-        
+
         const actionButtonsDiv = document.querySelector('.action-buttons');
         if (actionButtonsDiv) {
             actionButtonsDiv.parentNode.insertBefore(priceDisplay, actionButtonsDiv);
         }
-        
+
         window.ridePriceShown = true;
         console.log('Ride price displayed and marked as shown');
     }
@@ -1071,22 +1231,22 @@
             console.log(`Rating modal already shown for ${target}, skipping...`);
             return;
         }
-        
+
         ratingTarget = target;
         currentRating = 0;
-        
+
         document.getElementById('ratingModalTitle').textContent = `Rate ${target === 'user' ? 'Passenger' : 'Driver'}`;
         document.getElementById('ratingModalMessage').textContent = message;
         document.getElementById('selectedRating').innerHTML = '<span style="font-size: 18px; color: #6c757d;">Select a rating</span>';
         document.getElementById('submitRatingBtn').disabled = true;
-        
+
         // Reset star colors
         document.querySelectorAll('.star').forEach(star => {
             star.style.color = '#ddd';
         });
-        
+
         document.getElementById('ratingModal').style.display = 'block';
-        
+
         // Mark that rating modal has been shown for this target
         window[ratingKey] = true;
         console.log(`Rating modal displayed for ${target} and marked as shown`);
@@ -1100,7 +1260,7 @@
 
     function selectRating(rating) {
         currentRating = rating;
-        
+
         // Update star colors
         document.querySelectorAll('.star').forEach((star, index) => {
             if (index < rating) {
@@ -1109,7 +1269,7 @@
                 star.style.color = '#ddd';
             }
         });
-        
+
         // Update selected rating text
         document.getElementById('selectedRating').innerHTML = `<span style="font-size: 18px; color: #28a745;">${rating} star${rating > 1 ? 's' : ''} selected</span>`;
         document.getElementById('submitRatingBtn').disabled = false;
@@ -1117,19 +1277,19 @@
 
     async function submitRating() {
         if (currentRating === 0 || !ratingTarget) {
-            alert('Please select a rating');
+            showRideWarningToast('Rating Required', 'Please select a rating before submitting.');
             return;
         }
 
         try {
             const endpoint = ratingTarget === 'user' ? '/Ride/AddUserRating' : '/Ride/AddDriverRating';
-            const requestBody = { 
-                RideId: currentRideId, 
-                Rating: currentRating 
+            const requestBody = {
+                RideId: currentRideId,
+                Rating: currentRating
             };
-            
+
             console.log('Submitting rating:', { endpoint, requestBody, currentRideId, currentRating, ratingTarget });
-            
+
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
@@ -1143,12 +1303,12 @@
             if (response.ok) {
                 const data = await response.json();
                 console.log('Rating success:', data);
-                alert(data.message);
+                showRideSuccessToast('Rating Submitted', data.message);
                 closeRatingModal();
-                
+
                 // Mark this user as rated
                 markUserAsRated();
-                
+
                 // Check if both parties have rated
                 checkBothRated();
             } else {
@@ -1166,11 +1326,11 @@
                         console.error('Could not read error response:', textError);
                     }
                 }
-                alert("Error submitting rating: " + errorMessage);
+                showRideErrorToast('Rating Failed', errorMessage);
             }
         } catch (err) {
             console.error("Rating submission error:", err);
-            alert("Error submitting rating. Please try again.");
+            showRideErrorToast('Connection Error', 'Error submitting rating. Please try again.');
         }
     }
 
@@ -1178,7 +1338,7 @@
         if (confirm("Are you sure you have arrived at the pickup location?")) {
             try {
                 console.log('Driver arrived called for ride:', currentRideId);
-                
+
                 const response = await fetch('/Ride/DriverArrived', {
                     method: 'POST',
                     headers: {
@@ -1192,20 +1352,20 @@
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Driver arrived success:', data);
-                    
+
                     // Update ride status display immediately
                     updateRideStatusDisplay("DriverWaiting");
-                    
+
                     // Show success message
-                    alert(data.message);
+                    showRideSuccessToast('Driver Arrived', data.message);
                 } else {
                     const errorData = await response.json();
                     console.error('Driver arrived error:', errorData);
-                    alert("Error updating ride status: " + (errorData.message || "Unknown error"));
+                    showRideErrorToast('Update Failed', errorData.message || 'Unknown error');
                 }
             } catch (err) {
                 console.error("Driver arrived error:", err);
-                alert("Error updating ride status. Please try again.");
+                showRideErrorToast('Connection Error', 'Error updating ride status. Please try again.');
             }
         }
     }
@@ -1214,12 +1374,12 @@
     function hasUserRated() {
         return localStorage.getItem(`rated_${currentRideId}_${ratingTarget}`) === 'true';
     }
-    
+
     // Function to mark user as rated
     function markUserAsRated() {
         localStorage.setItem(`rated_${currentRideId}_${ratingTarget}`, 'true');
     }
-    
+
     // Function to check if both parties have rated
     function checkBothRated() {
         // Check if this function has already been called for this ride
@@ -1228,22 +1388,22 @@
             console.log('checkBothRated already called for this ride, skipping...');
             return;
         }
-        
+
         const driverRated = localStorage.getItem(`rated_${currentRideId}_user`) === 'true';
         const userRated = localStorage.getItem(`rated_${currentRideId}_driver`) === 'true';
-        
+
         console.log(`Checking ratings - Driver rated: ${driverRated}, User rated: ${userRated}`);
-        
+
         if (driverRated && userRated) {
             console.log('Both parties have rated, showing back to home button');
             showBackToHomeButton();
         }
-        
+
         // Mark that this function has been called for this ride
         window[checkKey] = true;
         console.log('checkBothRated marked as called for this ride');
     }
-    
+
     // SignalR event listeners are now set up in setupSignalRListeners() function
     // which is called after the connection is established
 
@@ -1253,25 +1413,25 @@
          localStorage.removeItem(`rated_${@Model.Id}_user`);
          localStorage.removeItem(`rated_${@Model.Id}_driver`);
 
-         
+
          // Check if ride is already cancelled and update UI accordingly
          const currentStatus = '@Model.Status.ToString()';
          console.log('Page loaded with ride status:', currentStatus);
-         
+
          // Check if we're in the middle of a rating process
          const driverRated = localStorage.getItem(`rated_${@Model.Id}_user`) === 'true';
          const userRated = localStorage.getItem(`rated_${@Model.Id}_driver`) === 'true';
          if (currentStatus === 'Cancelled') {
              updateRideStatusDisplay("Cancelled");
-             
+
              // Show the Back to Home button if ride is already cancelled
              showBackToHomeButton();
          } else if (currentStatus === 'Completed') {
              updateRideStatusDisplay("Completed");
-             
+
              // Show the Back to Home button
              showBackToHomeButton();
-             
+
              // Show rating modal if user hasn't rated yet
              if (!@isDriver) {
                  // User should rate the driver first
@@ -1294,7 +1454,7 @@
              // For other statuses, update button visibility automatically
              updateRideStatusDisplay(currentStatus);
          }
-         
+
          // Always update button visibility for initial state (only if not already updated)
          const initialButtonVisibilityKey = `buttonVisibilityUpdated_${@Model.Id}_${currentStatus}`;
          if (!window[initialButtonVisibilityKey]) {
@@ -1304,7 +1464,7 @@
          } else {
              console.log(`Initial button visibility already updated for status: ${currentStatus}, skipping...`);
          }
-         
+
          // Initialize buttons based on current status (only if not already initialized)
          const initializeButtonsKey = `buttonsInitialized_${@Model.Id}_${currentStatus}`;
          if (!window[initializeButtonsKey]) {
@@ -1314,10 +1474,10 @@
          } else {
              console.log(`Buttons already initialized for status: ${currentStatus}, skipping...`);
          }
-         
+
          // Initialize SignalR status
          updateSignalRStatus("Initializing...", "#6c757d");
-         
+
          // AUTO-CONNECT SIGNALR IMMEDIATELY
          try {
              await initializeConnection();
@@ -1332,21 +1492,21 @@
                  }
              }, 2000);
          }
-         
+
          // Add event listeners for rating stars
          document.querySelectorAll('.star').forEach(star => {
              star.addEventListener('click', function() {
                  selectRating(parseInt(this.dataset.rating));
              });
          });
-         
+
                             const mapContainer = document.getElementById('rideMap');
-        
+
         // Check if container has proper dimensions
         if (mapContainer && (mapContainer.offsetWidth === 0 || mapContainer.offsetHeight === 0)) {
             console.warn('Map container has zero dimensions, this might cause the map not to appear');
         }
-        
+
         // Try immediate initialization first
          if (typeof L !== 'undefined' && mapContainer && mapContainer.offsetWidth > 0 && mapContainer.offsetHeight > 0 && !window.mapInitialized) {
             try {
@@ -1356,13 +1516,13 @@
                      // Fall back to retry logic
                  }
          }
-         
+
          // Start automatic map initialization with retry logic (only if not already initialized)
          if (!window.mapInitialized) {
              autoInitializeMap();
          }
     });
-    
+
     // Also try to initialize when window is fully loaded (backup)
          window.addEventListener('load', async function() {
              // Ensure SignalR is connected
@@ -1373,27 +1533,27 @@
                      console.error('Failed to connect SignalR on window load:', error);
                  }
              }
-             
+
              // Only initialize map if it hasn't been initialized yet
              if (!map && !window.mapInitialized) {
             autoInitializeMap();
         }
     });
-    
+
     // Automatic map initialization with retry logic
          async function autoInitializeMap() {
              // Prevent multiple auto-initialization calls
              if (window.autoInitInProgress) {
                  return;
              }
-             
+
              // Prevent if map is already initialized
              if (window.mapInitialized) {
                  return;
              }
-             
+
              window.autoInitInProgress = true;
-        
+
         // Check if Leaflet is loaded
         if (typeof L === 'undefined') {
             // Retry after a short delay
@@ -1403,7 +1563,7 @@
                  }, 200);
             return;
         }
-        
+
         // Check if map container is ready
         const mapContainer = document.getElementById('rideMap');
         if (!mapContainer || mapContainer.offsetWidth === 0 || mapContainer.offsetHeight === 0) {
@@ -1414,13 +1574,13 @@
                  }, 200);
             return;
         }
-        
+
         try {
             // Initialize the map
             initializeMap();
         } catch (error) {
                  console.error('Error during automatic map initialization:', error);
-            
+
             // Retry after a longer delay
                  setTimeout(() => {
                      window.autoInitInProgress = false;
@@ -1431,5 +1591,5 @@
              }
          }
 
-    
+
 </script>

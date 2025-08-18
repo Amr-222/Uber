@@ -160,7 +160,7 @@
         console.log('Displaying ride request:', ride);
         const container = document.getElementById("rideRequests");
         container.innerHTML = "";
-        if (ride.id != 0 && ride.id != null) {
+
         const rideDiv = document.createElement("div");
         rideDiv.className = "ride-request";
         rideDiv.style.cssText = "border: 2px solid #007bff; border-radius: 8px; padding: 20px; margin: 15px; background-color: #f8f9fa; box-shadow: 0 2px 4px rgba(0,0,0,0.1);";
@@ -171,34 +171,24 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #007bff;">
                         <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">📏 Distance</p>
-                        <p style="margin: 0; font-size: 18px; color: #007bff;">
-                            ${(ride.distance && ride.distance > 0) ? ride.distance.toFixed(1) + ' km' : 'N/A'}
-                        </p>
+                        <p style="margin: 0; font-size: 18px; color: #007bff;">${(ride.distance && ride.distance > 0) ? ride.distance.toFixed(1) + ' km' : 'N/A'}</p>
                     </div>
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #28a745;">
                         <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">⏱ Duration</p>
-                        <p style="margin: 0; font-size: 18px; color: #28a745;">
-                            ${(ride.duration && ride.duration > 0) ? Math.round(ride.duration) + ' min' : 'N/A'}
-                        </p>
+                        <p style="margin: 0; font-size: 18px; color: #28a745;">${(ride.duration && ride.duration > 0) ? Math.round(ride.duration) + ' min' : 'N/A'}</p>
                     </div>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #ffc107;">
                         <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">💰 Price</p>
-                        <p style="margin: 0; font-size: 18px; color: #ffc107;">
-                            ${(ride.price && ride.price > 0) ? '£' + ride.price.toFixed(2) : 'N/A'}
-                        </p>
+                        <p style="margin: 0; font-size: 18px; color: #ffc107;">${(ride.price && ride.price > 0) ? '£' + ride.price.toFixed(2) : 'N/A'}</p>
                     </div>
                     <div style="background-color: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #6f42c1;">
                         <p style="margin: 0 0 5px 0; font-weight: bold; color: #495057;">⭐ User Rating</p>
-                        <p style="margin: 0; font-size: 18px; color: #6f42c1;">
-                            ${(ride.userRating && ride.userRating > 0) ? ride.userRating + '/5' : 'N/A'}
-                        </p>
+                        <p style="margin: 0; font-size: 18px; color: #6f42c1;">${(ride.userRating && ride.userRating > 0) ? ride.userRating + '/5' : 'N/A'}</p>
                     </div>
                 </div>
-                <p style="margin: 0; font-size: 14px; color: #6c757d;">
-                    <strong>Ride ID:</strong> ${ride.rideId}
-                </p>
+                <p style="margin: 0; font-size: 14px; color: #6c757d;"><strong>Ride ID:</strong> ${ride.rideId}</p>
             </div>
             <div style="display: flex; gap: 10px;">
                 <button onclick="acceptRide('${ride.rideId}', '${ride.rideGroup}')"
@@ -211,10 +201,7 @@
                 </button>
             </div>
         `;
-
-
         container.appendChild(rideDiv);
-        }
     }
     async function acceptRide(rideId, rideGroup) {
         try {
